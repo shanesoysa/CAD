@@ -1,0 +1,93 @@
+
+{% extends 'base.html' %}
+{% block content %}
+
+
+<p class="m-3">Simple demo of <a href="https://github.com/maykinmedia/dual-listbox">https://github.com/maykinmedia/dual-listbox</a></p>
+<div class="m-3">
+  <select id="demo" multiple>
+    <option value="1">One</option>
+    <option value="2">Two</option>
+    <option value="3">Three</option>
+    <option value="4">Four</option>
+    <option value="5">Five</option>
+    <option value="6">Six</option>
+    <option value="7">Seven</option>
+    <option value="8">Eight</option>
+    <option value="9">Nine</option>
+    <option value="10">Ten</option>
+  </select>
+</div>
+
+
+    <div class="container py-5">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <form>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label for="inputFirstname">First name</label>
+                        <input type="text" class="form-control" id="inputFirstname" placeholder="First name">
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="inputLastname">Last name</label>
+                        <input type="text" class="form-control" id="inputLastname" placeholder="Last name">
+                    </div>
+                </div>
+                <div class="md-form md-outline">
+                    <input type="time" id="default-picker" class="form-control" placeholder="Select time">
+                    <label for="default-picker">Default Time Picker</label>
+                  </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label for="inputAddressLine1">Address</label>
+                        <input type="text" class="form-control" id="inputAddressLine1" placeholder="Street Address">
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="inputAddressLine2">Address (Line 2)</label>
+                        <input type="text" class="form-control" id="inputAddressLine2" placeholder="Line 2">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label for="inputCity">City</label>
+                        <input type="text" class="form-control" id="inputCity" placeholder="City">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="inputState">State</label>
+                        <input type="text" class="form-control" id="inputState" placeholder="State">
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="inputPostalCode">Postal Code</label>
+                        <input type="text" class="form-control" id="inputPostalCode" placeholder="Postal Code">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <label for="inputContactNumber">Contact Number</label>
+                        <input type="number" class="form-control" id="inputContactNumber" placeholder="Contact Number">
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="inputWebsite">Website</label>
+                        <input type="text" class="form-control" id="inputWebsite" placeholder="Website">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary px-4 float-right">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+    let dualListbox = new DualListbox('#demo', {
+        addButtonText: '>',
+        removeButtonText: '<',
+        addAllButtonText: '>>',
+        removeAllButtonText: '<<',
+    });
+</script>
+{% endblock %}
