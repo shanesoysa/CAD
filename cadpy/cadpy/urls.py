@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from timetable import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('',  views.Lecturer.as_view(), name='lecturer'),
+    path('addlec/',  views.AddLecturer.as_view(), name='lecturer_create'),
+    path('updatelec/',  views.UpdateLecturer.as_view(), name='lecturer_update'),
+    path('deletelec/', views.DeleteLecturer.as_view(), name='lecturer_delete'),
+
 ]
