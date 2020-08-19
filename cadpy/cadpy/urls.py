@@ -24,4 +24,7 @@ urlpatterns = [
     path('updatelec/',  views.UpdateLecturer.as_view(), name='lecturer_update'),
     path('deletelec/', views.DeleteLecturer.as_view(), name='lecturer_delete'),
 
+    path('programmes/', views.ProgrammesView.as_view() , name='programmes'),
+    path('programmes/add', views.AddProgramme.as_view() , name='add_programmes'),
+
 ]

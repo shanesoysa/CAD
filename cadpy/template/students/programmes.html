@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Programmes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow-sm mb-4 bg-white rounded">
+        <div class="card-header bg-light text-info">
+            <h3>Programmes </h3>
+        </div>
+
+        <div class="card-body bg-light">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <form method="POST" action="" class="form-inline" id="addProgramme">
+                
+                    <div class="form-group m-4">
+                        <label class="text-black font-weight-bold" for="programmeId">Programme </label>
+                        <input type="text" class="form-control m-3" id="programmeId" name="programme" />
+                    </div>
+                   
+                    <div class="form-group m-4">
+                        <label class="font-weight-bold" for="abbreviationId">Abbreviation </label>
+                        <input type="text" class="form-control m-3" id="abbreviationId" name="abbreviation"/>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <div class="form-group m-4">
+                            <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Add  " />
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+
+
+                <table class="table" id="programmeTable">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Programme</th>
+                        <th scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for programme in programme_list %}
+                      <tr>
+                        <th scope="row">{{ programme.programme_abbv }}</th>
+                        <td>{{programme.programme_name}}</td>
+                        <td><pre><i class="fas fa-pencil-alt"></i>  <i class="far fa-trash-alt" style="color:purple;"></i></h5></pre></td>
+                      </tr>
+                    {% endfor %}  
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+
+$("form#addProgramme").submit(function() {
+
+    var programme = $('input[name="programme"]').val();
+    var abbreviation = $('input[name="abbreviation"]').val().trim();
+   
+
+    if (programme && abbreviation) {
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "add_programmes" %}',
+            data: {
+            'programme_name':programme,
+            'programme_abbv':abbreviation
+            },
+            dataType: 'json',
+            success: function (data) {
+            
+                console.log(data.programme);
+
+                if (data.programme) {
+                appendToUsrTable(data.programme);
+                alert("'Data Added'")
+                
+                }
+                
+            }
+        });
+    } else {
+        alert("All fields must have a valid value.");
+    }
+    $('form#addProgramme').trigger("reset");
+    return false;
+});
+
+function appendToUsrTable(programme) {
+    $("#programmeTable > tbody:last-child").append(`
+          <tr id="user-${programme.id}">
+            <th scope="row">${ programme.programme_abbv }</th>
+              '<td>${programme.programme_name}</td>
+              '<td><pre><i class="fas fa-pencil-alt"></i>  <i class="far fa-trash-alt" style="color:purple;"></i></h5></pre></td>
+          </tr>
+      `);
+  }
+
+
+
+</script>
+{% endblock javascript %}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+        <!--Font awesome icons-->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <title>Some</title>
+    </head>
+    <body>
+       
+        <div class="container-fluid">
+            <div class="card shadow-sm mb-4 bg-white rounded">
+                <div class="card-header bg-light text-info">
+                    <h3>Tags </h3>
+                </div>
+
+                <div class="card-body bg-light">
+                    <div class="card shadow p-3 mb-5 bg-white rounded">
+                        <form method="POST" action="" class="form-inline">
+                        
+                            <div class="form-group m-4">
+                                <label class="text-black font-weight-bold" for="labelId">Label </label>
+                                <input type="text" class="form-control m-3" id="labelId" name="tagLabel" />
+                            </div>
+                           
+                            <div class="form-group m-4">
+                                <label class="font-weight-bold" for="nColorId">Color </label>
+                                <input type="color" class="form-control m-3" id="nColorId" name="nColor" value="#ff0000"/>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <div class="form-group m-4">
+                                    <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Add  " />
+                                </div>
+                            </div>
+                            
+                        </form>
+                    </div>
+                
+                    <div class="card shadow p-3 mb-5 bg-white rounded">
+
+
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Programme</th>
+                                <th scope="col"></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            {% for programme in programme_list %}
+                              <tr>
+                                <th scope="row">{{ programme.programme_abbv }}</th>
+                                <td>{{programme.programme_name}}</td>
+                                <td><pre><i class="fas fa-pencil-alt"></i>  <i class="far fa-trash-alt" style="color:purple;"></i></h5></pre></td>
+                              </tr>
+                            {% endfor %}  
+                            </tbody>
+                          </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+        </body>
+</html>
