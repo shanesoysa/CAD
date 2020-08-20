@@ -33,7 +33,11 @@ urlpatterns = [
     path('academics/add', views.AddAcademicYearSemesterView.as_view() , name='add_academics'),
     path('academics/delete', views.DeleteAcademicYearSemesterView.as_view() , name='remove_academics'),
     path('academics/update', views.UpdateAcademicYearSemesterView.as_view() , name='update_academics'),
+   
+   
+    path('<int:pk>/subgroups', views.UpdateAcademicYearSemesterView.as_view() , name='subgroups'),
 
+    path('students/', views.StudentsView.as_view(), name='students'),
     path('students/', views.StudentsView.as_view(), name='students'),
     path('students/delete', views.UpdateAcademicYearSemesterView.as_view(), name='remove_students'),
 

@@ -166,7 +166,11 @@ class UpdateTags(View):
 
 
 class StudentsView(generic.ListView):
-    model = Group
+    context_object_name  = 'group_list'
+    
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Group.objects.exclude(generated_group = None)
     template_name = 'students/students.html'
 
 class ProgrammesView(generic.ListView):
@@ -322,7 +326,7 @@ class AddStudentsView(View):
                 group_no=group_num,
                 student_count=count
             )
-            student = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year_semester': obj.academic_year_semester.academic_year, 'programme': obj.programme.programme_abbv}
+            student = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year': obj.academic_year_semester.academic_year, 'academic_semester': obj.academic_year_semester.academic_semester, 'programme': obj.programme.programme_abbv}
             data = {
                 'student': student
             }

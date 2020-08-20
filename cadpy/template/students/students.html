@@ -58,10 +58,10 @@
                     {% endif%}  
                 </div>
                 <div style="width: 10%; float: right;">
-                    <h1 class="mb-5"><i class="fa fa-plus-circle shadow" aria-hidden="true" style="color:purple;border-radius: 100%;" data-toggle="tooltip" data-placement="top" title="Group Ids">
-                    </i></h1>
-                    <h1 class="mb-5"><i class="fa fa-plus-circle shadow" aria-hidden="true" style="color:blue; border-radius: 100%;" data-toggle="tooltip" data-placement="left" title="Programme"></i></h1>
-                    <h1><i class="fa fa-plus-circle shadow" aria-hidden="true" style="color:blueviolet; border-radius: 100%;" data-toggle="tooltip" data-placement="bottom" title="Academic Year & Semester"></i></h1>
+                    <h1 class="mb-5"><a href="{% url 'groups' %}"><i class="fa fa-plus-circle shadow" aria-hidden="true" style="color:purple;border-radius: 100%;" data-toggle="tooltip" data-placement="top" title="Group Ids">
+                    </i></a></h1>
+                    <h1 class="mb-5"><a href="{% url 'programmes' %}"><i class="fa fa-plus-circle shadow" aria-hidden="true" style="color:blue; border-radius: 100%;" data-toggle="tooltip" data-placement="left" title="Programme"></i></a></h1>
+                    <h1><a href="{% url 'academics' %}"><i class="fa fa-plus-circle shadow" aria-hidden="true" style="color:blueviolet; border-radius: 100%;" data-toggle="tooltip" data-placement="bottom" title="Academic Year & Semester"></i></a></h1>
                 </div>
             </div>
 

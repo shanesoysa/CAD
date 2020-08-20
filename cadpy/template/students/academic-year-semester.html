@@ -8,7 +8,7 @@
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded" style="border-radius: 100;" >
         <div class="card-header bg-light text-info">
-            <h3>Academic Year & Semester</h3>
+            <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Academic Year & Semester</h3>
         </div>
         <div class="scrollable bg-light" style="height: 600px;">
             <div class="card-body bg-light">
@@ -27,7 +27,7 @@
                             <input type="number" class="form-control m-3" id="academicSemesterId" name="academicSemester" min="1"/>
                         </div>
                         <!-- </div> -->
-                        <div class="col-md-2">
+                        <div class="col-lg-2">
                             <div class="form-group m-4">
                                 <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Add  " />
                             </div>
