@@ -46,16 +46,42 @@
                     </thead>
                     <tbody>
                     {% for programme in programme_list %}
-                      <tr>
-                        <th scope="row">{{ programme.programme_abbv }}</th>
-                        <td>{{programme.programme_name}}</td>
-                        <td><pre><i class="fas fa-pencil-alt"></i>  <i class="far fa-trash-alt" style="color:purple;"></i></h5></pre></td>
+                      <tr id="pr-{{programme.id}}">
+                        <th scope="row" class="proName userData" name="pname">{{ programme.programme_abbv }}</th>
+                        <td class="proAbbv userData" name="pabbv">{{programme.programme_name}}</td>
+                        <td><pre><span onClick="editProgramme({{programme.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt"></i></span>  <span onclick="deleteProgramme({{programme.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
                       </tr>
                     {% endfor %}  
                     </tbody>
                   </table>
             </div>
         </div>
+    </div>
+</div>
+
+ <!-- Modal -->
+ <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <h4 class="modal-title" id="myModalLabel">Update Programme</h4>
+        </div>
+        <form id="updateProgramme" action="">
+            <div class="modal-body">
+                <input class="form-control" id="form-id" type="hidden" name="formId"/>
+                <label for="name">Programme</label>
+                <input class="form-control" id="form-name" type="text" name="formName"/>
+                <label for="address">Abbreviation</label>
+                <input class="form-control" id="form-abbv" type="text" name="formAbbv"/>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" >Save changes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </form>
+      </div>
     </div>
 </div>
 {% endblock %}
@@ -100,7 +126,7 @@ $("form#addProgramme").submit(function() {
 
 function appendToUsrTable(programme) {
     $("#programmeTable > tbody:last-child").append(`
-          <tr id="user-${programme.id}">
+          <tr id="pr-${programme.id}">
             <th scope="row">${ programme.programme_abbv }</th>
               '<td>${programme.programme_name}</td>
               '<td><pre><i class="fas fa-pencil-alt"></i>  <i class="far fa-trash-alt" style="color:purple;"></i></h5></pre></td>
@@ -108,6 +134,86 @@ function appendToUsrTable(programme) {
       `);
   }
 
+function deleteProgramme(id) {
+  var action = confirm("Are you sure you want to delete programme?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "remove_programmes" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            
+            if (data.deleted) {
+              $("#programmeTable #pr-" + id).remove();
+            }
+        }
+    });
+  }
+}
+
+
+$("form#updateProgramme").submit(function() {
+
+var idInput = $('input[name="formId"]').val().trim();
+var nameInput = $('input[name="formName"]').val();
+var abbvInput = $('input[name="formAbbv"]').val().trim();
+
+
+if (nameInput && abbvInput) {
+    // Create Ajax Call
+    $.ajax({
+        url: '{% url "update_programmes" %}',
+        data: {
+          'id':idInput,
+          'programme_name':nameInput,
+          'programme_abbv':abbvInput,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.programme) {
+              
+              updateToUserTabel(data.programme);
+              
+            }
+        }
+    });
+   } else {
+    alert("All fields must have a valid value.");
+}
+
+$('form#updateProgramme').trigger("reset");
+$('#myModal').modal('hide');
+return false;
+});
+
+
+function editProgramme(id) {
+  
+  if (id) {
+  
+  tr_id = "#pr-" + id;
+  pname = $(tr_id).find(".proName").text();
+  pabbv = $(tr_id).find(".proAbbv").text();
+  
+  $('#form-id').val(id);
+  $('#form-name').val(pname);
+  $('#form-abbv').val(pabbv);
+
+  }
+}
+
+function updateToUserTabel(programme){
+$("#programmeTable #pr-" + programme.id).children(".userData").each(function() {
+    var attr = $(this).attr("name");
+    if (attr == "pname") {
+      $(this).text(programme.programme_name);
+    } else if (attr == "pabbv") {
+      $(this).text(programme.programme_abbv);
+    } 
+  });
+}
 
 
 </script>

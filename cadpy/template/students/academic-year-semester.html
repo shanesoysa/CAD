@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Programmes{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="card shadow-sm mb-4 bg-white rounded" style="border-radius: 100;" >
+        <div class="card-header bg-light text-info">
+            <h3>Academic Year & Semester</h3>
+        </div>
+        <div class="scrollable bg-light" style="height: 600px;">
+            <div class="card-body bg-light">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <form method="POST" action="" class="form-inline" id="addAcademics">
+                        <!-- <div class="form-row"> only to make the academic year come first-->
+                            <!-- <div class="col"> -->
+                        <div class="form-group m-4">
+                            <label class="text-black font-weight-bold" for="academicYearId">Academic Year </label>
+                            <input type="number" class="form-control m-3" id="academicYearId" name="academicYear" min="1"/>
+                        </div>
+                        <!-- </div> -->
+                        <!-- <div class="col"> -->
+                        <div class="form-group m-4">
+                            <label class="font-weight-bold" for="academicSemesterId">Academic Semester </label>
+                            <input type="number" class="form-control m-3" id="academicSemesterId" name="academicSemester" min="1"/>
+                        </div>
+                        <!-- </div> -->
+                        <div class="col-md-2">
+                            <div class="form-group m-4">
+                                <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Add  " />
+                            </div>
+                        </div>
+                        <!-- </div> -->
+                    </form>
+                </div>
+                <div class="row row-cols-1 row-cols-md-4 chaa">
+                    {% for academicyearsemester in academicyearsemester_list %}
+                    <div class="col mb-4" id="ays-{{academicyearsemester.id}}">
+                        <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+                            <pre>
+                                <h5>Y{{academicyearsemester.academic_year }}.S{{ academicyearsemester.academic_semester}}     <span onclick=""><i class="fas fa-pencil-alt"></i></span>   <span onclick="deleteAca({{academicyearsemester.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+
+$("form#addAcademics").submit(function() {
+
+var ayear = $('input[name="academicYear"]').val();
+var asemester = $('input[name="academicSemester"]').val();
+
+
+if (ayear && asemester) {
+    // Create Ajax Call
+    $.ajax({
+        url: '{% url "add_academics" %}',
+        data: {
+        'academic_year':ayear,
+        'academic_semester':asemester
+        },
+        dataType: 'json',
+        success: function (data) {
+        
+            console.log(data.academicyearsemester);
+
+            if (data.academicyearsemester) {
+            appendToAcademicsTable(data.academicyearsemester);
+            alert("'Data Added'")
+            
+            }
+            
+        }
+    });
+} else {
+    alert("All fields must have a valid value.");
+}
+$('form#addAcademics').trigger("reset");
+return false;
+});
+
+function appendToAcademicsTable(programme) {
+    console.log('In method')
+    $(".chaa").append(`
+    <div class="col mb-4" id="ays-${programme.id}">
+        <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+            <pre>
+                <h5>Y${programme.academic_year }.S${ programme.academic_semester}     <span onclick=""><i class="fas fa-pencil-alt"></i></span>   <span onclick="deleteAca(${programme.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+        </div>
+    </div>
+    `);
+}
+
+function deleteAca(id) {
+  var action = confirm("Are you sure you want to delete?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "remove_academics" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            alert('removed')
+            if (data.deleted) {
+              $("#ays-" + id).remove();
+            }
+        }
+    });
+  }
+}
+
+</script>
+{% endblock javascript %}
