@@ -1,17 +1,256 @@
 {% extends 'base.html' %}
 
 
-{% block title %}Programmes{% endblock %}
+{% block title %}Sub Groups{% endblock %}
 
 {% block content %}
-
-
-
+<div class="sidebar text-center">
+    <ul>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-home sidebar-icon"></i>
+          <span class="sidebar-text"> Home </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
+          <span class="sidebar-text"> Working</span>
+          <span class="sidebar-text"> Days</span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-users sidebar-icon"></i>
+          <span class="sidebar-text"> Lecturers</span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-book sidebar-icon"></i>
+          <span class="sidebar-text"> Subjects </span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
+          <span class="sidebar-text"> Students </span>
+          <a href="{% url 'students' %}" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-tags sidebar-icon"></i>
+          <span class="sidebar-text"> Tags </span>
+          <a href="{% url 'tags' %}" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
+          <span class="sidebar-text"> Locations </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button" autofocus>
+          <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
+          <span class="sidebar-text"> Statistics </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+    </ul>
+</div>
+<div class="container-fluid">
+    <div class="card shadow-sm mb-4 bg-white rounded" style="border-radius: 100;" >
+        <div class="card-header bg-light text-info">
+            <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Sub Groups</h3>
+        </div>
+        <div class="scrollable">
+            <div class="card-body bg-light">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <form action="" class="form-inline" id="addSubgroups">
+                        <div class="form-group m-4">
+                            <label class="text-black font-weight-bold" for="{{group.id}}">Group Id </label>
+                            <input type="text" class="form-control m-3" id="{{group.id}}" name="groupId" value={{group.generated_group}} readonly/>
+                        </div>
+                        <div class="form-group m-4">
+                            <label class="font-weight-bold" for="subgroupId">Sub Group </label>
+                            <input type="number" class="form-control m-3" id="subgroupId" name="subgroup" min="1"/>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group m-4">
+                                <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Save  " />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row row-cols-1 row-cols-md-4 chaa">
+                    {% for subgroup in group.subgroup_set.all %}
+                    <div class="col mb-2" id="sb-${subgroup.id}">
+                        <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+                            <pre>
+                                <h5>{{subgroup.subgroup_no }}    <span data-toggle="modal" data-target="#myModal" onclick="editSubgroup({{subgroup.id}})"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteAca({{subgroup.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div style="float: right;">
+                    <a href="{% url 'generate_subgroups' %}"><button class="btn btn-lg btn-danger"> Generate </button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--New Model-->
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Sub Groupd No</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="updateUser" action="">
+          <div class="modal-body">
+              <input class="form-control" id="form-id" type="hidden" name="formId"/>
+              <label for="name">Sub group Number </label>
+              <input class="form-control" id="form-name" type="number" name="formName"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 
 {% block javascript %}
 <script>
 
+$("form#addSubgroups").submit(function() {
+
+var groupId = $('input[name="groupId"]').val();
+var subgroup = $('input[name="subgroup"]').val();
+
+if (groupId && subgroup) {
+    // Create Ajax Call
+    
+    $.ajax({
+        url: '{% url "add_subgroups" group.id %}',
+        data: {
+        'group':groupId,
+        'subgroup_no':subgroup
+        },
+        dataType: 'json',
+        success: function (data) {
+        
+            console.log(data.subgroup);
+
+            if (data.subgroup) {
+            appendToAcademicsTable(data.subgroup);
+            alert("Data Added")
+            
+            }
+            
+        }
+    });
+} else {
+    alert("All fields must have a valid value.");
+}
+$('form#addSubgroups').trigger("reset");
+return false;
+});
+
+function appendToAcademicsTable(subgroup) {
+    console.log('In method')
+    $(".chaa").append(`
+    <div class="col mb-4" id="sb-${subgroup.id}">
+        <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+            <pre>
+                <h5>${subgroup.subgroup_no }    <span onclick="editSubgroup(${subgroup.id})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteAca(${subgroup.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+        </div>
+    </div>
+    `);
+}
+
+function deleteAca(id) {
+  var action = confirm("Are you sure you want to delete?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "remove_subgroups" group.id %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            alert('removed')
+            if (data.deleted) {
+              $("#sb-" + id).remove();
+            }
+        }
+    });
+  }
+}
+$("form#updateUser").submit(function() {
+
+var idInput = $('input[name="formId"]').val().trim();
+var nameInput = $('input[name="formName"]').val();
+
+
+
+if (nameInput) {
+    // Create Ajax Call
+    $.ajax({
+        url: '{% url "update_subgroups" group.id %}',
+        data: {
+          'id':idInput,
+          'subgroup_no':nameInput,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.subgroup) {
+              
+              updateToUserTabel(data.subgroup);
+              
+            }
+        }
+    });
+   } else {
+    alert("All fields must have a valid value.");
+}
+
+$('form#updateUser').trigger("reset");
+$('#myModal').modal('hide');
+return false;
+});
+
+
+function editSubgroup(id) {
+  
+  if (id) {
+  
+  tr_id = "#sb-" + id;
+  pname = $(tr_id).find(".proName").text();
+  
+  
+  $('#form-id').val(id);
+  $('#form-name').val(pname);
+ 
+
+  }
+}
+
+function updateToUserTabel(academicyearsemester){
+  location.reload();
+}
 </script>
 {% endblock javascript %}

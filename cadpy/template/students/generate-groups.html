@@ -4,6 +4,64 @@
 {% block title %}Groups{% endblock %}
 
 {% block content %}
+<div class="sidebar text-center">
+    <ul>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-home sidebar-icon"></i>
+          <span class="sidebar-text"> Home </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
+          <span class="sidebar-text"> Working</span>
+          <span class="sidebar-text"> Days</span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-users sidebar-icon"></i>
+          <span class="sidebar-text"> Lecturers</span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-book sidebar-icon"></i>
+          <span class="sidebar-text"> Subjects </span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
+          <span class="sidebar-text"> Students </span>
+          <a href="{% url 'students' %}" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-tags sidebar-icon"></i>
+          <span class="sidebar-text"> Tags </span>
+          <a href="{% url 'tags' %}" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
+          <span class="sidebar-text"> Locations </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button" autofocus>
+          <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
+          <span class="sidebar-text"> Statistics </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+    </ul>
+</div>
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded">
         <div class="card-header bg-light text-info">
@@ -20,9 +78,9 @@
                                 <select type="text" class="form-control m-3" id="academicsId" name="academics">
                                     <option disabled="true" selected="true"> -- Select Year and Semester </option>
                                     <option value="18">Y2.S1</option>
-                                    <option value="19">Y2.S1</option>
-                                    <option value="20">Y2.S1</option>
-                                    <option value="21">Y2.S1</option>
+                                    <option value="22">Y2.S2</option>
+                                    <option value="23">Y3.S1</option>
+                                    <option value="25">Y1.S1</option>
                                 </select>
                             </div>
                         </div>
@@ -34,8 +92,7 @@
                                     <option disabled="true" selected="true"> -- Programme </option>
                                     <option value="1">IT</option>
                                     <option value="3">DS</option>
-                                    <option value="5">ISE</option>
-                                    <option value="20"></option>
+                                    <option value="14">ISE</option>
                                 </select>
                             </div>
                         </div>
@@ -94,7 +151,7 @@
                 </div>
 
                 <div style="float: right;">
-                    <a href="{% url 'tags' %}"><button class="btn btn-large btn-danger shadow">Generate</button></a>
+                    <a href="{% url 'generate_students' %}"><button class="btn btn-large btn-danger shadow">Generate</button></a>
                 </div>
             </div>
         </div>
@@ -154,6 +211,7 @@
                 
                     console.log(data.student);
                     alert("Data Added")
+                    location.reload();
                     if (data.student) {
                     appendToUsrTable(data.student);
                     
@@ -172,7 +230,7 @@
     function appendToUsrTable(group) {
         $("#groupTb > tbody:last-child").append(`
              <tr id="sg-${group.id}">
-                <th scope="row" class="yearSem userData" name="pname">Y${group.academic_year}S${group.academic_semester}</th>
+                <th scope="row" class="yearSem userData" name="pname">Y${group.academic_year}.S${group.academic_semester}</th>
                 <th scope="row" class="Pro userData" name="pname">${group.programme }</th>
                 <th scope="row" class="grouNo userData" name="pname">${group.group_no}</th>
                 <td class="groupCount userData" name="pabbv">${programme.student_count}</td>

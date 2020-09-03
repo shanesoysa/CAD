@@ -112,6 +112,10 @@ class TagsView(generic.ListView):
     model = Tags
     template_name = 'tags/tags.html'
 
+class DDView(generic.ListView):
+    model = Tags
+    template_name = 'students/st.html'
+
 
 class DeleteTags(View):
     try:
@@ -172,6 +176,38 @@ class StudentsView(generic.ListView):
         """Return the last five published questions."""
         return Group.objects.exclude(generated_group = None)
     template_name = 'students/students.html'
+
+class StudentsGenerationView(generic.ListView):
+    context_object_name  = 'group_list'
+    
+    def get_queryset(self):
+        """Return the last five published questions."""
+        listOfGroups = Group.objects.filter(generated_group = None)
+        for group in listOfGroups:
+            print(group.pk)
+            #group_obj = Group.objects.get(pk=group.pk)
+            group_id = group.generate_group_id()
+            group.generated_group = group_id
+            group.save()
+        return Group.objects.exclude(generated_group = None)
+
+    template_name = 'students/students.html'
+
+class StudentsSubGroupGenerationView(generic.ListView):
+    context_object_name  = 'group_list'
+    
+    def get_queryset(self):
+        """Return the last five published questions."""
+        groupy = Group.objects.get(id = 27)
+        for subgroup in groupy.subgroup_set.all():
+            print(subgroup.pk)
+            #group_obj = Group.objects.get(pk=group.pk)
+            subgroup_id = subgroup.generate_subgroup_id()
+            subgroup.generated_subgroup = subgroup_id
+            subgroup.save()
+        return Group.objects.exclude(generated_group = None)
+
+    template_name = 'students/students.html'    
 
 class ProgrammesView(generic.ListView):
     model = Programme
@@ -303,7 +339,11 @@ class UpdateAcademicYearSemesterView(View):
 
 
 class GroupsView(generic.ListView):
-    model = Group
+    context_object_name  = 'group_list'
+    
+    def get_queryset(self):
+        """Return the last five published questions."""
+        return Group.objects.filter(generated_group = None)
     template_name = 'students/generate-groups.html'
 
 
@@ -381,3 +421,64 @@ class SubGroupsView(generic.DetailView):
     model = Group
     template_name = 'students/generate-subgroups.html'
         
+class AddSubGroups(View):
+    def  get(self, request, pk):
+        
+        try:
+            gp = request.GET.get('group', None)
+            subgp = request.GET.get('subgroup_no', None)
+            print(gp)
+            print(subgp)
+            groupObj = Group.objects.get(pk=pk)
+            print(groupObj)
+            obj = Subgroup.objects.create(
+                group = groupObj,
+                subgroup_no=subgp,
+            )
+            print('created')
+            subgroup = {'id': obj.id, 'group': obj.group.generated_group, 'group_id': obj.group.id, 'subgroup_no': obj.subgroup_no }
+            data = {
+                'subgroup': subgroup
+            }
+            print("successfull")
+
+            return JsonResponse(data)
+
+        except:
+            print("fail adding data")
+            pass   
+
+class DeleteSubGroups(View):
+    try:
+        def  get(self, request, pk):
+            id1 = request.GET.get('id', None)
+           
+            Subgroup.objects.get(id=id1).delete()
+            
+            data = {
+                'deleted': True
+            }
+            return JsonResponse(data)
+    except:
+        
+        print("programme delete failed")
+        pass
+
+
+class UpdateSubGroupsView(View):
+    try:
+        def  get(self, request, pk):
+            id1 = request.GET.get('id', None)
+            pabbv = request.GET.get('subgroup_no', None)
+
+            obj = Subgroup.objects.get(id=id1)
+            obj.subgroup_no = pabbv
+            obj.save()
+            subgroup = {'id':obj.id,'subgroup_no':obj.subgroup_no}
+            data = {
+                'subgroup': subgroup
+            }
+            return JsonResponse(data)    
+    except:
+        print("subgroup update failed")
+        pass        

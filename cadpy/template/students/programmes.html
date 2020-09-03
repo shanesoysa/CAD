@@ -4,15 +4,74 @@
 {% block title %}Programmes{% endblock %}
 
 {% block content %}
+
+<div class="sidebar text-center">
+  <ul>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-1x fa-home sidebar-icon"></i>
+        <span class="sidebar-text"> Home </span>
+        <a href="#" class="stretched-link"></a>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
+        <span class="sidebar-text"> Working</span>
+        <span class="sidebar-text"> Days</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-1x fa-users sidebar-icon"></i>
+        <span class="sidebar-text"> Lecturers</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-1x fa-book sidebar-icon"></i>
+        <span class="sidebar-text"> Subjects </span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
+        <span class="sidebar-text"> Students </span>
+        <a href="{% url 'students' %}" class="stretched-link"></a>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-1x fa-tags sidebar-icon"></i>
+        <span class="sidebar-text"> Tags </span>
+        <a href="{% url 'tags' %}" class="stretched-link"></a>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
+        <span class="sidebar-text"> Locations </span>
+        <a href="#" class="stretched-link"></a>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button" autofocus>
+        <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
+        <span class="sidebar-text"> Statistics </span>
+        <a href="#" class="stretched-link"></a>
+      </button>
+    </li>
+  </ul>
+</div>
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded">
         <div class="card-header bg-light text-info">
-            <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Programmes </h3>
+            <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Programmes  </h3>
         </div>
 
         <div class="card-body bg-light">
             <div class="card shadow p-3 mb-5 bg-white rounded">
-                <form method="POST" action="" class="form-inline" id="addProgramme">
+                <form action="" class="form-inline" id="addProgramme">
                 
                     <div class="form-group m-4">
                         <label class="text-black font-weight-bold" for="programmeId">Programme </label>
@@ -47,9 +106,9 @@
                     <tbody>
                     {% for programme in programme_list %}
                       <tr id="pr-{{programme.id}}">
-                        <th scope="row" class="proName userData" name="pname">{{ programme.programme_abbv }}</th>
-                        <td class="proAbbv userData" name="pabbv">{{programme.programme_name}}</td>
-                        <td><pre><span onClick="editProgramme({{programme.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt"></i></span>  <span onclick="deleteProgramme({{programme.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
+                        <th scope="row" class="proAbbv userData" name="pabbv">{{ programme.programme_abbv }}</th>
+                        <td class="proName userData" name="pname">{{programme.programme_name}}</td>
+                        <td><pre><span onClick="editProgramme({{programme.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>  <span onclick="deleteProgramme({{programme.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
                       </tr>
                     {% endfor %}  
                     </tbody>
@@ -58,9 +117,37 @@
         </div>
     </div>
 </div>
-
+<!--New Model-->
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Programme</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="updateUser" action="">
+          <div class="modal-body">
+              <input class="form-control" id="form-id" type="hidden" name="formId"/>
+              <label for="name">Programme</label>
+              <input class="form-control" id="form-name" type="text" name="formName"/>
+              <label for="address">Abbreviation</label>
+              <input class="form-control" id="form-abbv" type="text" name="formAbbv"/>   
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
  <!-- Modal -->
- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+ <!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -83,7 +170,7 @@
         </form>
       </div>
     </div>
-</div>
+</div> -->
 {% endblock %}
 
 
@@ -111,7 +198,7 @@ $("form#addProgramme").submit(function() {
 
                 if (data.programme) {
                 appendToUsrTable(data.programme);
-                alert("'Data Added'")
+                alert("Data Added")
                 
                 }
                 
@@ -129,7 +216,7 @@ function appendToUsrTable(programme) {
           <tr id="pr-${programme.id}">
             <th scope="row">${ programme.programme_abbv }</th>
               '<td>${programme.programme_name}</td>
-              '<td><pre><i class="fas fa-pencil-alt"></i>  <i class="far fa-trash-alt" style="color:purple;"></i></h5></pre></td>
+              '<td><pre><i class="fas fa-pencil-alt" style="color:purple;></i><span onclick="deleteProgramme({{programme.id}})">   <i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
           </tr>
       `);
   }
@@ -154,7 +241,7 @@ function deleteProgramme(id) {
 }
 
 
-$("form#updateProgramme").submit(function() {
+$("form#updateUser").submit(function() {
 
 var idInput = $('input[name="formId"]').val().trim();
 var nameInput = $('input[name="formName"]').val();
@@ -183,7 +270,7 @@ if (nameInput && abbvInput) {
     alert("All fields must have a valid value.");
 }
 
-$('form#updateProgramme').trigger("reset");
+$('form#updateUser').trigger("reset");
 $('#myModal').modal('hide');
 return false;
 });

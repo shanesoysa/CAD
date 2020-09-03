@@ -4,10 +4,68 @@
 {% block title %}Students{% endblock %}
 
 {% block content %}
+<div class="sidebar text-center">
+    <ul>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-home sidebar-icon"></i>
+          <span class="sidebar-text"> Home </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
+          <span class="sidebar-text"> Working</span>
+          <span class="sidebar-text"> Days</span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-users sidebar-icon"></i>
+          <span class="sidebar-text"> Lecturers</span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-book sidebar-icon"></i>
+          <span class="sidebar-text"> Subjects </span>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
+          <span class="sidebar-text"> Students </span>
+          <a href="{% url 'students' %}" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-tags sidebar-icon"></i>
+          <span class="sidebar-text"> Tags </span>
+          <a href="{% url 'tags' %}" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button">
+          <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
+          <span class="sidebar-text"> Locations </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+      <li>
+        <button class="sidebar-button" autofocus>
+          <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
+          <span class="sidebar-text"> Statistics </span>
+          <a href="" class="stretched-link"></a>
+        </button>
+      </li>
+    </ul>
+</div>
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded" style="border-radius: 100;" >
         <div class="card-header bg-light text-info">
-            <h3>Students</h3>
+            <h3 style="color: #33344a;">Students</h3>
         </div>
         <div class="scrollable bg-light" style="height: 600px;">
             <div class="card-body bg-light">
@@ -16,32 +74,35 @@
                 
                     {% if group_list %}
                         {% for groups in group_list%}
-                        <div class="card shadow pb-3 mb-3 bg-white rounded" style="width: 90%">
+                        <div class="card shadow pb-3 mb-3 bg-white rounded" style="width: 90%" id="gg-{{groups.id}}">
                             <div class="card-header">
-                                <h5 class="card-text">{{groups.generated_group}} <small>- {{groups.student_count}} students</small>
+                                <h5 class="card-text text-info">{{groups.generated_group}} <small>- {{groups.student_count}} students</small>
                                     <div style="float:right">
                                         <!-- <form action="generate-subgroups.html"> -->
                                             <a href="{% url 'subgroups' groups.id %}">
-                                            <button type="submit" class="btn btn-dark" id={{groups.generated_group}}>Add Sub Group</button></a>
+                                            <button type="submit" class="btn btn-primary" id={{groups.generated_group}}>Add Sub Group</button></a>
                                         <!-- </form> -->
+                                        &nbsp; 
                                         <span id="editIcon">
                                             <i class="fas fa-pencil-alt" style="color:purple;"></i>
                                         </span>
-                                        <span id="deleteIcon">
+                                        &nbsp; 
+                                        <span id="deleteIcon" onclick="deleteGroup({{groups.id}})">
                                             <i class="far fa-trash-alt" style="color:purple;"></i>
                                         </span>
+                                        &nbsp; 
                                     </div>
                                 </h5>    
                             </div>
                             {% if groups.subgroup_set.all != null and groups.subgroup_set.count > 0 %}<!-- does this even work-->
                                 <div class="card-body">
                                     <div class="card-text">
-                                            <h6 class="mb-3">Sub Groups</h6> 
+                                            <h6 class="mb-3" style="color: #33344a;">Sub Groups</h6> 
                                             <div class="row">
                                                 {% for subgroup in groups.subgroup_set.all %}
-                                                    <div class="col-md-3 shadow-sm p-1 mb-3 bg-light" style="border-radius: 5px; margin:0px 5px;">
-                                                        <h6 style="padding: 3px;">&nbsp; &nbsp; {{ subgroup.subgroup_no }}
-                                                            <span id="deleteIcon" style="float: right;">
+                                                    <div class="col-md-3 shadow-sm p-1 mb-3 bg-light" style="border-radius: 5px; margin:0px 5px;" id="sb-{{subgroup.id}}">
+                                                        <h6 style="padding: 3px;">&nbsp; &nbsp; {{ subgroup.generated_subgroup }}
+                                                            <span id="deleteIcon" style="float: right;" onclick="deleteSubGroup({{subgroup.id}})">
                                                                 <i class="far fa-trash-alt" style="color:purple;"></i>
                                                             </span>
                                                         </h6>
@@ -81,6 +142,44 @@
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
     });
+
+    function deleteSubGroup(id) {
+        var action = confirm("Are you sure you want to delete?");
+        if (action != false) {
+            $.ajax({
+                url: '{% url "remove_subgroups" 1 %}',
+                data: {
+                    'id': id,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    alert('removed')
+                    if (data.deleted) {
+                    $("#sb-" + id).remove();
+                    }
+                }
+            });
+        }
+    } 
+
+    function deleteGroup(id) {
+        var action = confirm("Are you sure you want to delete the group and all it's subgroups ?");
+        if (action != false) {
+            $.ajax({
+                url: '{% url "remove_groups" %}',
+                data: {
+                    'id': id,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    alert('removed')
+                    if (data.deleted) {
+                    $("#gg-" + id).remove();
+                    }
+                }
+            });
+        }  
+    }
         
 </script>
 {% endblock javascript %}

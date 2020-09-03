@@ -35,11 +35,18 @@ urlpatterns = [
     path('academics/update', views.UpdateAcademicYearSemesterView.as_view() , name='update_academics'),
    
    
-    path('<int:pk>/subgroups', views.UpdateAcademicYearSemesterView.as_view() , name='subgroups'),
+    path('<int:pk>/subgroups', views.SubGroupsView.as_view() , name='subgroups'),
+    path('<int:pk>/subgroups/add', views.AddSubGroups.as_view() , name='add_subgroups'),
+    path('<int:pk>/subgroups/delete', views.DeleteSubGroups.as_view() , name='remove_subgroups'),
+    path('<int:pk>/subgroups/update', views.UpdateSubGroupsView.as_view() , name='update_subgroups'),
+    path('subgroups/generate', views.StudentsSubGroupGenerationView.as_view() , name='generate_subgroups'),
+
+
+    path('dd/', views.DDView.as_view(), name='dd'),
+
 
     path('students/', views.StudentsView.as_view(), name='students'),
-    path('students/', views.StudentsView.as_view(), name='students'),
-    path('students/delete', views.UpdateAcademicYearSemesterView.as_view(), name='remove_students'),
+    path('students/generate', views.StudentsGenerationView.as_view(), name='generate_students'),
 
 
     path('tags/', views.TagsView.as_view() , name='tags'),
