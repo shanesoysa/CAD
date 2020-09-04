@@ -4,7 +4,8 @@
 {% block title %}Add Lecturers{% endblock %}
 
 {% block content %}
-<div class="container">
+
+<!-- <div class="container">
     <h1>Add Lecturer</h1>
     <div class="row">
       <div class="col-md-4 ">
@@ -87,61 +88,439 @@
         </table>
       </div>
     </div>
-  </div>
+  </div> -->
   <!-- Modal -->
-  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+<div class="row">
+  <div class="cycle-tab-container">
+    <ul class="nav nav-tabs">
+    <li class="cycle-tab-item active">
+      <a class="nav-link" role="tab" id="addsection" data-toggle="tab" href="">Add New Lecturer</a>
+    </li>
+    <li class="cycle-tab-item"> 
+      <a class="nav-link" role="tab" id="viewsection" data-toggle="tab" href="">View Added Lecturers</a>
+    </li>
+
+  </ul>
+  </div>
+</div>
+<div id="addingform">
+  <div class="row">
+    <div class="col mt-3">
+      <center><h2>Add New Lecturer</h2></center>
+    </div>
+    <hr/>
+  </div>
+
+<form action="" class="container" id="addLecturer">
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+        <h5>Name</h5>
+        <input
+          class="form-control"
+          type="text"
+          name="name1"
+      
+        />
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <div class="col-5">
+          <h5>Center</h5>
+          <select
+            class="form-control"
+            id="center1"
+            name="center1"
+          >
+          <option disabled selected></option>
+          <option value="Malabe">Malabe</option>
+          <option value="Metro">Metro</option>
+          <option  value="Jaffna">Matara</option>
+          <option value="Kandy">Kandy</option>
+          <option  value="Kurunegala">Kurunegala</option>
+          <option  value="Jaffna">Jaffna</option>
+        </select>
+
+        </div>
+  
+    </div>
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+        <h5>Employee ID</h5>
+        <input
+
+          class="form-control"
+          type="number "
+          name="employee_id1"
+        
+        />
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <div class="col-5">
+          <h5>Building</h5>
+          <select
+          id="building1"
+          class="form-control"
+          name="building1"
+        >
+        <option disabled selected></option>
+        <option value="New Building">New Building</option>
+        <option value="IT Building">IT Building</option>
+        <option value="Engineering Building">Engineering Building</option>
+        <option value="Auditorium">Auditorium</option>
+        <option value="Bussiness management Building">Bussiness management Building</option>
+        
+      </select>
+        </div>
+  
+    </div>
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+        <h5>Faculty</h5>
+        <select
+        class="form-control"
+        id="faculty1"
+       name="faculty1"
+      >
+      <option disabled selected></option>
+      <option value="Computing">Computing</option>
+      <option value="Engineering">Engineering</option>
+      <option value="Business">Business</option>
+      <option value=" Humanities & Sciences">Humanities & Sciences</option>
+     
+    </select>
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <div class="col-5">
+          <h5>Level</h5>
+          <select
+          class="form-control"
+          id="level1"
+          name="level1"
+        >
+        <option disabled selected></option>
+        <option value="1">Professor</option>
+        <option value="2">Assistant Professor</option>
+        <option value="3">Senior Lecturer(HG)</option>
+        <option value="4">Senior Lecturer</option>
+        <option value="5">Lecturer</option>
+        <option value="6">Assistant Lecturer</option>
+        <option value="7">Instructors</option>
+       
+      </select>
+        </div>
+  
+    </div>
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+        <h5>Department</h5>
+        <select
+        class="form-control"
+        id="department1"
+        name="department1"
+      >
+      <option disabled selected></option>
+      <option  value="Information technology">Information technology</option>
+      <option  value="Software Engineering">Software Engineering</option>
+      <option  value="Cyber Security">Cyber Security</option>
+      <option value="Interactive Media">Interactive Media </option>
+         
+    </select>
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <div class="col-5">
+          <h5>Rank</h5>
+          <input
+            value=""
+            class="form-control"
+            type="text"
+            name="rank1"
+            readonly
+           
+          />
+        </div>
+  
+    </div>
+    
+    
+
+    <div class="row p-2">
+      <div class="col-12">
+      <center>
+          
+          <button type="submit" name="" id="" class="btn btn-primary" btn-lg btn-block">Add Lecturer</button>
+         
+      </center>
+      </div>
+  
+    </div>
+   
+ 
+      </div>
+    </div>
+
+    
+    
+  </form>
+</div>
+
+</div>
+
+<div class="container d-none" id="tablediv">
+
+  <div class="row">
+  <div class="col-4">
+  <h3>Lecturers</h3>
+</div>
+<div class="col-4">
+  
+</div>
+
+  <div class="col-4" style="float: left;">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+      </div>
+      <input type="text" class="form-control" id="myInput" placeholder="Search..." aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+    
+  </div>
+
+</div>
+<div class="row">
+<div class="col-12">
+  
+
+  <table id="userTable" class="table table-striped">
+    <tr>
+      <th>Name</th>
+      <th>center</th>
+      <th>employee_id</th>
+      <th>building</th>
+      <th>faculty</th>
+      <th>level</th>
+      <th>department</th>
+      <th>rank</th>
+      <th colspan="3">Actions</th>
+    </tr>
+    {% if lecturers %}
+    {% for lecturer in lecturers %}
+    <tr id="user-{{lecturer.id}}">
+        <td class="lecName userData" name="name">{{lecturer.name}}</td>
+        <td class="lecCenter userData" name="center">{{lecturer.center}}</td>
+        <td class="lecEmployee_id userData" name="employee_id">{{lecturer.employee_id}}</td>
+        <td class="lecBuilding userData" name="building">{{lecturer.building}}</td>
+        <td class="lecFaculty userData" name="faculty">{{lecturer.faculty}}</td>
+        <td class="lecLevel userData" name="level">{{lecturer.level}}</td>
+        <td class="lecDepartment userData" name="department">{{lecturer.department}}</td>
+        <td class="lecRank userData" name="rank">{{lecturer.rank}}</td>
+
+        <td align="center">
+            <button class="btn btn-success form-control" onClick="editUser({{lecturer.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+        </td>
+        <td align="center">
+            <button class="btn btn-danger form-control" onClick="deleteUser({{lecturer.id}})">X</button>
+        </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+      No Users
+    {% endif %}
+  </table>
+</div>
+</div>
+</div> 
+</div>
+</div>
+
+<!-- <div class="modal" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+             <form id="updateUser" action="">
+      <div class="modal-body">
+          <input class="form-control" id="form-id" type="hidden" name="formId"/>
+          <label for="name">Name</label>
+          <input class="form-control" id="form-name" type="text"  value="Anil Perera"  name="formName"/>
+          <label for="address">Center</label>
+          <input class="form-control" id="form-center" type="text" value="Kandy" name="formCenter"/>
+          <label for="age">Employee ID</label>
+          <input class="form-control" id="form-employee_id" type="number"  value="002212" name="formEmployee_id" >
+          <label for="name">Faculty</label>
+          <input class="form-control" id="form-building" type="text"  value="Computing" name="formBuilding"/>
+          <label for="address">Building</label>
+          <input class="form-control" id="form-faculty" type="text" value="New Building" name="formFaculty"/>
+          <label for="age">Level</label>
+          <input class="form-control" id="form-level" type="number"  value="1" name="formLevel" >
+          <label for="address">Department</label>
+          <input class="form-control" id="form-department" type="text"  value="Computing" name="formDepartment"/>
+          <label for="age">Rank</label>
+          <input class="form-control" id="form-rank" type="text" value="1.002212" name="formRank" >          
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>      
+      </div>
+    </form>
+    </div>
+  </div> -->
+
+
+  <div class="modal" id="myModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          <h4 class="modal-title" id="myModalLabel">Update User</h4>
-        </div>
-        <form id="updateUser" action="">
+        <!-- <div class="modal-header">
+          <h5 class="modal-title">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div> -->
+       
+               <form id="updateUser" action="">
         <div class="modal-body">
-            <input class="form-control" id="form-id" type="hidden" name="formId"/>
-            <label for="name">Name</label>
-            <input class="form-control" id="form-name" type="text" name="formName"/>
-            <label for="address">Center</label>
-            <input class="form-control" id="form-center" type="text" name="formCenter"/>
-            <label for="age">Employee ID</label>
-            <input class="form-control" id="form-employee_id" type="number" name="formEmployee_id" >
-            <label for="name">Faculty</label>
-            <input class="form-control" id="form-building" type="text" name="formBuilding"/>
-            <label for="address">Building</label>
-            <input class="form-control" id="form-faculty" type="text" name="formFaculty"/>
-            <label for="age">Level</label>
-            <input class="form-control" id="form-level" type="number" name="formLevel" >
-            <label for="address">Department</label>
-            <input class="form-control" id="form-department" type="text" name="formDepartment"/>
-            <label for="age">Rank</label>
-            <input class="form-control" id="form-rank" type="number" name="formRank" >
+          <input class="form-control" id="form-id" type="hidden" name="formId"/>
+          <label for="name">Name</label>
+          <input class="form-control" id="form-name" type="text"  value="Anil Perera"  name="formName"/>
+          <label for="address">Center</label>
+          <input class="form-control" id="form-center" type="text" value="Kandy" name="formCenter"/>
+          <label for="age">Employee ID</label>
+          <input class="form-control" id="form-employee_id" type="number"  value="002212" name="formEmployee_id" >
+          <label for="name">Faculty</label>
+          <input class="form-control" id="form-building" type="text"  value="Computing" name="formBuilding"/>
+          <label for="address">Building</label>
+          <input class="form-control" id="form-faculty" type="text" value="New Building" name="formFaculty"/>
+          <label for="age">Level</label>
+          <input class="form-control" id="form-level" type="number"  value="1" name="formLevel" >
+          <label for="address">Department</label>
+          <input class="form-control" id="form-department" type="text"  value="Computing" name="formDepartment"/>
+          <label for="age">Rank</label>
+          <input class="form-control" id="form-rank" type="text" value="1.002212" name="formRank" > 
             
         </div>
+        
         <div class="modal-footer">
-            <button type="submit" class="btn btn-primary" >Save changes</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
         </div>
-        </form>
+      </form>
       </div>
     </div>
   </div>
+  
+
+<!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+       
+      </div>
+      <form id="updateUser" action="">
+      <div class="modal-body">
+          <input class="form-control" id="form-id" type="hidden" name="formId"/>
+          <label for="name">Name</label>
+          <input class="form-control" id="form-name" type="text" name="formName"/>
+          <label for="address">Center</label>
+          <input class="form-control" id="form-center" type="text" name="formCenter"/>
+          <label for="age">Employee ID</label>
+          <input class="form-control" id="form-employee_id" type="number" name="formEmployee_id" >
+          <label for="name">Faculty</label>
+          <input class="form-control" id="form-building" type="text" name="formBuilding"/>
+          <label for="address">Building</label>
+          <input class="form-control" id="form-faculty" type="text" name="formFaculty"/>
+          <label for="age">Level</label>
+          <input class="form-control" id="form-level" type="number" name="formLevel" >
+          <label for="address">Department</label>
+          <input class="form-control" id="form-department" type="text" name="formDepartment"/>
+          <label for="age">Rank</label>
+          <input class="form-control" id="form-rank" type="number" name="formRank" >
+          
+      </div>
+      <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div> -->
+
+
+
+
 {% endblock %}
 {% block javascript %}
 
 <script>
+  
+
+  $("#viewsection").click(function(){
+    $("#addingform").hide(500);
+    $("#tablediv").removeClass('d-none');
+  });
+  
+  $("#addsection").click(function(){
+    $("#tablediv").addClass('d-none');
+    $("#addingform").show();
+
+  });
+
+  $(document).ready(function(){
+    $("#myInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#userTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  });
+
+  jQuery(function($) {
+    var $level = $('select#level1');
+    var $empID = $('input[name="employee_id1"]');
+    var $rank = $('input[name="rank1"]');
+  
+  
+    $empID.add($level).keyup(function() {
+      $rank.val($level.val() + '.' + $empID.val());
+    });
+  });
+
   // Create Django Ajax Call
   $("form#addLecturer").submit(function() {
+   
+
       var nameInput = $('input[name="name1"]').val();
-      var centerInput = $('input[name="center1"]').val().trim();
-      var employee_idInput = $('input[name="employee_id1"]').val().trim();
-      var buildingInput = $('input[name="building1"]').val().trim();
-      var facultyInput = $('input[name="faculty1"]').val().trim();
-      var levelInput = $('input[name="level1"]').val().trim();
-      var departmentInput = $('input[name="department1"]').val().trim();
-      var rankInput = $('input[name="rank1"]').val().trim();
+      var centerInput = $('select#center1').val();
+      var employee_idInput = $('input[name="employee_id1"]').val();
+      var buildingInput = $('select#building1').val();
+      var facultyInput = $('select#faculty1').val();
+      var levelInput = $('select#level1').val();
+
+
+      var departmentInput = $('select#department1').val();
+      var rankInput = $('input[name="rank1"]').val();
 
       if (nameInput && centerInput && employee_idInput && buildingInput && facultyInput && levelInput && departmentInput && rankInput ) {
           // Create Ajax Call
+          console.log("inside");
           $.ajax({
               url: '{% url "lecturer_create" %}',
               data: {
@@ -177,25 +556,55 @@
   function appendToUsrTable(lecturer) {
     $("#userTable > tbody:last-child").append(`
           <tr id="user-${lecturer.id}">
-              <td class="userName" name="name">${lecturer.name}</td>
-              '<td class="userAddress" name="center">${lecturer.center}</td>
-              '<td class="userAge" name="employee_id">${lecturer.employee_id}</td>
-              '<td class="userAddress" name="building">${lecturer.building}</td>
-              '<td class="userAge" name="faculty">${lecturer.faculty}</td>
-              '<td class="userAddress" name="level">${lecturer.level}</td>
-              '<td class="userAge" name="department">${lecturer.department}</td>
-              '<td class="userAddress" name="rank">${lecturer.rank}</td>
+              <td class="lecName userData" name="name">${lecturer.name}</td>
+              '<td class="lecCenter userData" name="center">${lecturer.center}</td>
+              '<td class="lecEmployee_id userData" name="employee_id">${lecturer.employee_id}</td>
+              '<td class="lecBuilding userData" name="building">${lecturer.building}</td>
+              '<td class="lecFaculty userData" name="faculty">${lecturer.faculty}</td>
+              '<td class="lecLevel userData" name="level">${lecturer.level}</td>
+              '<td class="lecDepartment userData" name="department">${lecturer.department}</td>
+              '<td class="lecRank userData" name="rank">${lecturer.rank}</td>
               
 
               '<td align="center">
                   <button class="btn btn-success form-control" onClick="editUser(${lecturer.id})" data-toggle="modal" data-target="#myModal")">EDIT</button>
               </td>
               <td align="center">
-                  <button class="btn btn-danger form-control" onClick="deleteUser(${lecturer.id})">DELETE</button>
+                  <button class="btn btn-danger form-control" onClick="deleteUser(${lecturer.id})">X</button>
               </td>
           </tr>
       `);
   }
+
+
+  
+function editUser(id) {
+  console.log(id);
+  if (id) {
+    tr_id = "#user-" + id;
+    name1 = $(tr_id).find(".lecName").text();
+    center1 = $(tr_id).find(".lecCenter").text();
+    employee_id1 = $(tr_id).find(".lecEmployee_id").text();
+    building1 = $(tr_id).find(".lecBuilding").text();
+    faculty1 = $(tr_id).find(".lecFaculty").text();
+    level1 = $(tr_id).find(".lecLevel").text();
+    department1 = $(tr_id).find(".lecDepartment").text();
+    rank1 = $(tr_id).find(".lecRank").text();
+    
+    $('#form-id').val(id);
+    $('#form-name').val(name1);
+    $('#form-center').val(center1);
+    $('#form-employee_id').val(employee_id1);
+    $('#form-building').val(building1);
+    $('#form-faculty').val(faculty1);
+    $('#form-level').val(level1);
+    $('#form-department').val(department1);
+    $('#form-rank').val(rank1);
+ 
+  }
+}
+
+	
 
   $("form#updateUser").submit(function() {
 
@@ -239,34 +648,12 @@
     }
     $('form#updateUser').trigger("reset");
     $('#myModal').modal('hide');
+    
+
     return false;
 });
 
 
-function editUser(id) {
-  if (id) {
-    tr_id = "#user-" + id;
-    name1 = $(tr_id).find(".lecName").text();
-    center1 = $(tr_id).find(".lecCenter").text();
-    employee_id1 = $(tr_id).find(".lecEmployee_id").text();
-    building1 = $(tr_id).find(".lecBuilding").text();
-    faculty1 = $(tr_id).find(".lecFaculty").text();
-    level1 = $(tr_id).find(".lecLevel").text();
-    department1 = $(tr_id).find(".lecDepartment").text();
-    rank1 = $(tr_id).find(".lecRank").text();
-    
-    $('#form-id').val(id);
-    $('#form-name').val(name1);
-    $('#form-center').val(center1);
-    $('#form-employee_id').val(employee_id1);
-    $('#form-building').val(building1);
-    $('#form-faculty').val(faculty1);
-    $('#form-level').val(level1);
-    $('#form-department').val(department1);
-    $('#form-rank').val(rank1);
- 
-  }
-}
 
 function updateToUserTabel(lecturer){
     $("#userTable #user-" + lecturer.id).children(".userData").each(function() {

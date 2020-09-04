@@ -1,21 +1,248 @@
 {% load static %}
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>{% block title %}Title{% endblock title %}</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    {% block stylesheet %}{% endblock stylesheet %}
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+      integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+      crossorigin="anonymous"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+
+    <script>
+      if (typeof module === "object") {
+        window.module = module;
+        module = undefined;
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      if (window.module) module = window.module;
+    </script>
+
+    {% block stylesheet %}
+    <style>
+      body {
+        height: 100%;
+      }
+      .sidebar ul {
+        list-style: none;
+        margin: 0;
+        height: 100vh;
+        padding: 0;
+      }
+      .sidebar ul i,
+      li {
+        color: white;
+      }
+      .sidebar {
+        width: auto;
+        background-color: #33344a;
+        float: left;
+      }
+      .sidebar-button:hover {
+        background-color: #4c4260;
+      }
+      .sidebar-button {
+        display: block;
+        font-size: 1.2rem;
+        height: 4.6rem;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        background: 0;
+        border: 0;
+        /* height: 100%; */
+        width: 100%;
+        padding: 0.1rem 0.4rem;
+      }
+      .sidebar-button:focus {
+        background-image: linear-gradient(
+            180deg,
+            rgba(60, 62, 93, 0.6),
+            rgba(60, 62, 93, 0) 33%
+          ),
+          linear-gradient(
+            225deg,
+            rgba(60, 62, 93, 0.6) 33%,
+            rgba(60, 62, 93, 0) 70%
+          ),
+          linear-gradient(
+            270deg,
+            rgba(60, 62, 93, 0.6) 70%,
+            rgba(60, 62, 93, 0) 94%
+          ),
+          linear-gradient(
+            315deg,
+            rgba(60, 62, 93, 0.6) 33%,
+            rgba(60, 62, 93, 0) 70%
+          ),
+          linear-gradient(
+            360deg,
+            rgba(60, 62, 93, 0.6),
+            rgba(60, 62, 93, 0) 33%
+          ),
+          linear-gradient(
+            90deg,
+            rgba(98, 100, 167, 0.75) 6%,
+            rgba(98, 100, 167, 0) 70%
+          );
+      }
+      .sidebar-button:focus {
+        outline: 0;
+      }
+      .sidebar-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        font-size: 0.8rem;
+        text-rendering: optimizeLegibility;
+        /* margin-top: -1.3rem; */
+        text-decoration: none;
+        opacity: 0.63;
+        color: white;
+      }
+      .sidebar-button:hover * {
+        opacity: 1;
+      }
+      .sidebar-icon {
+        opacity: 0.63;
+      }
+
+      .cycle-tab-container {
+        margin: 30px auto;
+        width: 800px;
+
+        box-shadow: 0 0 10px 2px #ddd;
+      }
+
+      .cycle-tab-container a {
+        color: #173649;
+        font-size: 16px;
+        font-family: roboto;
+        text-align: center;
+      }
+
+      .tab-pane {
+        text-align: center;
+        height: 100px !important;
+        margin: 30px auto;
+        width: 500px;
+        max-width: 100%;
+      }
+
+      .fade {
+        opacity: 0;
+        transition: opacity 4s ease-in-out;
+      }
+
+      .fade.active {
+        opacity: 1;
+      }
+
+      .cycle-tab-item {
+        width: 180px;
+      }
+
+      .cycle-tab-item:after {
+        display: block;
+        content: "";
+        border-bottom: solid 3px orange;
+        transform: scaleX(0);
+        transition: transform 0ms ease-out;
+      }
+      .cycle-tab-item.active:after {
+        transform: scaleX(1);
+        transform-origin: 0% 50%;
+        transition: transform 5000ms ease-in;
+      }
+
+      .nav-link:focus,
+      .nav-link:hover,
+      .cycle-tab-item.active a {
+        border-color: transparent !important;
+        color: orange;
+      }
+    </style>
+    {% endblock stylesheet %}
   </head>
   <body>
+    <div class="sidebar text-center">
+      <ul>
+        <li>
+          <button class="sidebar-button">
+            <a href="{% url 'index' %}">
+              <i class="fas fa-1x fa-home sidebar-icon"></i>
+              <span class="sidebar-text"> Home </span>
+            </a>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <a href="{% url 'lecturer' %}">
+              <i class="fas fa-1x fa-users sidebar-icon"></i>
+              <span class="sidebar-text"> Lecturers</span>
+            </a>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <a href="{% url 'subject' %}">
+              <i class="fas fa-1x fa-book sidebar-icon"></i>
+
+              <span class="sidebar-text"> Subjects </span>
+            </a>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
+            <span class="sidebar-text"> Students </span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-tags sidebar-icon"></i>
+            <span class="sidebar-text"> Tags </span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
+            <span class="sidebar-text"> Locations </span>
+          </button>
+        </li>
+      </ul>
+    </div>
     <main>
-    {% block content %}
-    {% endblock content %}
+      {% block content %} {% endblock content %}
     </main>
-    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
     <script src='https://code.jquery.com/jquery-3.2.1.min.js'></script>
-    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
-    {% block javascript %}
-    {% endblock javascript%}
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script> -->
+    {% block javascript %} {% endblock javascript%}
   </body>
 </html>

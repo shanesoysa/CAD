@@ -11,3 +11,14 @@ class Lecturer(models.Model):
     department = models.CharField(max_length=100,blank=True)
     rank=models.CharField(max_length=100,blank=True)
     objects = models.Manager()
+
+class Subjects(models.Model):
+    offeredYear=models.CharField(max_length=4,blank=True)
+    offeredSemester=models.CharField(max_length=100,blank=True)
+    subjectName=models.CharField(max_length=100,blank=True)
+    subjectCode=models.CharField(max_length=10,blank=True)
+    noLecHours=models.IntegerField(blank=True, null=True)
+    noTutHours=models.IntegerField(blank=True, null=True)
+    noLabHours=models.IntegerField(blank=True, null=True)
+    noEveHours=models.IntegerField(blank=True, null=True)
+    objects = models.Manager()
