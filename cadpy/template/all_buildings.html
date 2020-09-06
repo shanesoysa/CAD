@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+      integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      .sidebar ul {
+        list-style: none;
+        margin: 0;
+        height: 100vh;
+        padding: 0;
+      }
+      .sidebar ul i,
+      li {
+        color: white;
+      }
+      .sidebar {
+        width: 5.4rem;
+        background-color: #33344a;
+        float: left;
+        position: fixed;
+      }
+      .sidebar-button:hover {
+        background-color: #4c4260;
+      }
+      .sidebar-button {
+        display: block;
+        font-size: 1.2rem;
+        height: 4.6rem;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        background: 0;
+        border: 0;
+        /* height: 100%; */
+        width: 100%;
+        padding: 0.1rem 0.4rem;
+      }
+      .sidebar-button:focus {
+        background-image: linear-gradient(
+            180deg,
+            rgba(60, 62, 93, 0.6),
+            rgba(60, 62, 93, 0) 33%
+          ),
+          linear-gradient(
+            225deg,
+            rgba(60, 62, 93, 0.6) 33%,
+            rgba(60, 62, 93, 0) 70%
+          ),
+          linear-gradient(
+            270deg,
+            rgba(60, 62, 93, 0.6) 70%,
+            rgba(60, 62, 93, 0) 94%
+          ),
+          linear-gradient(
+            315deg,
+            rgba(60, 62, 93, 0.6) 33%,
+            rgba(60, 62, 93, 0) 70%
+          ),
+          linear-gradient(
+            360deg,
+            rgba(60, 62, 93, 0.6),
+            rgba(60, 62, 93, 0) 33%
+          ),
+          linear-gradient(
+            90deg,
+            rgba(98, 100, 167, 0.75) 6%,
+            rgba(98, 100, 167, 0) 70%
+          );
+      }
+      .sidebar-button:focus {
+        outline: 0;
+      }
+      .sidebar-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        font-size: 0.8rem;
+        text-rendering: optimizeLegibility;
+        text-decoration: none;
+        opacity: 0.63;
+        color: white;
+      }
+      .sidebar-button:hover * {
+        opacity: 1;
+      }
+      .sidebar-icon {
+        opacity: 0.63;
+      }
+      .main {
+        background: #f3f2f1;
+        min-height: 100%;
+        margin-left: 5.4rem;
+        width: calc(100% - 5.4rem);
+      }
+      .icon {
+        opacity: 0.6;
+      }
+      .card:hover {
+        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2),
+          0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      }
+      .card {
+        background: #f3f2f1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- sidebar -->
+    <div class="sidebar text-center">
+      <ul>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-home sidebar-icon"></i>
+            <span class="sidebar-text"> Home </span>
+            <a href="{% url 'home'%}" class="stretched-link"></a>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
+            <span class="sidebar-text"> Working</span>
+            <span class="sidebar-text"> Days</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-users sidebar-icon"></i>
+            <span class="sidebar-text"> Lecturers</span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-book sidebar-icon"></i>
+            <span class="sidebar-text"> Subjects </span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
+            <span class="sidebar-text"> Students </span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-tags sidebar-icon"></i>
+            <span class="sidebar-text"> Tags </span>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button" autofocus>
+            <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
+            <span class="sidebar-text"> Locations </span>
+            <a href="{% url 'all_buildings'%}" class="stretched-link"></a>
+          </button>
+        </li>
+        <li>
+          <button class="sidebar-button">
+            <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
+            <span class="sidebar-text"> Statistics </span>
+            <a href="{% url 'statistics'%}" class="stretched-link"></a>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <!-- sidebar end -->
+    <!-- main content -->
+    <div class="container-fluid main pb-3">
+      <div class="row d-flex justify-content-between">
+        <div class="col-4 mt-4 ml-4">
+          <h2>Buildings</h2>
+        </div>
+        <div class="col-3 align-self-end text-center">
+          <a href="{% url 'building' %}" class="btn btn-primary"
+            >Add Building</a
+          >
+        </div>
+      </div>
+      <hr />
+      <div class="row">
+        {% if buildings %} {% for building in buildings %}
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body">
+              <i class="far fa-building fa-3x icon"></i>
+              <p class="m-0">{{building.name}}</p>
+              <span>{{building.room_set.all|length}} Rooms</span>
+              <a
+                href="{% url 'building_detail' building.id %}"
+                class="stretched-link"
+              ></a>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body">
+              <i class="fas fa-city fa-3x icon"></i>
+              <p class="m-0">{{building.name}}</p>
+              <span>3 Rooms</span>
+            </div>
+          </div>
+        </div> -->
+        {% endfor %} {% else %} {% endif %}
+      </div>
+    </div>
+    <!-- main content end -->
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      var a = "{{buildings|length}}";
+      console.log(a);
+    </script>
+  </body>
+</html>
