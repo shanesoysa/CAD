@@ -1,8 +1,11 @@
 from django.shortcuts import render
+from django.template.context_processors import request
 from django.views.generic import ListView
 from django.views.generic import View, DetailView
 from django.http import JsonResponse
 from .models import Lecturer as Lecturer1, Building as BuildingModel, Room as RoomModel
+from .models import Subjects as Subjects1
+from django.core import serializers
 
 # Create your views here.
 
@@ -266,8 +269,61 @@ def lecturerStatistics(request):
     return render(request, 'lecturer_statistics.html')
 
 
+def lecturerCount(reuqest):
+    count = Lecturer1.objects.count()
+    data = {
+        'count': count
+    }
+    return JsonResponse(data)
+
+
+def lecturerCenterStats(request):
+    metro = Lecturer1.objects.filter(center='Metro').count()
+    malabe = Lecturer1.objects.filter(center='Malabe').count()
+    matara = Lecturer1.objects.filter(center='Matara').count()
+    kurunegala = Lecturer1.objects.filter(center='Kurunagala').count()
+    kandy = Lecturer1.objects.filter(center='Kandy').count()
+    jaffna = Lecturer1.objects.filter(center='Jaffna').count()
+    centers = [metro, malabe, matara, kurunegala, kandy, jaffna]
+    data = {
+        'centers': centers,
+    }
+    return JsonResponse(data)
+
+
+def lecurerLevelStat(request):
+    p = Lecturer1.objects.filter(level=1).count()
+    ap = Lecturer1.objects.filter(level=2).count()
+    slhg = Lecturer1.objects.filter(level=3).count()
+    sl = Lecturer1.objects.filter(level=4).count()
+    l = Lecturer1.objects.filter(level=5).count()
+    al = Lecturer1.objects.filter(level=6).count()
+    i = Lecturer1.objects.filter(level=7).count()
+    levels = [p, ap, slhg, sl, l, al, i]
+    data = {
+        'levels': levels
+    }
+    return JsonResponse(data)
+
+
+def subjectCount(request):
+    count = Subjects1.objects.count()
+    data = {
+        'count': count
+    }
+    return JsonResponse(data)
+
+
 def subjectStatistics(request):
     return render(request, 'subject_statistics.html')
+
+
+def allSubjectStatistics(request):
+    subjects = Subjects1.objects.all()
+    data = {
+        'subjects': subjects
+    }
+    return JsonResponse(serializers.serialize('json', subjects), safe=False)
 
 
 def studentStatistics(request):

@@ -199,99 +199,29 @@
                 <select
                   class="custom-select"
                   id="type1"
-                  onchange="changeSelect()"
+                  onchange="changeSelect(this)"
                 >
-                  <option selected value="1">Year 1 Semester 1</option>
-                  <option value="2">Year 1 Semester 2</option>
-                  <option value="3">Year 2 Semester 1</option>
-                  <option value="Lecture Hall">Year 2 Semester 2</option>
-                  <option value="Lecture Hall">Year 3 Semester 1</option>
-                  <option value="Lecture Hall">Year 3 Semester 2</option>
-                  <option value="Lecture Hall">Year 4 Semester 1</option>
-                  <option value="Lecture Hall">Year 4 Semester 2</option>
+                  <option value="" disabled selected>
+                    -- please select --
+                  </option>
+                  <option value="11">Year 1 Semester 1</option>
+                  <option value="12">Year 1 Semester 2</option>
+                  <option value="21">Year 2 Semester 1</option>
+                  <option value="22">Year 2 Semester 2</option>
+                  <option value="31">Year 3 Semester 1</option>
+                  <option value="32">Year 3 Semester 2</option>
+                  <option value="41">Year 4 Semester 1</option>
+                  <option value="42">Year 4 Semester 2</option>
                 </select>
               </div>
             </div>
           </div>
-          <div class="row" id="col1">
-            <div class="col-3">
-              <div class="card border-0">
-                <div
-                  class="card-body subject-card text-center"
-                  onclick="changeSubject('Mathematics for Computing','MC')"
-                >
-                  MC
-                </div>
-              </div>
-            </div>
-            <div class="col-3">
-              <div class="card border-0">
-                <div
-                  class="card-body subject-card text-center"
-                  onclick="changeSubject('Introduction to Programming','IP')"
-                >
-                  IP
-                </div>
-              </div>
-            </div>
-            <div class="col-3">
-              <div class="card border-0">
-                <div
-                  class="card-body subject-card text-center"
-                  onclick="changeSubject('Communication Skills','CS')"
-                >
-                  CS
-                </div>
-              </div>
-            </div>
-            <div class="col-3">
-              <div class="card border-0">
-                <div
-                  class="card-body subject-card text-center"
-                  onclick="changeSubject('Introduction to Computer Systems','ICS')"
-                >
-                  ICS
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row d-none" id="col2">
-            <div class="col-3">
-              <div class="card border-0">
-                <div
-                  class="card-body subject-card text-center"
-                  onclick="changeSubject('Object Oriented Concepts','OOC')"
-                >
-                  OOC
-                </div>
-              </div>
-            </div>
-            <div class="col-3">
-              <div class="card border-0">
-                <div
-                  class="card-body subject-card text-center"
-                  onclick="changeSubject('English for Academic Purposes','EAP')"
-                >
-                  EAP
-                </div>
-              </div>
-            </div>
-            <div class="col-3">
-              <div class="card border-0">
-                <div
-                  class="card-body subject-card text-center"
-                  onclick="changeSubject('Information Systems & Data Modeling','ISDM')"
-                >
-                  ISDM
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="row" id="area"></div>
         </div>
         <div class="col-3">
           <div class="card border-0">
             <div class="card-body text-center">
-              <h1>7</h1>
+              <h1 id="subjectCount">&nbsp;</h1>
               <h2>Subjects</h2>
             </div>
           </div>
@@ -301,7 +231,8 @@
         <div class="col-6 m-auto">
           <div class="card border-0 py-3">
             <div class="card-body text-center">
-              <h1 id="subject">Mathematics for Computing</h1>
+              <h1 id="subject"></h1>
+              <h2 id="subjectCode"></h2>
             </div>
           </div>
         </div>
@@ -333,20 +264,71 @@
       if (window.module) module = window.module;
     </script>
     <script>
-      function changeSelect() {
-        var value = $("#type1").val();
-        console.log(value);
+      var len, subData;
+      $(document).ready(function () {
+        $.ajax({
+          url: '{% url "allSubjectStatistics" %}',
+          dataType: "json",
+          success: function (data) {
+            subData = JSON.parse(data);
+            len = subData.length;
+            $("#subjectCount").html(len);
+          },
+        });
+      });
 
-        $("#col1").addClass("d-none");
-        $("#col2").removeClass("d-none");
-        changeSubject("Object Oriented Concepts", "OOC");
+      function changeSelect(x) {
+        $("#area").empty();
+        $("#subject").text("\xa0");
+        $("#subjectCode").text("\xa0");
+        var data1 = [0, 0, 0, 0];
+        addData(data1);
+        for (var i = 0; i < len; i++) {
+          if (
+            subData[i].fields.offeredYear == x.value[0] &&
+            subData[i].fields.offeredSemester == x.value[1]
+          ) {
+            $("#area").append(
+              '<div class="col-3">' +
+                '<div class="card border-0">' +
+                '<div class="card-body subject-card text-center"' +
+                'onclick="changeSubject(' +
+                "'" +
+                subData[i].fields.subjectName +
+                "'" +
+                "," +
+                "'" +
+                subData[i].fields.subjectCode +
+                "'" +
+                "," +
+                subData[i].fields.noLecHours +
+                "," +
+                subData[i].fields.noTutHours +
+                "," +
+                subData[i].fields.noLabHours +
+                "," +
+                subData[i].fields.noEveHours +
+                ')" >' +
+                subData[i].fields.subjectName +
+                "</div></div></div>"
+            );
+          }
+        }
+        $(".subject-card:first").click();
+      }
+
+      function changeSubject(s, code, a, b, c, d) {
+        $("#subject").html(s);
+        $("#subjectCode").html(code);
+        var data1 = [a, b, c, d];
+        addData(data1);
       }
 
       var doughnutChart = document.getElementById("doughnutChart");
       var data = {
         datasets: [
           {
-            data: [2, 1, 2, 0],
+            data: [0, 0, 0, 0],
             backgroundColor: [
               "rgba(255, 99, 132, 0.5)",
               "rgba(255, 206, 86, 0.2)",
@@ -384,32 +366,6 @@
           backgroundColor: backgroundColor,
         });
         myDoughnutChart.update();
-      }
-
-      function changeSubject(s, s2) {
-        $("#subject").html(s);
-        console.log(s2);
-        switch (s2) {
-          case "MC":
-            var data1 = [2, 1, 2, 0];
-            break;
-          case "IP":
-            var data1 = [2, 1, 2, 0];
-            break;
-          case "CS":
-            var data1 = [4, 0, 0, 0];
-            break;
-          case "EAP":
-            var data1 = [4, 0, 0, 0];
-            break;
-          case "ICS":
-            var data1 = [2, 1, 2, 0];
-            break;
-          default:
-            var data1 = [2, 1, 2, 0];
-        }
-        console.log(data1);
-        addData(data1);
       }
     </script>
   </body>

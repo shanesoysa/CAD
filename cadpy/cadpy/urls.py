@@ -26,7 +26,9 @@ urlpatterns = [
     # path('building2/', views.addBuilding2, name='building2'),
     # path('all_buildings2', views.allBuildings2, name='all_buildings2'),
     path('', views.home, name='home'),
-    #####################################################
+
+    #################################################################################
+
     # ranul
     # location
     path('building/', views.addBuilding, name='building'),
@@ -42,11 +44,22 @@ urlpatterns = [
     path('all_buildings', views.Buildings.as_view(), name='all_buildings'),
     path('building/<int:pk>/', views.BuildingDetail.as_view(),
          name='building_detail'),
+
     # statistics
     path('lecturer_statistics', views.lecturerStatistics,
          name='lecturer_statistics'),
-    path('subject_statistics', views.subjectStatistics, name='subject_statistics'),
+    path('subject_statistics', views.subjectStatistics,
+         name='subject_statistics'),
     path('student_statistics', views.studentStatistics, name='student_statistics'),
     path('statistics', views.statistics, name='statistics'),
-    #####################################################
+    path('statistics/lecturerCount', views.lecturerCount, name='lecturerCount'),
+    path('statistics/lecturerCenterStats',
+         views.lecturerCenterStats, name='lecturerCenterStats'),
+    path('statistics/lecurerLevelStat',
+         views.lecurerLevelStat, name='lecurerLevelStat'),
+    path('statistics/subjectCount', views.subjectCount, name='subjectCount'),
+    path('statistics/allSubjectStatistics',
+         views.allSubjectStatistics, name='allSubjectStatistics'),
+
+    #################################################################################
 ]

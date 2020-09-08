@@ -76,13 +76,13 @@ WSGI_APPLICATION = 'cadpy.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-       'default': {
+    'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'bfsxmrr5z6eb7xxj2gxg',
-        'USER':'uusbmkqcm0d9eoqo',
-        'PASSWORD':'0wb1mqewyiVbp597wA1A',
-        'HOST':'bfsxmrr5z6eb7xxj2gxg-mysql.services.clever-cloud.com',
-        'PORT':'3306'
+        'USER': 'uusbmkqcm0d9eoqo',
+        'PASSWORD': '0wb1mqewyiVbp597wA1A',
+        'HOST': 'bfsxmrr5z6eb7xxj2gxg-mysql.services.clever-cloud.com',
+        'PORT': '3306'
     }
 }
 

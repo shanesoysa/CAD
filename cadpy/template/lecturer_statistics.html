@@ -189,7 +189,7 @@
           <div class="col-6 m-auto">
             <div class="card border-0 py-3">
               <div class="card-body text-center">
-                <h1>4</h1>
+                <h1 id="lectureCount">&nbsp;</h1>
                 <h2>Lecturers</h2>
               </div>
             </div>
@@ -202,11 +202,7 @@
       </div>
     </div>
     <!-- main content end -->
-    <script
-      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
       integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
@@ -219,6 +215,59 @@
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script>
+      $(document).ready(function () {
+        $.ajax({
+          url: '{%url "lecturerCount" %}',
+          dataType: "json",
+          success: function (data) {
+            $("#lectureCount").html(data.count);
+          },
+        });
+
+        $.ajax({
+          url: '{%url "lecurerLevelStat" %}',
+          dataType: "json",
+          success: function (data) {
+            addData(myChart, data.levels, barBackgrounColour);
+          },
+        });
+
+        $.ajax({
+          url: '{%url "lecturerCenterStats" %}',
+          dataType: "json",
+          success: function (data) {
+            addData(myDoughnutChart, data.centers, backgroundColor);
+          },
+        });
+      });
+
+      var backgroundColor = [
+        "rgba(255, 99, 132, 0.5)",
+        "rgba(255, 206, 86, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgb(123, 141, 232)",
+        "rgb(155, 232, 212)",
+        "rgb(149, 240, 162)",
+      ];
+
+      function addData(v, d, b) {
+        v.data.datasets.pop();
+        v.data.datasets.push({
+          data: d,
+          backgroundColor: b,
+        });
+        v.update();
+      }
+
+      var barBackgrounColour = [
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(255, 206, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+      ];
       var ctx = document.getElementById("barChart");
       var myChart = new Chart(ctx, {
         type: "bar",
@@ -234,17 +283,8 @@
           ],
           datasets: [
             {
-              // label: "# of Votes",
-              data: [0, 0, 0, 2, 1, 0, 1],
-              backgroundColor: [
-                "rgba(255, 99, 132, 0.2)",
-                "rgba(54, 162, 235, 0.2)",
-                "rgba(255, 206, 86, 0.2)",
-                "rgba(75, 192, 192, 0.2)",
-                "rgba(153, 102, 255, 0.2)",
-                "rgba(255, 159, 64, 0.2)",
-                "rgba(54, 162, 235, 0.2)",
-              ],
+              data: [0, 0, 0, 0, 0, 0, 0],
+              backgroundColor: barBackgrounColour,
               borderColor: [
                 "rgba(255, 99, 132, 1)",
                 "rgba(54, 162, 235, 1)",
@@ -291,17 +331,20 @@
       var data = {
         datasets: [
           {
-            data: [1, 2, 1],
+            data: [0, 0, 0, 0, 0, 0],
             backgroundColor: [
               "rgba(255, 99, 132, 0.5)",
               "rgba(255, 206, 86, 0.2)",
               "rgba(54, 162, 235, 0.2)",
+              "rgb(123, 141, 232)",
+              "rgb(155, 232, 212)",
+              "rgb(149, 240, 162)",
             ],
           },
         ],
 
         // These labels appear in the legend and in the tooltips when hovering different arcs
-        labels: ["Metro", "Malabe", "Matara"],
+        labels: ["Metro", "Malabe", "Matara", "Kurunegala", "Kandy", "Jaffna"],
       };
       var myDoughnutChart = new Chart(doughnutChart, {
         type: "doughnut",
