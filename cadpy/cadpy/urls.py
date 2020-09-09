@@ -57,9 +57,17 @@ urlpatterns = [
          views.lecturerCenterStats, name='lecturerCenterStats'),
     path('statistics/lecurerLevelStat',
          views.lecurerLevelStat, name='lecurerLevelStat'),
-    path('statistics/subjectCount', views.subjectCount, name='subjectCount'),
+    #     path('statistics/subjectCount', views.subjectCount, name='subjectCount'),
     path('statistics/allSubjectStatistics',
          views.allSubjectStatistics, name='allSubjectStatistics'),
+    path('statistics/allProgrammeStatistics',
+         views.allProgrammeStatistics, name='allProgrammeStatistics'),
+    path('statistics/allYearSemesterStatistics',
+         views.allYearSemesterStatistics, name='allYearSemesterStatistics'),
+    path('statistics/allGroupStatistics',
+         views.allGroupStatistics, name='allGroupStatistics'),
+    path('statistics/allSubGroupStatistics',
+         views.allSubGroupStatistics, name='allSubGroupStatistics'),
 
     #################################################################################
 ]

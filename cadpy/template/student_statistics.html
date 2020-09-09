@@ -197,13 +197,12 @@
                 >
                 <select
                   class="custom-select"
-                  id="type1"
-                  onchange="changeSelect()"
+                  id="yearSelect"
+                  onchange="changeYearSelect()"
                 >
-                  <option selected value="1">Year 1 Semester 1</option>
-                  <option value="2">Year 1 Semester 2</option>
-                  <option value="3">Year 2 Semester 1</option>
-                  <option value="Lecture Hall">Year 2 Semester 2</option>
+                  <option value="" disabled selected>
+                    -- please select --
+                  </option>
                 </select>
               </div>
             </div>
@@ -212,12 +211,12 @@
                 <label for="exampleFormControlSelect1">Select programme</label>
                 <select
                   class="custom-select"
-                  id="type1"
-                  onchange="changeSelect2()"
+                  id="programmeSelect"
+                  onchange="changeYearSelect()"
                 >
-                  <option selected value="1">IT</option>
-                  <option value="1">ISE</option>
-                  <option value="1">DS</option>
+                  <option value="" disabled selected>
+                    -- please select --
+                  </option>
                 </select>
               </div>
             </div>
@@ -226,7 +225,7 @@
         <div class="col-3">
           <div class="card border-0">
             <div class="card-body text-center">
-              <h1>3</h1>
+              <h1 id="programmeCount" class="countOnce">0</h1>
               <h2>Programmes</h2>
             </div>
           </div>
@@ -236,7 +235,7 @@
         <div class="col-4">
           <div class="card border-0 py-3">
             <div class="card-body text-center">
-              <h1 id="count">2000</h1>
+              <h1 id="count" class="count">0</h1>
               <h2>Students</h2>
             </div>
           </div>
@@ -244,7 +243,7 @@
         <div class="col-4">
           <div class="card border-0 py-3">
             <div class="card-body text-center">
-              <h1 id="groups">20</h1>
+              <h1 id="groups" class="count">0</h1>
               <h2>Groups</h2>
             </div>
           </div>
@@ -252,7 +251,7 @@
         <div class="col-4">
           <div class="card border-0 py-3">
             <div class="card-body text-center">
-              <h1 id="subgroups">40</h1>
+              <h1 id="subgroups" class="count">0</h1>
               <h2>Sub-Groups</h2>
             </div>
           </div>
@@ -282,16 +281,144 @@
       if (window.module) module = window.module;
     </script>
     <script>
-      function changeSelect2() {
-        $("#count").html("0");
-        $("#groups").html("0");
-        $("#subgroups").html("0");
+      var progData,
+        len,
+        semData,
+        semLen,
+        groupData,
+        groupLen,
+        subGroupData,
+        subGroupLen;
+      $(document).ready(function () {
+        $.ajax({
+          url: "{% url 'allProgrammeStatistics' %}",
+          dataType: "json",
+          success: function (data) {
+            progData = JSON.parse(data);
+            len = progData.length;
+            $("#programmeCount").html(len);
+            animateOnce();
+            for (var i = 0; i < len; i++) {
+              var o = new Option(
+                progData[i].fields.programme_name,
+                progData[i].pk
+              );
+              $(o).html(progData[i].fields.programme_name);
+              $("#programmeSelect").append(o);
+            }
+          },
+        });
+
+        $.ajax({
+          url: "{% url 'allYearSemesterStatistics' %}",
+          dataType: "json",
+          success: function (data) {
+            semData = JSON.parse(data);
+            semLen = semData.length;
+            for (var i = 0; i < semLen; i++) {
+              var o = new Option(
+                "Year " +
+                  semData[i].fields.academic_year +
+                  " Semester " +
+                  semData[i].fields.academic_semester,
+                semData[i].pk
+              );
+              $(o).html(
+                "Year " +
+                  semData[i].fields.academic_year +
+                  " Semester " +
+                  semData[i].fields.academic_semester
+              );
+              $("#yearSelect").append(o);
+            }
+          },
+        });
+
+        $.ajax({
+          url: "{% url 'allGroupStatistics' %}",
+          dataType: "json",
+          success: function (data) {
+            groupData = JSON.parse(data);
+            groupLen = groupData.length;
+          },
+        });
+
+        $.ajax({
+          url: "{% url 'allSubGroupStatistics' %}",
+          dataType: "json",
+          success: function (data) {
+            subGroupData = JSON.parse(data);
+            subGroupLen = subGroupData.length;
+          },
+        });
+      });
+
+      function animate() {
+        $(".count").each(function () {
+          $(this)
+            .prop("Counter", 0)
+            .animate(
+              {
+                Counter: $(this).text(),
+              },
+              {
+                duration: 1000,
+                easing: "swing",
+                step: function (now) {
+                  $(this).text(Math.ceil(now));
+                },
+              }
+            );
+        });
       }
 
-      function changeSelect() {
-        $("#count").html("500");
-        $("#groups").html("10");
-        $("#subgroups").html("20");
+      function animateOnce() {
+        $(".countOnce").each(function () {
+          $(this)
+            .prop("Counter", 0)
+            .animate(
+              {
+                Counter: $(this).text(),
+              },
+              {
+                duration: 1000,
+                easing: "swing",
+                step: function (now) {
+                  $(this).text(Math.ceil(now));
+                },
+              }
+            );
+        });
+      }
+
+      function changeYearSelect() {
+        var year = $("#yearSelect").val();
+        var prog = $("#programmeSelect").val();
+        var group = 0;
+        var sum = 0;
+        var arr = [];
+        var sub = 0;
+        if (year && prog) {
+          for (var i = 0; i < groupLen; i++) {
+            if (
+              groupData[i].fields.academic_year_semester == year &&
+              groupData[i].fields.programme == prog
+            ) {
+              group++;
+              sum += groupData[i].fields.student_count;
+              arr.push(groupData[i].pk);
+            }
+          }
+          for (var i = 0; i < subGroupLen; i++) {
+            if (arr.includes(subGroupData[i].fields.group)) {
+              sub++;
+            }
+          }
+        }
+        $("#count").html(sum);
+        $("#groups").html(group);
+        $("#subgroups").html(sub);
+        animate();
       }
     </script>
   </body>

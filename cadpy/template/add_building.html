@@ -417,6 +417,7 @@
           dataType: "json",
           success: function (data) {
             if (data.deleted) {
+              $("#buildingError").text("\xA0");
               $(".cus_btn").prop("disabled", false);
               $("#deleteBuildingButton span").removeClass("spinner-border");
               $("#addColumn").removeClass("d-none");

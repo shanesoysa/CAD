@@ -3,7 +3,7 @@ from django.template.context_processors import request
 from django.views.generic import ListView
 from django.views.generic import View, DetailView
 from django.http import JsonResponse
-from .models import Lecturer as Lecturer1, Building as BuildingModel, Room as RoomModel
+from .models import AcademicYearSemester, Group, Lecturer as Lecturer1, Building as BuildingModel, Programme, Room as RoomModel, Subgroup
 from .models import Subjects as Subjects1
 from django.core import serializers
 
@@ -320,14 +320,31 @@ def subjectStatistics(request):
 
 def allSubjectStatistics(request):
     subjects = Subjects1.objects.all()
-    data = {
-        'subjects': subjects
-    }
     return JsonResponse(serializers.serialize('json', subjects), safe=False)
 
 
 def studentStatistics(request):
     return render(request, 'student_statistics.html')
+
+
+def allProgrammeStatistics(request):
+    programmes = Programme.objects.all()
+    return JsonResponse(serializers.serialize('json', programmes), safe=False)
+
+
+def allYearSemesterStatistics(request):
+    yearSemester = AcademicYearSemester.objects.all()
+    return JsonResponse(serializers.serialize('json', yearSemester), safe=False)
+
+
+def allGroupStatistics(request):
+    groups = Group.objects.all()
+    return JsonResponse(serializers.serialize('json', groups), safe=False)
+
+
+def allSubGroupStatistics(request):
+    subGroups = Subgroup.objects.all()
+    return JsonResponse(serializers.serialize('json', subGroups), safe=False)
 
 
 def statistics(request):

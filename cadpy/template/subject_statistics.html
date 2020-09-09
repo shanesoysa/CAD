@@ -221,7 +221,7 @@
         <div class="col-3">
           <div class="card border-0">
             <div class="card-body text-center">
-              <h1 id="subjectCount">&nbsp;</h1>
+              <h1 id="subjectCount" class="count">0</h1>
               <h2>Subjects</h2>
             </div>
           </div>
@@ -273,9 +273,29 @@
             subData = JSON.parse(data);
             len = subData.length;
             $("#subjectCount").html(len);
+            animate();
           },
         });
       });
+
+      function animate() {
+        $(".count").each(function () {
+          $(this)
+            .prop("Counter", 0)
+            .animate(
+              {
+                Counter: $(this).text(),
+              },
+              {
+                duration: 1000,
+                easing: "swing",
+                step: function (now) {
+                  $(this).text(Math.ceil(now));
+                },
+              }
+            );
+        });
+      }
 
       function changeSelect(x) {
         $("#area").empty();
