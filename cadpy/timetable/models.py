@@ -74,3 +74,13 @@ class Subgroup(models.Model):
         sub_group_id = self.group.generated_group + '.' + str(self.subgroup_no)
         return sub_group_id
     #str not defined        
+class Subjects(models.Model):
+    offeredYear=models.CharField(max_length=4,blank=True)
+    offeredSemester=models.CharField(max_length=100,blank=True)
+    subjectName=models.CharField(max_length=100,blank=True)
+    subjectCode=models.CharField(max_length=10,blank=True)
+    noLecHours=models.IntegerField(blank=True, null=True)
+    noTutHours=models.IntegerField(blank=True, null=True)
+    noLabHours=models.IntegerField(blank=True, null=True)
+    noEveHours=models.IntegerField(blank=True, null=True)
+    objects = models.Manager()

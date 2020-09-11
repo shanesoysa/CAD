@@ -2,14 +2,7 @@
 
 
 {% block title %}Students{% endblock %}
-{% block stylesheet %}
-    <style>
-        .viewTool {
-        background: #F2F8FD;
-        color: #2E3F7F;
-    }
-    </style>
-{% endblock stylesheet %}
+
 
 {% block content %}
 <div class="container-fluid">
@@ -89,10 +82,6 @@
 <script>
     
     $(document).ready(function(){
-        $('.tooltip').tooltip({
-        tooltipClass: "viewTool"
-        });
-
         $('[data-toggle="tooltip"]').tooltip();
     });
 

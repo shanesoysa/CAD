@@ -3,10 +3,16 @@ from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
-from .models import Lecturer as Lecturer1, Subgroup, Group, Programme, AcademicYearSemester, Tags
+from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags
 from django.db.utils import IntegrityError
 #import sys
+from .models import Lecturer as Lecturer1
+from .models import Subjects as Subjects1
+
 # Create your views here.
+def index(request):
+     return render(request, 'home.html')
+    
 
 class Lecturer(ListView):
     model = Lecturer1
@@ -98,6 +104,105 @@ class DeleteLecturer(View):
         def  get(self, request):
             id1 = request.GET.get('id', None)
             Lecturer1.objects.get(id=id1).delete()
+            data = {
+                'deleted': True
+            }
+            return JsonResponse(data)
+    except:
+        
+        print("lecturer delete failed")
+        pass
+
+class Subjects(ListView):
+    model = Subjects1
+    template_name = 'list_subjects.html'
+    context_object_name = 'subjects'
+
+    
+
+
+class AddSubjects(View):
+    def  get(self, request):
+        
+        try:
+            offeredYear1 = request.GET.get('offeredYear', None)
+            offeredSemester1 = request.GET.get('offeredSemester', None)
+            subjectName1 = request.GET.get('subjectName', None)
+            subjectCode1 = request.GET.get('subjectCode', None)
+            noLecHours1 = request.GET.get('noLecHours', None)
+            noTutHours1 = request.GET.get('noTutHours', None)
+            noLabHours1 = request.GET.get('noLabHours', None)
+            noEveHours1 = request.GET.get('noEveHours', None)
+            
+            obj = Subjects1.objects.create(
+                offeredYear=offeredYear1,
+                offeredSemester=offeredSemester1,
+                subjectName=subjectName1,
+                subjectCode=subjectCode1,
+                noLecHours=noLecHours1,
+                noTutHours=noTutHours1,
+                noLabHours=noLabHours1,
+                noEveHours=noEveHours1
+            )
+            
+
+            subject = {'id':obj.id,'offeredYear':obj.offeredYear,'offeredSemester':obj.offeredSemester,'subjectName':obj.subjectName,'subjectCode':obj.subjectCode,'noLecHours':obj.noLecHours,'noTutHours':obj.noTutHours,'noLabHours':obj.noLabHours,'noEveHours':obj.noEveHours}
+
+            data = {
+                'subject': subject
+            }
+            print("successfull")
+
+            return JsonResponse(data)
+
+        except:
+            print("fail adding data")
+            pass
+
+class UpdateSubject(View):
+    try:
+        def  get(self, request):
+            id1 = request.GET.get('id', None)
+            offeredYear1 = request.GET.get('offeredYear', None)
+            offeredSemester1 = request.GET.get('offeredSemester', None)
+            subjectName1 = request.GET.get('subjectName', None)
+            subjectCode1 = request.GET.get('subjectCode', None)
+            noLecHours1 = request.GET.get('noLecHours', None)
+            noTutHours1 = request.GET.get('noTutHours', None)
+            noLabHours1 = request.GET.get('noLabHours', None)
+            noEveHours1 = request.GET.get('noEveHours', None)
+
+            obj = Subjects1.objects.get(id=id1)
+            obj.offeredYear = offeredYear1
+            obj.offeredSemester = offeredSemester1
+            obj.subjectName = subjectName1
+            obj.subjectCode = subjectCode1            
+            obj.noLecHours = noLecHours1
+            obj.noTutHours = noTutHours1
+            obj.noLabHours = noLabHours1
+            obj.noEveHours = noEveHours1
+           
+            
+            obj.save()
+
+            subject = {'id':obj.id,'offeredYear':obj.offeredYear,'offeredSemester':obj.offeredSemester,'subjectName':obj.subjectName,'subjectCode':obj.subjectCode,'noLecHours':obj.noLecHours,'noTutHours':obj.noTutHours,'noLabHours':obj.noLabHours,'noEveHours':obj.noEveHours}
+
+            data = {
+                'subject': subject
+            }
+            return JsonResponse(data)
+            
+    except:
+        
+        print("subject update failed")
+        pass
+    
+
+class DeleteSubject(View):
+    try:
+        def  get(self, request):
+            id1 = request.GET.get('id', None)
+            Subjects1.objects.get(id=id1).delete()
             data = {
                 'deleted': True
             }
@@ -233,7 +338,6 @@ class ProgrammesView(generic.ListView):
 
 class AddProgramme(View):
     def  get(self, request):
-        
         try:
             pname = request.GET.get('programme_name', None)
             pabbv = request.GET.get('programme_abbv', None)
@@ -248,11 +352,8 @@ class AddProgramme(View):
                 'success_stat': 1,
                 'programme': programme
             }
-            print("successfull")
-
             return JsonResponse(data)
-
-        except:
+        except:        
             data = {
                 'success': 0,
                 'error': 'Cannot save duplicate programme abbreviation'
@@ -272,7 +373,6 @@ class DeleteProgramme(View):
             }
             return JsonResponse(data)
     except:
-        
         print("programme delete failed")
         pass
 
@@ -456,13 +556,11 @@ class DeleteStudentsView(View):
             id1 = request.GET.get('id', None)
            
             Group.objects.get(id=id1).delete()
-            
             data = {
                 'deleted': True
             }
             return JsonResponse(data)
     except:
-        
         print("Students delete failed")
         pass
     
@@ -546,3 +644,5 @@ class UpdateSubGroupsView(View):
         except Exception as ex:
             print('Error: ', ex)    
             pass        
+        
+
