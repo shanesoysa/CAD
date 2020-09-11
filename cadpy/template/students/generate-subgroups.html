@@ -23,23 +23,25 @@
                         </div>
                         <div class="col-md-2">
                             <div class="form-group m-4">
-                                <input type="submit" class="form-control m-3 btn btn-info btn-block" disabled="true" value="  Save  " />
+                                <input type="submit" class="form-control m-3 btn btn-info btn-block" id="save_btn" disabled="true" value="  Save  " />
                             </div>
                         </div>
                     </form>
                 </div>
+                {% if group.subgroup_set.all|length > 0 %}
+                    <div style="float: right;">
+                        <a href="{% url 'generate_subgroups' group.id %}"><button class="btn btn-lg btn-danger"> Generate </button></a>
+                    </div>
+                {% endif %}
                 <div class="row row-cols-1 row-cols-md-4 chaa">
                     {% for subgroup in group.subgroup_set.all %}
                     <div class="col mb-2" id="sb-${subgroup.id}">
                         <div class="card shadow p-3 mb-5 bg-white rounded text-center">
                             <pre>
-                                <h5>{{subgroup.subgroup_no }}    <span data-toggle="modal" data-target="#myModal" onclick="editSubgroup({{subgroup.id}})"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteAca({{subgroup.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+                                <h5 class="proName">{{subgroup.subgroup_no }}    <span data-toggle="modal" data-target="#myModal" onclick="editSubgroup({{subgroup.id}})"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteAca({{subgroup.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
                         </div>
                     </div>
                     {% endfor %}
-                </div>
-                <div style="float: right;">
-                    <a href="{% url 'generate_subgroups' %}"><button class="btn btn-lg btn-danger"> Generate </button></a>
                 </div>
             </div>
         </div>
@@ -50,7 +52,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Update Sub Groupd No</h5>
+        <h5 class="modal-title">Update Sub Group</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -59,12 +61,12 @@
         <form id="updateUser" action="">
           <div class="modal-body">
               <input class="form-control" id="form-id" type="hidden" name="formId"/>
-              <label for="name">Sub group Number </label>
-              <input class="form-control" id="form-name" type="number" name="formName"/>
+              <label for="form-name">Sub group Number </label>
+              <input class="form-control" id="form-name" type="number" min="1" name="formName"/>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="submit" id="update_btn" class="btn btn-primary" disabled="true">Save changes</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         
         </div>
@@ -81,7 +83,16 @@
     $(function(){
         $('#subgroupId').change(function(){
             if($('input[name="subgroup"]').val())
-                $(':disabled').prop("disabled", false);
+                $('#save_btn').prop("disabled", false);
+            else  
+                $('#save_btn').prop("disabled", true);  
+        });
+
+        $('#form-name').change(function(){
+            if($('input[name="formName"]').val())
+                $('#update_btn').prop("disabled", false);
+            else  
+                $('#update_btn').prop("disabled", true); 
         });
     });
 
@@ -90,7 +101,6 @@ $("form#addSubgroups").submit(function() {
 var groupId = $('input[name="groupId"]').val();
 var subgroup = $('input[name="subgroup"]').val();
 
-if (groupId && subgroup) {
     // Create Ajax Call
     
     $.ajax({
@@ -101,20 +111,19 @@ if (groupId && subgroup) {
         },
         dataType: 'json',
         success: function (data) {
-        
-            console.log(data.subgroup);
-
-            if (data.subgroup) {
-                appendToAcademicsTable(data.subgroup);
+            if(data.success_stat == 1){
+                if (data.subgroup) {
+                    appendToAcademicsTable(data.subgroup);
+                    $('form#addSubgroups').trigger("reset");
+                }
+            }else{
+                alert(data.error_msg);
             }
-            
         }
     });
-} else {
-    alert("All fields must have a valid value.");
-}
-$('form#addSubgroups').trigger("reset");
-return false;
+
+    $('#save_btn').prop("disabled", true);
+    return false;
 });
 
 function appendToAcademicsTable(subgroup) {
@@ -123,7 +132,7 @@ function appendToAcademicsTable(subgroup) {
     <div class="col mb-4" id="sb-${subgroup.id}">
         <div class="card shadow p-3 mb-5 bg-white rounded text-center">
             <pre>
-                <h5>${subgroup.subgroup_no }    <span onclick="editSubgroup(${subgroup.id})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteAca(${subgroup.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+                <h5 class="proName">${subgroup.subgroup_no }    <span onclick="editSubgroup(${subgroup.id})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteAca(${subgroup.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
         </div>
     </div>
     `);
@@ -139,9 +148,10 @@ function deleteAca(id) {
         },
         dataType: 'json',
         success: function (data) {
-            alert('removed')
             if (data.deleted) {
               $("#sb-" + id).remove();
+            }else{
+                alert('error occured')
             }
         }
     });
@@ -149,13 +159,10 @@ function deleteAca(id) {
 }
 $("form#updateUser").submit(function() {
 
-var idInput = $('input[name="formId"]').val().trim();
-var nameInput = $('input[name="formName"]').val();
+    var idInput = $('input[name="formId"]').val().trim();
+    var nameInput = $('input[name="formName"]').val();
 
-
-
-if (nameInput) {
-    // Create Ajax Call
+    
     $.ajax({
         url: '{% url "update_subgroups" group.id %}',
         data: {
@@ -164,35 +171,28 @@ if (nameInput) {
         },
         dataType: 'json',
         success: function (data) {
-            if (data.subgroup) {
-              
-              updateToUserTabel(data.subgroup);
-              
+            if(data.success_stat == 1){
+                $('form#updateUser').trigger("reset");
+                updateToUserTabel(data.subgroup);
+            }else{
+                alert(data.error_msg)
             }
         }
     });
-   } else {
-    alert("All fields must have a valid value.");
-}
-
-$('form#updateUser').trigger("reset");
-$('#myModal').modal('hide');
-return false;
+    $('#myModal').modal('hide');
+    return false;
 });
 
 
 function editSubgroup(id) {
   
   if (id) {
-  
-  tr_id = "#sb-" + id;
-  pname = $(tr_id).find(".proName").text();
-  
-  
-  $('#form-id').val(id);
-  $('#form-name').val(pname);
- 
-
+    tr_id = "#sb-" + id;
+    pname = $(tr_id).find(".proName").text();
+    $('#form-id').val(id);
+    $('#form-name').val(pname);
+  }else{
+      alert("id not found")
   }
 }
 

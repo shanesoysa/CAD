@@ -14,8 +14,8 @@ class Lecturer(models.Model):
 
 
 class Tags(models.Model):
-    label = models.CharField(max_length=25)
-    color = models.CharField(max_length=25)
+    label = models.CharField(max_length=25, unique=True)
+    color = models.CharField(max_length=25, unique=True)
 
     def __str__(self):
         return self.label
@@ -66,7 +66,10 @@ class Subgroup(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     subgroup_no = models.IntegerField(default=1)
     generated_subgroup = models.CharField(max_length=100, blank=True, null=True)
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['group', 'subgroup_no'], name='subgroup_details') 
+        ]
     def generate_subgroup_id(self):
         sub_group_id = self.group.generated_group + '.' + str(self.subgroup_no)
         return sub_group_id

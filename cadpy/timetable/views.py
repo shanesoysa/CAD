@@ -4,7 +4,8 @@ from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
 from .models import Lecturer as Lecturer1, Subgroup, Group, Programme, AcademicYearSemester, Tags
-
+from django.db.utils import IntegrityError
+#import sys
 # Create your views here.
 
 class Lecturer(ListView):
@@ -141,16 +142,23 @@ class AddTagsView(View):
             )
             tags = {'id': obj.id, 'label': obj.label, 'color': obj.color }
             data = {
-                'tags': tags
+                'success_stat': 1,
+                'student_tags': tags
             }
             return JsonResponse(data)
-        except:
+        except IntegrityError as e:
+            data = {
+                'success_stat':0,
+                'error_msg': 'Tag label or color already exists'
+            }
+            return JsonResponse(data)
+        except Exception as ex:
             print("fail adding data")
             pass   
 
 class UpdateTags(View):
-    try:
-        def  get(self, request):
+    def  get(self, request):
+        try:
             id1 = request.GET.get('id', None)
             pname = request.GET.get('label', None)
             pabbv = request.GET.get('color', None)
@@ -161,12 +169,23 @@ class UpdateTags(View):
             obj.save()
             tags = {'id':obj.id, 'label':obj.label, 'color':obj.color}
             data = {
+                'success_stat': 1,
                 'tags': tags
             }
             return JsonResponse(data)    
-    except:
-        print("tags update failed")
-        pass
+        except IntegrityError as e:
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Tag label or color already exists'
+            }
+            return JsonResponse(data)
+        except Exception as ex:
+            print("tags update failed")
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Something went wrong'
+            }
+            return JsonResponse(data)
 
 
 class StudentsView(generic.ListView):
@@ -198,9 +217,8 @@ class StudentsSubGroupGenerationView(generic.ListView):
     
     def get_queryset(self):
         """Return the last five published questions."""
-        groupy = Group.objects.get(id = 27)
+        groupy = Group.objects.get(id = self.kwargs['pk'])
         for subgroup in groupy.subgroup_set.all():
-            print(subgroup.pk)
             #group_obj = Group.objects.get(pk=group.pk)
             subgroup_id = subgroup.generate_subgroup_id()
             subgroup.generated_subgroup = subgroup_id
@@ -454,7 +472,6 @@ class SubGroupsView(generic.DetailView):
         
 class AddSubGroups(View):
     def  get(self, request, pk):
-        
         try:
             gp = request.GET.get('group', None)
             subgp = request.GET.get('subgroup_no', None)
@@ -464,41 +481,49 @@ class AddSubGroups(View):
             print(groupObj)
             obj = Subgroup.objects.create(
                 group = groupObj,
-                subgroup_no=subgp,
+                subgroup_no = subgp,
             )
             print('created')
             subgroup = {'id': obj.id, 'group': obj.group.generated_group, 'group_id': obj.group.id, 'subgroup_no': obj.subgroup_no }
             data = {
+                'success_stat': 1,
                 'subgroup': subgroup
             }
             print("successfull")
-
             return JsonResponse(data)
-
-        except:
+        except IntegrityError as e:
+            #print("Oops!", sys.exc_info()[0], "occurred.")
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Cannot save duplicate subgroup'
+            }
             print("fail adding data")
+            return JsonResponse(data)
+        except Exception as ex:
+            print('Error: ', ex)    
             pass   
 
 class DeleteSubGroups(View):
-    try:
-        def  get(self, request, pk):
+    def  get(self, request, pk):
+        try:
             id1 = request.GET.get('id', None)
-           
-            Subgroup.objects.get(id=id1).delete()
-            
+            Subgroup.objects.get(id=id1).delete()  
             data = {
                 'deleted': True
             }
             return JsonResponse(data)
-    except:
-        
-        print("programme delete failed")
-        pass
+        except:
+            print("programme delete failed")
+            data = {
+                'deleted': False
+            }
+            return JsonResponse(data)
+       
 
 
 class UpdateSubGroupsView(View):
-    try:
-        def  get(self, request, pk):
+    def  get(self, request, pk):
+        try:
             id1 = request.GET.get('id', None)
             pabbv = request.GET.get('subgroup_no', None)
 
@@ -507,9 +532,17 @@ class UpdateSubGroupsView(View):
             obj.save()
             subgroup = {'id':obj.id,'subgroup_no':obj.subgroup_no}
             data = {
+                'success_stat': 1,
                 'subgroup': subgroup
             }
             return JsonResponse(data)    
-    except:
-        print("subgroup update failed")
-        pass        
+        except IntegrityError as e:
+            print("subgroup update failed")
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Cannot save duplicate subgroup'
+            }
+            return JsonResponse(data)
+        except Exception as ex:
+            print('Error: ', ex)    
+            pass        

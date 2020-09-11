@@ -13,21 +13,21 @@
 
         <div class="card-body bg-light">
             <div class="card shadow p-3 mb-5 bg-white rounded">
-                <form class="form-inline" id="addTags" action="">
+                <form class="form-inline row" id="addTags" action="">
                 
-                    <div class="form-group m-4">
-                        <label class="text-black font-weight-bold" for="labelId">Label </label>
+                    <div class="form-group m-2 col-4">
+                        <label class="text-black font-weight-bold" for="labelId">Tag Label </label>
                         <input type="text" class="form-control m-3" id="labelId" name="tagLabel" />
                     </div>
                    
-                    <div class="form-group m-4">
+                    <div class="form-group m-2 col-4">
                         <label class="font-weight-bold" for="nColorId">Color </label>
                         <input type="color" class="form-control m-3" id="nColorId" name="nColor" value="#ff0000"/>
                     </div>
                     
-                    <div class="col-md-2">
+                    <div class="col-md-2 col-4">
                         <div class="form-group m-4">
-                            <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Add  " />
+                            <input type="submit" class="form-control m-3 btn btn-info btn-block" id="save_btn" disabled="true" value="  Add  " />
                         </div>
                     </div>
                     
@@ -95,48 +95,54 @@
 
 {% block javascript %}
 <script>
-
+    $(function(){
+      $(":input").change(function(){
+        if($('input[name="tagLabel"]').val() && $('input[name="nColor"]').val()){
+          $('#save_btn').prop("disabled", false);
+        }else{
+          $('#save_btn').prop("disabled", true);
+        }
+      });
+    });
+    
     $("form#addTags").submit(function() {
     
         var tlabel = $('input[name="tagLabel"]').val();
         var tcolor = $('input[name="nColor"]').val();
-       
-    
-        if (tlabel && tcolor) {
-            // Create Ajax Call
-            $.ajax({
-                url: '{% url "add_tags" %}',
-                data: {
-                'label':tlabel,
-                'color':tcolor
-                },
-                dataType: 'json',
-                success: function (data) {
-                    console.log('tag' + data);
-                    console.log(data.tags);
-                    if (data.tags) {
-                        
-                        appendToUsrTable(data.tags);
-                        alert("Data Added")
-                    
-                    }
-                    
+        
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "add_tags" %}',
+            data: {
+            'label':tlabel,
+            'color':tcolor
+            },
+            dataType: 'json',
+            success: function (data) {
+              if(data.success_stat == 1){
+                $('form#addTags').trigger("reset");
+                if (data.student_tags) {
+                    appendToUsrTable(data.student_tags);
                 }
-            });
-        } else {
-            alert("All fields must have a valid value.");
-        }
-        $('form#addTags').trigger("reset");
+              }else{
+                alert(data.error_msg);
+              }
+                
+            }
+        });
+        
+        $('#save_btn').prop("disabled", true);
         return false;
     });
     
-    function appendToUsrTable(programme) {
+    function appendToUsrTable(tags) {
         $("#myTable > tbody:last-child").append(`
-            <tr id="tg-${tags.id}">
-                <th class="proAbbv userData" name="pabbv" style="background-color: {{tags.color}}; border-radius:10%; margin:10px; width:10px; height:10px;" scope="row">${tags.color}</th>
-                <td class="proName userData" name="pname">${ tags.label }</td>
-                <td ><pre><span onclick="editTag(${tags.id})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteTag(${tags.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span></pre></td>
-            </tr>
+        <tr id="tg-${tags.id}">
+          <th name="pabbv" class="proAbbv userData" style="background-color: ${tags.color}; border-radius:10%; margin:10px; width:10px; height:10px;"></th>
+          <td class="proName userData"name="pname">${ tags.label }</td>
+          <td  ><pre><span onclick="editTag(${tags.id})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteTag(${tags.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span></pre></td>
+        </tr>
+
           `);
       }
     
@@ -159,28 +165,27 @@
     }
     
     
-    $("form#updateUser").submit(function() {
+  $("form#updateUser").submit(function() {
 
-var idInput = $('input[name="formId"]').val().trim();
-var nameInput = $('input[name="formName"]').val();
-var abbvInput = $('input[name="formAbbv"]').val();
+    var idInput = $('input[name="formId"]').val().trim();
+    var labelInput = $('input[name="formName"]').val();
+    var colorInput = $('input[name="formAbbv"]').val();
 
-
-if (nameInput && abbvInput) {
+    if (labelInput && colorInput) {
     // Create Ajax Call
     $.ajax({
         url: '{% url "update_tags" %}',
         data: {
           'id':idInput,
-          'label':nameInput,
-          'color':abbvInput,
+          'label':labelInput,
+          'color':colorInput,
         },
         dataType: 'json',
         success: function (data) {
-            if (data.tags) {
-              
+            if (data.success_stat == 1) {
               updateToUserTabel(data.tags);
-              
+            }else{
+              alert(data.error_msg)
             }
         }
     });
