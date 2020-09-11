@@ -5,64 +5,6 @@
 
 {% block content %}
 
-<div class="sidebar text-center">
-  <ul>
-    <li>
-      <button class="sidebar-button">
-        <i class="fas fa-1x fa-home sidebar-icon"></i>
-        <span class="sidebar-text"> Home </span>
-        <a href="#" class="stretched-link"></a>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-button">
-        <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
-        <span class="sidebar-text"> Working</span>
-        <span class="sidebar-text"> Days</span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-button">
-        <i class="fas fa-1x fa-users sidebar-icon"></i>
-        <span class="sidebar-text"> Lecturers</span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-button">
-        <i class="fas fa-1x fa-book sidebar-icon"></i>
-        <span class="sidebar-text"> Subjects </span>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-button">
-        <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
-        <span class="sidebar-text"> Students </span>
-        <a href="{% url 'students' %}" class="stretched-link"></a>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-button">
-        <i class="fas fa-1x fa-tags sidebar-icon"></i>
-        <span class="sidebar-text"> Tags </span>
-        <a href="{% url 'tags' %}" class="stretched-link"></a>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-button">
-        <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
-        <span class="sidebar-text"> Locations </span>
-        <a href="#" class="stretched-link"></a>
-      </button>
-    </li>
-    <li>
-      <button class="sidebar-button" autofocus>
-        <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
-        <span class="sidebar-text"> Statistics </span>
-        <a href="#" class="stretched-link"></a>
-      </button>
-    </li>
-  </ul>
-</div>
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded">
         <div class="card-header bg-light text-info">
@@ -76,16 +18,18 @@
                     <div class="form-group m-4">
                         <label class="text-black font-weight-bold" for="programmeId">Programme </label>
                         <input type="text" class="form-control m-3" id="programmeId" name="programme" />
+                        <small id="pg_id" class="text-info" style="display: none;"></small>
                     </div>
                    
                     <div class="form-group m-4">
                         <label class="font-weight-bold" for="abbreviationId">Abbreviation </label>
                         <input type="text" class="form-control m-3" id="abbreviationId" name="abbreviation"/>
+                        <small id="ag_id" class="text-info" style="display: none;"></small>
                     </div>
                     
                     <div class="col-md-2">
                         <div class="form-group m-4">
-                            <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Add  " />
+                            <input type="submit" id="iform" class="form-control m-3 btn btn-info btn-block" disabled="true" value="  Add  " />
                         </div>
                     </div>
                     
@@ -138,7 +82,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="submit" id ="uform" class="btn btn-primary" disabled="true">Save changes</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         
         </div>
@@ -146,39 +90,28 @@
     </div>
   </div>
 </div>
- <!-- Modal -->
- <!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-          <h4 class="modal-title" id="myModalLabel">Update Programme</h4>
-        </div>
-        <form id="updateProgramme" action="">
-            <div class="modal-body">
-                <input class="form-control" id="form-id" type="hidden" name="formId"/>
-                <label for="name">Programme</label>
-                <input class="form-control" id="form-name" type="text" name="formName"/>
-                <label for="address">Abbreviation</label>
-                <input class="form-control" id="form-abbv" type="text" name="formAbbv"/>
-                
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" >Save changes</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </form>
-      </div>
-    </div>
-</div> -->
 {% endblock %}
 
 
 {% block javascript %}
 <script>
+  $(function(){
+    
+    $(":text").change(function(){
+      if ($('input[name="programme"]').val() && $('input[name="abbreviation"]').val()){
+        $("#iform").prop("disabled", false);
+      }
+    })
 
-$("form#addProgramme").submit(function() {
+    $("#form-name, #form-abbv").change(function(){
+      if($('input[name="formName"]').val() && $('input[name="formAbbv"]').val())
+        $("#uform").prop("disabled", false);
+    });
+  });
 
+$("form#addProgramme").submit(function(e) {
+
+    e.preventDefault()
     var programme = $('input[name="programme"]').val();
     var abbreviation = $('input[name="abbreviation"]').val().trim();
    
@@ -193,17 +126,17 @@ $("form#addProgramme").submit(function() {
             },
             dataType: 'json',
             success: function (data) {
-            
-                console.log(data.programme);
-
-                if (data.programme) {
-                appendToUsrTable(data.programme);
-                alert("Data Added")
-                
-                }
-                
+              if(data.success_stat == 1){
+                $('input[name="programme"]').val('');
+                $('input[name="abbreviation"]').val('');
+                if(data.programme)
+                  appendToUsrTable(data.programme);
+              }else{
+                  alert(data.error)
+              } 
             }
         });
+        $("#iform").prop("disabled", true);
     } else {
         alert("All fields must have a valid value.");
     }
@@ -216,7 +149,7 @@ function appendToUsrTable(programme) {
           <tr id="pr-${programme.id}">
             <th scope="row">${ programme.programme_abbv }</th>
               '<td>${programme.programme_name}</td>
-              '<td><pre><i class="fas fa-pencil-alt" style="color:purple;></i><span onclick="deleteProgramme({{programme.id}})">   <i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
+              '<td><pre><span onClick="editProgramme({{programme.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;></i></span>   <span onclick="deleteProgramme({{programme.id}})">   <i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
           </tr>
       `);
   }
@@ -259,11 +192,13 @@ if (nameInput && abbvInput) {
         },
         dataType: 'json',
         success: function (data) {
+          if(data.success_stat == 1){
             if (data.programme) {
-              
               updateToUserTabel(data.programme);
-              
             }
+          }else{
+            alert(data.error_msg)
+          }
         }
     });
    } else {

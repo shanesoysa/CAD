@@ -4,64 +4,7 @@
 {% block title %}Tags{% endblock %}
 
 {% block content %}
-<div class="sidebar text-center">
-    <ul>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-home sidebar-icon"></i>
-          <span class="sidebar-text"> Home </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
-          <span class="sidebar-text"> Working</span>
-          <span class="sidebar-text"> Days</span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-users sidebar-icon"></i>
-          <span class="sidebar-text"> Lecturers</span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-book sidebar-icon"></i>
-          <span class="sidebar-text"> Subjects </span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
-          <span class="sidebar-text"> Students </span>
-          <a href="{% url 'students' %}" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-tags sidebar-icon"></i>
-          <span class="sidebar-text"> Tags </span>
-          <a href="{% url 'tags' %}" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
-          <span class="sidebar-text"> Locations </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button" autofocus>
-          <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
-          <span class="sidebar-text"> Statistics </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-    </ul>
-</div>
+
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded">
         <div class="card-header bg-light text-info">

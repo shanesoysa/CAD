@@ -23,12 +23,18 @@ class Tags(models.Model):
 class AcademicYearSemester(models.Model):
     academic_year = models.IntegerField(default=1)
     academic_semester = models.IntegerField(default=1)
-
+    class Meta:
+        db_table = "academicyearsemester"
+        constraints = [
+            models.UniqueConstraint(fields=['academic_year', 'academic_semester'], name='academic_details') 
+        ]
+    
     def __str__(self):
         return 'Y' + str(self.academic_year) + '.S' + str(self.academic_semester)
+
 class Programme(models.Model):
     programme_name = models.CharField(max_length=100)
-    programme_abbv = models.CharField(max_length=20)
+    programme_abbv = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.programme_abbv
@@ -39,6 +45,11 @@ class Group(models.Model):
     group_no = models.CharField(max_length=2)
     student_count = models.IntegerField(null=True, blank=True)
     generated_group = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['academic_year_semester', 'programme', 'group_no'], name='student_details') 
+        ]
 
     def generate_group_id(self):
         group_id = self.academic_year_semester.__str__ ()+ '.' + self.programme.__str__() 
@@ -54,7 +65,7 @@ class Group(models.Model):
 class Subgroup(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     subgroup_no = models.IntegerField(default=1)
-    generated_subgroup = models.CharField(max_length=100, blank=True)
+    generated_subgroup = models.CharField(max_length=100, blank=True, null=True)
 
     def generate_subgroup_id(self):
         sub_group_id = self.group.generated_group + '.' + str(self.subgroup_no)

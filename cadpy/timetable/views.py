@@ -227,6 +227,7 @@ class AddProgramme(View):
             )
             programme = {'id': obj.id, 'programme_name': obj.programme_name, 'programme_abbv': obj.programme_abbv }
             data = {
+                'success_stat': 1,
                 'programme': programme
             }
             print("successfull")
@@ -234,8 +235,12 @@ class AddProgramme(View):
             return JsonResponse(data)
 
         except:
+            data = {
+                'success': 0,
+                'error': 'Cannot save duplicate programme abbreviation'
+            }
             print("fail adding data")
-            pass   
+            return JsonResponse(data)   
 
 class DeleteProgramme(View):
     try:
@@ -255,8 +260,8 @@ class DeleteProgramme(View):
 
 
 class UpdateProgramme(View):
-    try:
-        def  get(self, request):
+    def  get(self, request):
+        try:
             id1 = request.GET.get('id', None)
             pname = request.GET.get('programme_name', None)
             pabbv = request.GET.get('programme_abbv', None)
@@ -267,12 +272,16 @@ class UpdateProgramme(View):
             obj.save()
             programme = {'id':obj.id,'programme_name':obj.programme_name,'programme_abbv':obj.programme_abbv}
             data = {
+                'success_stat': 1,
                 'programme': programme
             }
             return JsonResponse(data)    
-    except:
-        print("programme update failed")
-        pass
+        except:
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Cannot save duplicate programme abbreviation'
+            }
+            return JsonResponse(data)  
 
 class AcademicYearSemesterView(generic.ListView):
     model = AcademicYearSemester
@@ -285,21 +294,24 @@ class AddAcademicYearSemesterView(View):
         try:
             ayear = request.GET.get('academic_year', None)
             asemester = request.GET.get('academic_semester', None)
-            print(ayear)
-            print(asemester)
             obj = AcademicYearSemester.objects.create(
                 academic_year=ayear,
                 academic_semester=asemester
             )
+            
             academicyearsemester = {'id': obj.id, 'academic_year': obj.academic_year, 'academic_semester': obj.academic_semester }
             data = {
+                'success_stat': 1,
                 'academicyearsemester': academicyearsemester
             }
             print("successfull")
             return JsonResponse(data)
         except:
-            print("fail adding data")
-            pass   
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Cannot save duplicate academic year and semester'
+            }
+            return JsonResponse(data)
 
 class DeleteAcademicYearSemesterView(View):
     try:
@@ -317,8 +329,8 @@ class DeleteAcademicYearSemesterView(View):
 
 
 class UpdateAcademicYearSemesterView(View):
-    try:
-        def  get(self, request):
+    def  get(self, request):
+        try:
             id1 = request.GET.get('id', None)
             ayear = request.GET.get('academic_year', None)
             asemester = request.GET.get('academic_semester', None)
@@ -329,17 +341,27 @@ class UpdateAcademicYearSemesterView(View):
             obj.save()
             academicyearsemester = {'id':obj.id ,'academic_year':obj.academic_year ,'academic_semester':obj.academic_semester}
             data = {
+                'success_stat': 1,
                 'academicyearsemester': academicyearsemester
             }
             return JsonResponse(data)    
-    except:
-        print("Academic year-semester update failed")
-        pass
-
+        except:
+            print("Academic year-semester update failed")
+            data = {
+                    'success_stat': 0,
+                    'error_msg': 'Cannot save duplicate academic year and semester'
+            }
+            return JsonResponse(data)
 
 
 class GroupsView(generic.ListView):
     context_object_name  = 'group_list'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)    
+        context['programme_ll'] = Programme.objects.all()
+        context['academic_ll'] = AcademicYearSemester.objects.all()
+        return context
     
     def get_queryset(self):
         """Return the last five published questions."""
@@ -349,8 +371,7 @@ class GroupsView(generic.ListView):
 
 
 class AddStudentsView(View):
-    def  get(self, request):
-        
+    def  get(self, request):  
         try:
             semester = request.GET.get('academic_year_semester', None)
             prog = request.GET.get('programme', None)
@@ -359,7 +380,6 @@ class AddStudentsView(View):
 
             yearSemester = AcademicYearSemester.objects.get(pk=semester)
             programm = Programme.objects.get(pk=prog)
-
             obj = Group.objects.create(
                 academic_year_semester=yearSemester,
                 programme=programm,
@@ -368,18 +388,20 @@ class AddStudentsView(View):
             )
             student = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year': obj.academic_year_semester.academic_year, 'academic_semester': obj.academic_year_semester.academic_semester, 'programme': obj.programme.programme_abbv}
             data = {
+                'success_stat': 1,
                 'student': student
             }
-            print("successfull")
             return JsonResponse(data)
         except:
-            print("fail adding data")
-            pass   
-
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Cannot save duplicate student group'
+            }
+            return JsonResponse(data)
 
 class UpdateGroupsView(View):
-    try:
-        def  get(self, request):
+    def  get(self, request):
+        try:
             id1 = request.GET.get('id', None)
             academics = request.GET.get('academic_year_semester', None)
             gprogramme = request.GET.get('programme', None)
@@ -387,19 +409,28 @@ class UpdateGroupsView(View):
             scount = request.GET.get('student_count', None)
 
             obj = Group.objects.get(id=id1)
-            obj.academic_year_semester = academics
-            obj.programme = programme
+            yearSemester = AcademicYearSemester.objects.get(pk=academics)
+            programm = Programme.objects.get(pk=gprogramme)
+
+            obj.academic_year_semester = yearSemester
+            obj.programme = programm
             obj.group_no = ggroup
             obj.student_count = scount
             obj.save()
-            group = {'id':obj.id ,'academic_year_semester':obj.academic_year_semester ,'programme':obj.programme, 'group_no': obj.group_no, 'student_count': student_count }
+            group = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year': obj.academic_year_semester.academic_year, 'academic_semester': obj.academic_year_semester.academic_semester, 'programme': obj.programme.programme_abbv}
             data = {
+                'success_stat': 1,
                 'group': group
             }
             return JsonResponse(data)    
-    except:
-        print("update of group failed")
-        pass
+        except Exception as e:
+            print(e)
+            print("update of group failed")
+            data = {
+                'success_stat': 0,
+                'error_msg': 'Cannot save duplicate student group'
+            }
+            return JsonResponse(data)
 
 class DeleteStudentsView(View):
     try:

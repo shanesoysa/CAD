@@ -4,64 +4,7 @@
 {% block title %}Programmes{% endblock %}
 
 {% block content %}
-<div class="sidebar text-center">
-    <ul>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-home sidebar-icon"></i>
-          <span class="sidebar-text"> Home </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
-          <span class="sidebar-text"> Working</span>
-          <span class="sidebar-text"> Days</span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-users sidebar-icon"></i>
-          <span class="sidebar-text"> Lecturers</span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-book sidebar-icon"></i>
-          <span class="sidebar-text"> Subjects </span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
-          <span class="sidebar-text"> Students </span>
-          <a href="{% url 'students' %}" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-tags sidebar-icon"></i>
-          <span class="sidebar-text"> Tags </span>
-          <a href="{% url 'tags' %}" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
-          <span class="sidebar-text"> Locations </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button" autofocus>
-          <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
-          <span class="sidebar-text"> Statistics </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-    </ul>
-</div>
+
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded" style="border-radius: 100;" >
         <div class="card-header bg-light text-info">
@@ -71,33 +14,28 @@
             <div class="card-body bg-light">
                 <div class="card shadow p-3 mb-5 bg-white rounded">
                     <form action="" class="form-inline" id="addAcademics">
-                        <!-- <div class="form-row"> only to make the academic year come first-->
-                            <!-- <div class="col"> -->
                         <div class="form-group m-4">
                             <label class="text-black font-weight-bold" for="academicYearId">Academic Year </label>
                             <input type="number" class="form-control m-3" id="academicYearId" name="academicYear" min="1"/>
                         </div>
-                        <!-- </div> -->
-                        <!-- <div class="col"> -->
+
                         <div class="form-group m-4">
                             <label class="font-weight-bold" for="academicSemesterId">Academic Semester </label>
                             <input type="number" class="form-control m-3" id="academicSemesterId" name="academicSemester" min="1"/>
                         </div>
-                        <!-- </div> -->
                         <div class="col-lg-2">
                             <div class="form-group m-4">
-                                <input type="submit" class="form-control m-3 btn btn-info btn-block" value="  Add  " />
+                                <input type="submit" id="mybtn" class="form-control m-3 btn btn-info btn-block" value="  Add  " disabled="true"/>
                             </div>
                         </div>
-                        <!-- </div> -->
-                    </form>
+                      </form>
                 </div>
                 <div class="row row-cols-1 row-cols-md-4 chaa">
                     {% for academicyearsemester in academicyearsemester_list %}
                     <div class="col mb-4" id="ays-{{academicyearsemester.id}}">
                         <div class="card shadow p-3 mb-5 bg-white rounded text-center">
                             <pre>
-                                <h5>Y<span class="proName userData"name="pname">{{academicyearsemester.academic_year }}</span>.S<span name="pabbv" class="proAbbv userData" >{{ academicyearsemester.academic_semester}}</span>     <span onclick="editAcademics({{academicyearsemester.id}})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt"></i></span>   <span onclick="deleteAca({{academicyearsemester.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+                                <h5>Y<span class="proName userData"name="pname">{{academicyearsemester.academic_year }}</span>.S<span name="pabbv" class="proAbbv userData" >{{ academicyearsemester.academic_semester}}</span>     <span onclick="editAcademics({{academicyearsemester.id}})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt" style="color: #4c4260;"></i></span>   <span onclick="deleteAca({{academicyearsemester.id}})"><i class="far fa-trash-alt" style="color: #4c4260;"></i></span><h5></pre>
                         </div>
                     </div>
                     {% endfor %}
@@ -146,14 +84,18 @@
 
 {% block javascript %}
 <script>
+  $(function(){
+    $(':input[type="number"]').change(function(){
+      if ($('input[name="academicYear"]').val() && $('input[name="academicSemester"]').val()){
+        $("#mybtn").prop("disabled", false);
+      }
+    })
+  });
 
-$("form#addAcademics").submit(function() {
+  $("form#addAcademics").submit(function() {
 
-var ayear = $('input[name="academicYear"]').val();
-var asemester = $('input[name="academicSemester"]').val();
-
-
-if (ayear && asemester) {
+    var ayear = $('input[name="academicYear"]').val();
+    var asemester = $('input[name="academicSemester"]').val();
     // Create Ajax Call
     $.ajax({
         url: '{% url "add_academics" %}',
@@ -163,31 +105,28 @@ if (ayear && asemester) {
         },
         dataType: 'json',
         success: function (data) {
-        
+          if(data.success_stat == 1){
             console.log(data.academicyearsemester);
-
             if (data.academicyearsemester) {
-            appendToAcademicsTable(data.academicyearsemester);
-            alert("'Data Added'")
-            
+              appendToAcademicsTable(data.academicyearsemester);
             }
+            $('form#addAcademics').trigger("reset");
             
+          }else{
+            alert(data.error_msg)
+          }
+          $("#mybtn").prop("disabled", true);
         }
     });
-} else {
-    alert("All fields must have a valid value.");
-}
-$('form#addAcademics').trigger("reset");
-return false;
-});
+    return false;
+  });
 
 function appendToAcademicsTable(programme) {
-    console.log('In method')
     $(".chaa").append(`
     <div class="col mb-4" id="ays-${programme.id}">
         <div class="card shadow p-3 mb-5 bg-white rounded text-center">
             <pre>
-                <h5>Y${programme.academic_year }.S${ programme.academic_semester}     <span onclick="editAcademics({{academicyearsemester.id}})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt"></i></span>   <span onclick="deleteAca(${programme.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span><h5></pre>
+                <h5>Y${programme.academic_year }.S${ programme.academic_semester}     <span onclick="editAcademics({{academicyearsemester.id}})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt" style="color: #4c4260;"></i></span>   <span onclick="deleteAca(${programme.id})"><i class="far fa-trash-alt" style="color: #4c4260;"></i></span><h5></pre>
         </div>
     </div>
     `);
@@ -231,11 +170,13 @@ if (nameInput && abbvInput) {
         },
         dataType: 'json',
         success: function (data) {
+          if(data.success_stat == 1){
             if (data.academicyearsemester) {
-              
               updateToUserTabel(data.academicyearsemester);
-              
             }
+          }else{
+            alert(data.error_msg)
+          }
         }
     });
    } else {

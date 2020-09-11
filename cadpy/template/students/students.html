@@ -2,66 +2,16 @@
 
 
 {% block title %}Students{% endblock %}
+{% block stylesheet %}
+    <style>
+        .viewTool {
+        background: #F2F8FD;
+        color: #2E3F7F;
+    }
+    </style>
+{% endblock stylesheet %}
 
 {% block content %}
-<div class="sidebar text-center">
-    <ul>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-home sidebar-icon"></i>
-          <span class="sidebar-text"> Home </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
-          <span class="sidebar-text"> Working</span>
-          <span class="sidebar-text"> Days</span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-users sidebar-icon"></i>
-          <span class="sidebar-text"> Lecturers</span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-book sidebar-icon"></i>
-          <span class="sidebar-text"> Subjects </span>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
-          <span class="sidebar-text"> Students </span>
-          <a href="{% url 'students' %}" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-tags sidebar-icon"></i>
-          <span class="sidebar-text"> Tags </span>
-          <a href="{% url 'tags' %}" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button">
-          <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
-          <span class="sidebar-text"> Locations </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-      <li>
-        <button class="sidebar-button" autofocus>
-          <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
-          <span class="sidebar-text"> Statistics </span>
-          <a href="" class="stretched-link"></a>
-        </button>
-      </li>
-    </ul>
-</div>
 <div class="container-fluid">
     <div class="card shadow-sm mb-4 bg-white rounded" style="border-radius: 100;" >
         <div class="card-header bg-light text-info">
@@ -100,6 +50,7 @@
                                             <h6 class="mb-3" style="color: #33344a;">Sub Groups</h6> 
                                             <div class="row">
                                                 {% for subgroup in groups.subgroup_set.all %}
+                                                    {% if subgroup.generated_subgroup != None %}
                                                     <div class="col-md-3 shadow-sm p-1 mb-3 bg-light" style="border-radius: 5px; margin:0px 5px;" id="sb-{{subgroup.id}}">
                                                         <h6 style="padding: 3px;">&nbsp; &nbsp; {{ subgroup.generated_subgroup }}
                                                             <span id="deleteIcon" style="float: right;" onclick="deleteSubGroup({{subgroup.id}})">
@@ -107,6 +58,7 @@
                                                             </span>
                                                         </h6>
                                                     </div>
+                                                    {% endif %}
                                                 {% endfor%}
                                         </div>
                                     </div>
@@ -140,6 +92,10 @@
 <script>
     
     $(document).ready(function(){
+        $('.tooltip').tooltip({
+        tooltipClass: "viewTool"
+        });
+
         $('[data-toggle="tooltip"]').tooltip();
     });
 
@@ -153,7 +109,6 @@
                 },
                 dataType: 'json',
                 success: function (data) {
-                    alert('removed')
                     if (data.deleted) {
                     $("#sb-" + id).remove();
                     }
@@ -172,7 +127,6 @@
                 },
                 dataType: 'json',
                 success: function (data) {
-                    alert('removed')
                     if (data.deleted) {
                     $("#gg-" + id).remove();
                     }
