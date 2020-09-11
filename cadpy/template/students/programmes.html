@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Programmes{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="card shadow-sm mb-4 bg-white rounded">
+        <div class="card-header bg-light text-info">
+            <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Programmes  </h3>
+        </div>
+
+        <div class="card-body bg-light">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <form action="" class="form-inline" id="addProgramme">
+                
+                    <div class="form-group m-4">
+                        <label class="text-black font-weight-bold" for="programmeId">Programme </label>
+                        <input type="text" class="form-control m-3" id="programmeId" name="programme" />
+                        <small id="pg_id" class="text-info" style="display: none;"></small>
+                    </div>
+                   
+                    <div class="form-group m-4">
+                        <label class="font-weight-bold" for="abbreviationId">Abbreviation </label>
+                        <input type="text" class="form-control m-3" id="abbreviationId" name="abbreviation"/>
+                        <small id="ag_id" class="text-info" style="display: none;"></small>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <div class="form-group m-4">
+                            <input type="submit" id="iform" class="form-control m-3 btn btn-info btn-block" disabled="true" value="  Add  " />
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+
+
+                <table class="table" id="programmeTable">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Programme</th>
+                        <th scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for programme in programme_list %}
+                      <tr id="pr-{{programme.id}}">
+                        <th scope="row" class="proAbbv userData" name="pabbv">{{ programme.programme_abbv }}</th>
+                        <td class="proName userData" name="pname">{{programme.programme_name}}</td>
+                        <td><pre><span onClick="editProgramme({{programme.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>  <span onclick="deleteProgramme({{programme.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
+                      </tr>
+                    {% endfor %}  
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!--New Model-->
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Programme</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="updateUser" action="">
+          <div class="modal-body">
+              <input class="form-control" id="form-id" type="hidden" name="formId"/>
+              <label for="name">Programme</label>
+              <input class="form-control" id="form-name" type="text" name="formName"/>
+              <label for="address">Abbreviation</label>
+              <input class="form-control" id="form-abbv" type="text" name="formAbbv"/>   
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" id ="uform" class="btn btn-primary" disabled="true">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+  $(function(){
+    
+    $(":text").change(function(){
+      if ($('input[name="programme"]').val() && $('input[name="abbreviation"]').val()){
+        $("#iform").prop("disabled", false);
+      }
+    })
+
+    $("#form-name, #form-abbv").change(function(){
+      if($('input[name="formName"]').val() && $('input[name="formAbbv"]').val())
+        $("#uform").prop("disabled", false);
+    });
+  });
+
+$("form#addProgramme").submit(function(e) {
+
+    e.preventDefault()
+    var programme = $('input[name="programme"]').val();
+    var abbreviation = $('input[name="abbreviation"]').val().trim();
+   
+
+    if (programme && abbreviation) {
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "add_programmes" %}',
+            data: {
+            'programme_name':programme,
+            'programme_abbv':abbreviation
+            },
+            dataType: 'json',
+            success: function (data) {
+              if(data.success_stat == 1){
+                $('input[name="programme"]').val('');
+                $('input[name="abbreviation"]').val('');
+                if(data.programme)
+                  appendToUsrTable(data.programme);
+              }else{
+                  alert(data.error)
+              } 
+            }
+        });
+        $("#iform").prop("disabled", true);
+    } else {
+        alert("All fields must have a valid value.");
+    }
+    $('form#addProgramme').trigger("reset");
+    return false;
+});
+
+function appendToUsrTable(programme) {
+    $("#programmeTable > tbody:last-child").append(`
+          <tr id="pr-${programme.id}">
+            <th scope="row">${ programme.programme_abbv }</th>
+              '<td>${programme.programme_name}</td>
+              '<td><pre><span onClick="editProgramme({{programme.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;></i></span>   <span onclick="deleteProgramme({{programme.id}})">   <i class="far fa-trash-alt" style="color:purple;"></i></span></h5></pre></td>
+          </tr>
+      `);
+  }
+
+function deleteProgramme(id) {
+  var action = confirm("Are you sure you want to delete programme?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "remove_programmes" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            
+            if (data.deleted) {
+              $("#programmeTable #pr-" + id).remove();
+            }
+        }
+    });
+  }
+}
+
+
+$("form#updateUser").submit(function() {
+
+var idInput = $('input[name="formId"]').val().trim();
+var nameInput = $('input[name="formName"]').val();
+var abbvInput = $('input[name="formAbbv"]').val().trim();
+
+
+if (nameInput && abbvInput) {
+    // Create Ajax Call
+    $.ajax({
+        url: '{% url "update_programmes" %}',
+        data: {
+          'id':idInput,
+          'programme_name':nameInput,
+          'programme_abbv':abbvInput,
+        },
+        dataType: 'json',
+        success: function (data) {
+          if(data.success_stat == 1){
+            if (data.programme) {
+              updateToUserTabel(data.programme);
+            }
+          }else{
+            alert(data.error_msg)
+          }
+        }
+    });
+   } else {
+    alert("All fields must have a valid value.");
+}
+
+$('form#updateUser').trigger("reset");
+$('#myModal').modal('hide');
+return false;
+});
+
+
+function editProgramme(id) {
+  
+  if (id) {
+  
+  tr_id = "#pr-" + id;
+  pname = $(tr_id).find(".proName").text();
+  pabbv = $(tr_id).find(".proAbbv").text();
+  
+  $('#form-id').val(id);
+  $('#form-name').val(pname);
+  $('#form-abbv').val(pabbv);
+
+  }
+}
+
+function updateToUserTabel(programme){
+$("#programmeTable #pr-" + programme.id).children(".userData").each(function() {
+    var attr = $(this).attr("name");
+    if (attr == "pname") {
+      $(this).text(programme.programme_name);
+    } else if (attr == "pabbv") {
+      $(this).text(programme.programme_abbv);
+    } 
+  });
+}
+
+
+</script>
+{% endblock javascript %}

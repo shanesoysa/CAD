@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Groups{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card shadow-sm mb-4 bg-white rounded">
+        <div class="card-header bg-light text-info">
+            <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Generate Groups </h3>
+        </div>
+
+        <div class="card-body bg-light">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <form action="" id="addGroup">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group m-4">
+                                <label class="text-black font-weight-bold" for="academicsId">Academic year & Semester </label>
+                                <select type="text" class="form-control m-3 sformA" id="academicsId" name="academics">
+                                    <option disabled="true" selected="true"> -- Select Year and Semester </option>
+                                    {% for aca in academic_ll %}
+                                      <option value="{{ aca.id }}">{{ aca }}</option>
+                                    {% endfor%}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group m-4">
+                                <label class="font-weight-bold" for="programmeId">Programme </label>
+                                <select type="text" class="form-control m-3 sformA" id="programmeId" name="programme">
+                                    <option disabled="true" selected="true"> -- Programme </option>
+                                    {% for prog in programme_ll %}
+                                      <option value="{{prog.id}}">{{ prog.programme_abbv}}</option>
+                                    {% endfor%}
+                                </select>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group m-4">
+                                <label class="text-black font-weight-bold" for="groupId">Group Number </label>
+                                <input type="number" class="form-control m-3 sformA" min=1 id="groupId" name="group" />
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4">
+                            <div class="form-group m-4">
+                                <label class="font-weight-bold" for="countId">Student Count </label>
+                                <input type="number" class="form-control m-3 sformA" min=1 id="countId" name="count"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group m-4" style="float: bottom;">
+                                <input type="submit" id ="save_btn" class="form-control m-3 btn btn-info btn-block" disabled="true" value="  Add  " />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Generate Btn-->
+            {% if group_list != None %}
+                <div style="float: right;">
+                    <a href="{% url 'generate_students' %}"><button class="btn btn-large btn-danger shadow" id="generate_btn">Generate</button></a>
+                </div>
+            {% endif %}
+
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+
+
+                <div style="width: 80%; float: left;">
+                    <table class="table" id="groupTb" >
+                        <thead>
+                          <tr>
+                            <th scope="col">Acadmic Year Semester</th>
+                            <th scope="col">Programme</th>
+                            <th scope="col">Group No</th>
+                            <th scope="col">Student Count</th>
+                            <th scope="col"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {% for group in group_list %}
+                          <tr id="sg-{{group.id}}">
+                            <th scope="row" class="yearSem userData" name="raca">{{ group.academic_year_semester }}</th>
+                            <th scope="row" class="Pro userData" name="rprogramme">{{ group.programme }}</th>
+                            <th scope="row" class="groupNo userData" name="rgno">{{ group.group_no }}</th>
+                            <td class="groupCount userData" name="rstudent_count">{{group.student_count}}</td>
+                            <td><pre><span onClick="editGroup({{group.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color: #4c4260;"></i></span>  <span onclick="deleteGroup({{group.id}})"><i class="far fa-trash-alt" style="color: #4c4260;"></i></span></h5></pre></td>
+                          </tr>
+                        {% endfor %}  
+                        </tbody>
+                      </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <!--New Model-->
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Group</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="updateGroup" action="">
+            <div class="modal-body">
+                <input class="form-control" id="form-id" type="hidden" name="formId"/>
+                <label for="model_academics">Academic year & Semester </label>
+                <select type="text" class="form-control" id="model_academics" name="formAcademics">
+                    <option disabled="true"> -- Select Year and Semester </option>
+                    {% for aca in academic_ll %}
+                        <option value="{{ aca.id }}">{{ aca }}</option>
+                    {% endfor%}
+                </select>
+                <label for="model_programme">Programme </label>
+                <select type="text" class="form-control" id="model_programme" name="formProgramme">
+                    <option disabled="true"> -- Programme </option>
+                    {% for prog in programme_ll %}
+                        <option value="{{prog.id}}">{{ prog.programme_abbv}}</option>
+                    {% endfor%}
+                </select>
+                <label for="model_group_no_id">Group Number</label>
+                <input class="form-control" id="model_group_no_id" type="number" min=1 name="formGroupNo"/>
+                <label for="model_student_count_id">Student Count</label>
+                <input class="form-control" id="model_student_count_id" type="number" min=1 name="formStudentCount"/>   
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" id ="uform" class="btn btn-primary" disabled="true">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          
+          </div>
+      </form>
+      </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+    $(document).ready(function(){
+
+        $('.sformA').change(function(){
+            if($('#academicsId').val() && $('#programmeId').val() && $('input[name="group"]').val())
+                $("#save_btn").prop("disabled", false);
+        });
+
+        $(":input").change(function(){
+            $(":disabled").prop("disabled", false);
+        });
+
+    });
+
+    $("form#addGroup").submit(function() {
+    
+        var gacademics = $('#academicsId').val();
+        var gprogramme = $('#programmeId').val();
+        var ggroup = $('input[name="group"]').val();
+        var gcount = $('input[name="count"]').val();
+       
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "add_groups" %}',
+            data: {
+            'academic_year_semester':gacademics,
+            'programme':gprogramme,
+            'group_no':ggroup,
+            'student_count':gcount
+            },
+            dataType: 'json',
+            success: function (data) {
+                if(data.success_stat == 1){
+                    // location.reload();
+                    if (data.student) {
+                        appendToUsrTable(data.student);
+                    }
+                    $('form#addGroup').trigger("reset");
+                }else{
+                    alert(data.error_msg)
+                }  
+            }
+        });
+    
+        $("#save_btn").prop("disabled", true);
+        return false;
+    });
+
+    function appendToUsrTable(group) {
+        $("#groupTb > tbody:last-child").append(`
+            <tr id="sg-${group.id}">
+                <th scope="row" class="yearSem userData" name="raca">Y${ group.academic_year }.S${ group.academic_semester }</th>
+                <th scope="row" class="Pro userData" name="rprogramme">${ group.programme }</th>
+                <th scope="row" class="groupNo userData" name="rgno">${ group.group_no }</th>
+                <td class="groupCount userData" name="rstudent_count">${group.student_count}</td>
+                <td><pre><span onClick="editGroup(${group.id})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color: #4c4260;"></i></span>  <span onclick="deleteGroup(${group.id})"><i class="far fa-trash-alt" style="color: #4c4260;"></i></span></h5></pre></td>
+            </tr>
+          `);
+      }
+    
+    function deleteGroup(id) {
+      var action = confirm("Are you sure you want to delete ?");
+      if (action != false) {
+        $.ajax({
+            url: '{% url "remove_groups" %}',
+            data: {
+                'id': id,
+            },
+            dataType: 'json',
+            success: function (data) {
+                
+                if (data.deleted) {
+                  $("#groupTb #sg-" + id).remove();
+                }
+            }
+        });
+      }
+    }
+    
+    
+    $("form#updateGroup").submit(function() {
+    
+    var idInput = $('input[name="formId"]').val().trim();
+    var groupNoInput = $('input[name="formGroupNo"]').val();
+    var studentCountInput = $('input[name="formStudentCount"]').val();
+    var gacademics = $('#model_academics').val();
+    var gprogramme = $('#model_programme').val();
+    
+    if (groupNoInput && studentCountInput) {
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "update_groups" %}',
+            data: {
+              'id':idInput,
+              'academic_year_semester': gacademics,
+              'programme': gprogramme,
+              'group_no':groupNoInput,
+              'student_count':studentCountInput
+            },
+            dataType: 'json',
+            success: function (data) {
+                if(data.success_stat == 1){
+                    if (data.group) 
+                        updateToUserTabel(data.group);
+                
+                }else{
+                    alert(data.error_msg)
+                }
+                
+            }
+        });
+       } else {
+        alert("All fields must have a valid value.");
+    }
+    
+    $('form#updateGroup').trigger("reset");
+    $('#myModal').modal('hide');
+    return false;
+    });
+    
+    
+    function editGroup(id) {
+      
+      if (id) {
+      
+      tr_id = "#sg-" + id;
+      pname = $(tr_id).find(".groupNo").text();
+      pabbv = $(tr_id).find(".groupCount").text();
+      programme = $(tr_id).find(".Pro").text();
+      academics = $(tr_id).find(".yearSem").text();
+      
+      $('#form-id').val(id);
+      $('#model_group_no_id').val(pname);
+      $('#model_student_count_id').val(pabbv);
+      $('#model_programme').val(programme);
+      $('#model_academics').val(academics);
+    
+      }
+    }
+    
+    function updateToUserTabel(group){
+    $("#groupTb #sg-" + group.id).children(".userData").each(function() {
+        var attr = $(this).attr("name");
+        if (attr == "rstudent_count") {
+            $(this).text(group.student_count);
+        } else if (attr == "rgno") {
+            $(this).text(group.group_no);
+        } else if(attr == "rprogramme"){
+            $(this).text(group.programme);
+        }else if(attr == "raca"){
+            $(this).text('Y' + group.academic_semester + '.S' + group.academic_year);
+        }
+      });
+    }
+    
+</script>
+{% endblock javascript %}

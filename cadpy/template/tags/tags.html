@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Tags{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="card bg-white">
+        <div class="card-header bg-light text-info">
+            <h3 style="color: #33344a;" >Tags </h3>
+        </div>
+
+        <div class="card-body bg-light">
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+                <form class="form-inline row" id="addTags" action="">
+                
+                    <div class="form-group m-2 col-4">
+                        <label class="text-black font-weight-bold" for="labelId">Label </label>
+                        <input type="text" class="form-control m-3" id="labelId" name="tagLabel" />
+                    </div>
+                   
+                    <div class="form-group m-2 col-4">
+                        <label class="font-weight-bold" for="nColorId">Color </label>
+                        <input type="color" class="form-control m-3" id="nColorId" name="nColor" value="#ff0000"/>
+                    </div>
+                    
+                    <div class="col-md-2 col-4">
+                        <div class="form-group m-4">
+                            <input type="submit" class="form-control m-3 btn btn-info btn-block" id="save_btn" disabled="true" value="  Add  " />
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+        
+            <div class="card shadow p-3 mb-5 bg-white rounded">
+
+
+                <table class="table" id="myTable">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Programme</th>
+                        <th scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for tags in tags_list %}
+                        <tr id="tg-{{tags.id}}">
+                            <th name="pabbv" class="proAbbv userData" style="background-color: {{tags.color}}; border-radius:10%; margin:10px; width:10px; height:10px;"></th>
+                            <td class="proName userData"name="pname">{{ tags.label }}</td>
+                            <td  ><pre><span onclick="editTag({{tags.id}})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteTag({{tags.id}})"><i class="far fa-trash-alt" style="color:purple;"></i></span></pre></td>
+                        </tr>
+                        {% endfor %}  
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--New Model-->
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Tag</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="updateUser" action="">
+            <div class="modal-body">
+              <input class="form-control" id="form-id" type="hidden" name="formId"/>
+              <label for="name">Label</label>
+              <input class="form-control" id="form-name" type="text" name="formName"/>
+              <label for="address">Color</label>
+              <input class="form-control" id="form-abbv" type="color" name="formAbbv"/>   
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+    $(function(){
+      $(":input").change(function(){
+        if($('input[name="tagLabel"]').val() && $('input[name="nColor"]').val()){
+          $('#save_btn').prop("disabled", false);
+        }else{
+          $('#save_btn').prop("disabled", true);
+        }
+      });
+    });
+    
+    $("form#addTags").submit(function() {
+    
+        var tlabel = $('input[name="tagLabel"]').val();
+        var tcolor = $('input[name="nColor"]').val();
+        
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "add_tags" %}',
+            data: {
+            'label':tlabel,
+            'color':tcolor
+            },
+            dataType: 'json',
+            success: function (data) {
+              if(data.success_stat == 1){
+                $('form#addTags').trigger("reset");
+                if (data.student_tags) {
+                    appendToUsrTable(data.student_tags);
+                }
+              }else{
+                alert(data.error_msg);
+              }
+                
+            }
+        });
+        
+        $('#save_btn').prop("disabled", true);
+        return false;
+    });
+    
+    function appendToUsrTable(tags) {
+        $("#myTable > tbody:last-child").append(`
+        <tr id="tg-${tags.id}">
+          <th name="pabbv" class="proAbbv userData" style="background-color: ${tags.color}; border-radius:10%; margin:10px; width:10px; height:10px;"></th>
+          <td class="proName userData"name="pname">${ tags.label }</td>
+          <td  ><pre><span onclick="editTag(${tags.id})" data-toggle="modal" data-target="#myModal"><i class="fas fa-pencil-alt" style="color:purple;"></i></span>   <span onclick="deleteTag(${tags.id})"><i class="far fa-trash-alt" style="color:purple;"></i></span></pre></td>
+        </tr>
+
+          `);
+      }
+    
+    function deleteTag(id) {
+      var action = confirm("Are you sure you want to delete ?");
+      if (action != false) {
+        $.ajax({
+            url: '{% url "remove_tags" %}',
+            data: {
+                'id': id,
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.deleted) {
+                  $("#myTable #tg-" + id).remove();
+                }
+            }
+        });
+      }
+    }
+    
+    
+  $("form#updateUser").submit(function() {
+
+    var idInput = $('input[name="formId"]').val().trim();
+    var labelInput = $('input[name="formName"]').val();
+    var colorInput = $('input[name="formAbbv"]').val();
+
+    if (labelInput && colorInput) {
+    // Create Ajax Call
+    $.ajax({
+        url: '{% url "update_tags" %}',
+        data: {
+          'id':idInput,
+          'label':labelInput,
+          'color':colorInput,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.success_stat == 1) {
+              updateToUserTabel(data.tags);
+            }else{
+              alert(data.error_msg)
+            }
+        }
+    });
+   } else {
+    alert("All fields must have a valid value.");
+}
+
+$('form#updateUser').trigger("reset");
+$('#myModal').modal('hide');
+return false;
+});
+
+
+function editTag(id) {
+  
+  if (id) {
+  
+  tr_id = "#tg-" + id;
+  pname = $(tr_id).find(".proName").text();
+  pabbv = $(tr_id).find(".proAbbv").text();
+  
+  $('#form-id').val(id);
+  $('#form-name').val(pname);
+  $('#form-abbv').val(pabbv);
+
+  }
+}
+
+function updateToUserTabel(tags){
+$("#myTable #tg-" + tags.id).children(".userData").each(function() {
+    var attr = $(this).attr("name");
+    if (attr == "pname") {
+      $(this).text(tags.label);
+    } else if (attr == "pabbv") {
+      $(this).css('background-color',tags.color);
+    } 
+  });
+}
+    
+</script>
+{% endblock javascript %}
