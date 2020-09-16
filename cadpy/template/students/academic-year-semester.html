@@ -5,12 +5,13 @@
 
 {% block content %}
 
-<div class="container-fluid">
-    <div class="card shadow-sm mb-4 bg-white rounded" style="border-radius: 100;" >
-        <div class="card-header bg-light text-info">
+<div class="container-fluid main bg-light">
+    <div >
+        <div class="bg-light text-info" style="padding: 15px 0px; font-weight: 900;">
             <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Academic Year & Semester</h3>
         </div>
-        <div class="scrollable bg-light" style="height: 600px;">
+        <hr style="margin-top: 0px; margin-left: 0rem; ">
+        <div class="scrollable bg-light">
             <div class="card-body bg-light">
                 <div class="card shadow p-3 mb-5 bg-white rounded">
                     <form action="" class="form-inline" id="addAcademics">
@@ -142,7 +143,7 @@ function deleteAca(id) {
         },
         dataType: 'json',
         success: function (data) {
-            alert('removed')
+    
             if (data.deleted) {
               $("#ays-" + id).remove();
             }
