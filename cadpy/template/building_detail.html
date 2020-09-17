@@ -174,7 +174,7 @@
     <div class="container-fluid px-0 main">
       <div class="row">
         <div class="col mt-3">
-          <h2>Add New Building</h2>
+          <h2 id="title">{{building.name}}</h2>
         </div>
       </div>
       <hr />
@@ -445,6 +445,7 @@
           },
           dataType: "json",
           success: function () {
+            $('#title').text(nameInput);
             $("#deleteBuildingButton").prop("disabled", false);
             $("#updateBuildingButton").prop("disabled", false);
             $("#updateBuildingButton span").removeClass("spinner-border");
@@ -521,6 +522,7 @@
           dataType: "json",
           success: function (data) {
             if (data.deleted) {
+              $('#title').text('Add New Building');
               $("#buildingError").text("\xA0");
               $(".cus_btn").prop("disabled", false);
               $("#deleteBuildingButton span").removeClass("spinner-border");
@@ -606,6 +608,7 @@
             dataType: "json",
             success: function (data) {
               if (data.building) {
+                $('#title').text(nameInput);
                 $("#buildingError").text("\xA0");
                 $("#addBuildingButton span").removeClass("spinner-border");
                 $("#addColumn").addClass("d-none");
