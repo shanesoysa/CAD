@@ -24,7 +24,7 @@ class AcademicYearSemester(models.Model):
     academic_year = models.IntegerField(default=1)
     academic_semester = models.IntegerField(default=1)
     class Meta:
-        db_table = "academicyearsemester"
+        db_table = "timetable_academicyearsemester"
         constraints = [
             models.UniqueConstraint(fields=['academic_year', 'academic_semester'], name='academic_details') 
         ]
