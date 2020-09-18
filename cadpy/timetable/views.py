@@ -8,7 +8,7 @@ from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
-
+from .models import Session, ParallelSession, Timeslots
 # Create your views here.
 def index(request):
      return render(request, 'home.html')
@@ -645,4 +645,17 @@ class UpdateSubGroupsView(View):
             print('Error: ', ex)    
             pass        
         
+class AssignSessionsView(generic.ListView):
+    model =  Session
+    template_name = 'sessions/assign-sessions.html'
+
+class ConsecutiveSessionsView(generic.ListView):
+    model =  Session
+    template_name = 'sessions/consecutive-sessions.html'
+
+class BlockTimeSlotsView(generic.ListView):
+    model =  Session
+    template_name = 'sessions/blocked-timeslots.html'
+
+
 

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Blocking Sessions{% endblock title %}
+
+{% block stylesheet %}{% endblock stylesheet %}
+
+{% block content %}
+<div class="container-fluid main bg-light">
+    <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
+        <h3 style="color: #33344a;" >Assign Sessions </h3>
+    </div>
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+            <form class="row">
+                <div class="col form-group">
+                    <label for="groupId" class="text-black font-weight-bold">Group</label>
+                    <select id="groupId" class="form-control" name="group">
+                        <option value="default" disabled>Select Group</option>
+                    </select>
+                </div>
+                <div class="col form-group">
+                    <label for="lecturerId" class="text-black font-weight-bold">Lecturer</label>
+                    <select id="lecturerId" class="form-control" name="lecturer">
+                        <option value="default" disabled>Select Lecturer</option>
+                    </select>
+                </div>
+                <div class="col form-group">
+                    <label for="subjectId" class="text-black font-weight-bold">Subject</label>
+                    <select id="subjectId" class="form-control" name="subject">
+                        <option value="default" disabled>Select Subject</option>
+                    </select>
+                </div>
+                <div class="col form-group">
+                    <label for="tagId" class="text-black font-weight-bold">Tag</label>
+                    <select id="tagId" class="form-control" name="tag">
+                        <option value="default" disabled>Select Tag</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript%}
+
+
+
+
+{% endblock javascript %}

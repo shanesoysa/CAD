@@ -84,3 +84,24 @@ class Subjects(models.Model):
     noLabHours=models.IntegerField(blank=True, null=True)
     noEveHours=models.IntegerField(blank=True, null=True)
     objects = models.Manager()
+
+class Session(models.Model):
+    lecturers = models.ManyToManyField(Lecturer)
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tags, on_delete=models.CASCADE)
+    group_id = models.ForeignKey(Group, on_delete=models.CASCADE)
+    subgroup_id = models.ForeignKey(Subgroup, on_delete=models.CASCADE, null=True, blank=True)
+    student_count = models.IntegerField(default=1)
+    duration = models.IntegerField(default=1)
+    consecutive_session = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+class Timeslots(models.Model):
+    day = models.DateField()
+
+class ParallelSession(models.Model):
+    id = models.AutoField(primary_key=True)
+    sessions = models.ManyToManyField(Session)
+
+class NonParallelSession(models.Model):
+    sessions = models.ManyToManyField(Session)
+

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Blocking Sessions{% endblock title %}
+
+{% block stylesheet %}{% endblock stylesheet %}
+
+{% block content %}
+<div class="container-fluid main bg-white">
+    <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
+        <h3 style="color: #33344a;" >Block Timeslots </h3>
+    </div>
+    <div>
+        <form onsubmit="methods()">
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="block_name" id="lecturer" value="L"/>
+                <label class="form-check-label" for="lecturer">Lecturer</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="block_name" id="group" value="G"/>
+                <label class="form-check-label" for="group">Group</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input type="radio" class="form-check-input" name="block_name" id="subgroup" value="S"/>
+                <label class="form-check-label" for="subgroup">Subgroup</label>
+            </div>
+            <select class="form-control">
+                <option disabled>--Select</option>
+            </select>
+            <input type="submit" value="Select Time" />
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript%}
+
+
+
+
+{% endblock javascript %}
+
