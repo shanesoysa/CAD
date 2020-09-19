@@ -66,5 +66,7 @@ urlpatterns = [
     path('groups/delete', views.DeleteStudentsView.as_view() , name='remove_groups'),
     path('groups/update', views.UpdateGroupsView.as_view() , name='update_groups'),
 
-
+    path('sessions/assign', views.AssignSessionsView.as_view(), name="assign_sessions"),
+    path('timeslots/blocked', views.BlockTimeSlotsView.as_view(), name="blocked_timeslots"),
+    path('sessions/consecutive', views.ConsecutiveSessionsView.as_view(), name="consecutive_sessions")
 ]
