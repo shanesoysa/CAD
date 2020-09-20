@@ -1,0 +1,509 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Subjects{% endblock %}
+
+{% block content %}
+
+<div class="container">
+ 
+
+  <div class="row">
+    <div class="cycle-tab-container">
+      <ul class="nav nav-tabs">
+      <li class="cycle-tab-item active">
+        <a class="nav-link" role="tab" id="addsubject" data-toggle="tab" href="">Add New Subject</a>
+      </li>
+      <li class="cycle-tab-item"> 
+        <a class="nav-link" role="tab" id="viewsubjecttable" data-toggle="tab" href="#profile">View Added Subjects</a>
+      </li>
+  
+    </ul>
+    </div>
+  </div>
+
+    
+    <div class="row">
+      <div class="col-md-12" id="formadddiv">
+        <h1 id="subjectTitle" class="">Subjects</h1>
+        <form id="addLecturer" action="" >
+       
+    
+          
+
+          <div class="form-group row">
+            <div class="col-6">
+              <h4>Planning</h4>
+              <!-- <input class="form-control" type="text" name="offeredYear1" placeholder="Offered Year" > -->
+
+              <select
+              class="form-control"
+              id="offeredYear1"
+              name="offeredYear1"
+              placeholder="Offered Year"
+            >
+            <option disabled selected>Offered Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option  value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          
+          </select>
+
+            </div>
+
+
+            <div class="col-6">
+              <h4>Time Planning</h4>
+              <input class="form-control" type="number" name="noLecHours1" placeholder="Number of Hours" >
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-6">
+            <!-- <input class="form-control" type="text" name="offeredSemester1" placeholder="Offered Semester" > -->
+
+            <select
+            class="form-control"
+            id="offeredSemester1"
+            name="offeredSemester1"
+            
+          >
+          <option disabled selected>Offered Semester</option>
+          <option value="1">1st Semester</option>
+          <option value="2">2nd Semester</option>
+          
+        
+        </select>
+
+            </div>
+            <div class="col-6">
+              <input class="form-control" type="number" name="noTutHours1" placeholder="No of tute hours" >
+            </div>
+          </div>
+
+          <h4>Subject Details</h4>
+          <div class="form-group row">
+            <div class="col-6">
+            <input class="form-control" type="text" name="subjectName1" placeholder="Subject Name" >
+            </div>
+            <div class="col-6">
+            <input class="form-control" type="number" name="noLabHours1" placeholder="No of Lab Hours" > 
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-6">
+            <input class="form-control" type="text" name="subjectCode1" placeholder="Subject Code" >
+            </div>
+            <div class="col-6">
+              <input class="form-control" type="number" name="noEveHours1" placeholder="No of Evaluation Hours" >
+            </div>
+          </div>
+
+          
+          <!-- <h4>Time Planning</h4>
+        
+          <div class="form-group">
+            <input class="form-control" type="number" name="noLecHours1" placeholder="Number of Hours" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="number" name="noTutHours1" placeholder="No of tute hours" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="number" name="noLabHours1" placeholder="No of Lab Hours" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="number" name="noEveHours1" placeholder="No of Evaluation Hours" >
+          </div> -->
+         
+          <div class="form-group row">
+            <div class="col-4">
+        
+            </div>
+            <div class="col-4">
+              <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
+            </div>
+            <div class="col-4">
+        
+            </div>
+          </div>
+
+        
+        </form>
+      </div>
+
+      <div class="d-none" id="subjectSection">
+      <div class="row">
+        <div class="col-4">
+        <h3>Subjects</h3>
+      </div>
+      <div class="col-4">
+        
+      </div>
+      
+        <div class="col-4" style="float: left;">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+            </div>
+            <input type="text" class="form-control" id="myInput" placeholder="Search..." aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+          
+        </div>
+      
+      </div>
+
+      <div class="col-md-4" >
+        <h3 id="subjecttable" class=""></h3>
+        <table id="userTable" class="table table-striped">
+          <tr>
+            <th>offeredYear</th>
+            <th>offeredSemester</th>
+            <th>subjectName</th>
+            <th>subjectCode</th>
+            <th>noLecHours</th>
+            <th>noTutHours</th>
+            <th>noLabHours</th>
+            <th>noEveHours </th>
+            <th colspan="3">Actions</th>
+          </tr>
+          {% if subjects %}
+          {% for subject in subjects %}
+          <tr id="user-{{subject.id}}">
+              <td class="lecName userData" name="offeredYear">{{subject.offeredYear}}</td>
+              <td class="lecCenter userData" name="offeredSemester">{{subject.offeredSemester}}</td>
+              <td class="lecEmployee_id userData" name="subjectName">{{subject.subjectName}}</td>
+              <td class="lecBuilding userData" name="subjectCode">{{subject.subjectCode}}</td>
+              <td class="lecFaculty userData" name="noLecHours">{{subject.noLecHours}}</td>
+              <td class="lecLevel userData" name="noTutHours">{{subject.noTutHours}}</td>
+              <td class="lecDepartment userData" name="noLabHours">{{subject.noLabHours}}</td>
+              <td class="lecRank userData" name="noEveHours">{{subject.noEveHours}}</td>
+
+              <td align="center">
+                  <button class="btn btn-success form-control" onClick="editUser({{subject.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+              </td>
+              <td align="center">
+                  <button class="btn btn-danger form-control" onClick="deleteUser({{subject.id}})">DELETE</button>
+              </td>
+          </tr>
+          {% endfor %}
+          {% else %}
+            No Users
+          {% endif %}
+        </table>
+      </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+
+
+
+  <div class="modal" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+               <form id="updateUser" action="">
+        <div class="modal-body">
+          <input class="form-control" id="form-id" type="hidden" name="formId"/>
+          <label for="name">Offered Year</label>
+          <input class="form-control" id="form-name" type="text" name="offeredYear2"/>
+          <label for="address">Offered Semester</label>
+          <input class="form-control" id="form-center" type="text" name="offeredSemester2"/>
+          <label for="age">Subject Name</label>
+          <input class="form-control" id="form-employee_id" type="text" name="subjectName2" >
+          <label for="name">Subject Code</label>
+          <input class="form-control" id="form-building" type="text" name="subjectCode2"/>
+          <label for="address">Number Of lecture Hours</label>
+          <input class="form-control" id="form-faculty" type="number" name="noLecHours2"/>
+          <label for="age">Number Of Tutorial Hours</label>
+          <input class="form-control" id="form-level" type="number" name="noTutHours2" >
+          <label for="address">Number Of Lab Hours</label>
+          <input class="form-control" id="form-department" type="number" name="noLabHours2"/>
+          <label for="age">Number Of Evaluation Hours</label>
+          <input class="form-control" id="form-rank" type="number" name="noEveHours2" >
+            
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+  
+
+
+
+
+<!-- 
+
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <h4 class="modal-title" id="myModalLabel">Update User</h4>
+        </div>
+        
+        <form id="updateUser" action="">
+        <div class="modal-body">
+            <input class="form-control" id="form-id" type="hidden" name="formId"/>
+            <label for="name">Offered Year</label>
+            <input class="form-control" id="form-name" type="text" name="offeredYear2"/>
+            <label for="address">Offered Semester</label>
+            <input class="form-control" id="form-center" type="text" name="offeredSemester2"/>
+            <label for="age">Subject Name</label>
+            <input class="form-control" id="form-employee_id" type="text" name="subjectName2" >
+            <label for="name">Subject Code</label>
+            <input class="form-control" id="form-building" type="text" name="subjectCode2"/>
+            <label for="address">Number Of lecture Hours</label>
+            <input class="form-control" id="form-faculty" type="number" name="noLecHours2"/>
+            <label for="age">Number Of Tutorial Hours</label>
+            <input class="form-control" id="form-level" type="number" name="noTutHours2" >
+            <label for="address">Number Of Lab Hours</label>
+            <input class="form-control" id="form-department" type="number" name="noLabHours2"/>
+            <label for="age">Number Of Evaluation Hours</label>
+            <input class="form-control" id="form-rank" type="number" name="noEveHours2" >
+            
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" >Save changes</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div> -->
+{% endblock %}
+{% block javascript %}
+
+<script>
+  $("#viewsubjecttable").click(function(){
+    $("#formadddiv").hide(500);
+    $("#subjectTitle").hide(500);
+    $("#subjectSection").removeClass('d-none');
+   
+  });
+  
+  $("#addsubject").click(function(){
+   
+    $("#formadddiv").show(500);
+    $("#subjectTitle").show(500);
+    $("#subjectSection").addClass('d-none');
+  });
+
+
+    $(document).ready(function(){
+    $("#myInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#userTable tr").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+  }); 
+
+  // Create Django Ajax Call
+  $("form#addLecturer").submit(function() {
+      var offeredYearInput = $('#offeredYear1').val();
+      var offeredSemesterInput = $('#offeredSemester1').val();
+      var subjectNameInput = $('input[name="subjectName1"]').val().trim();
+      var subjectCodeInput = $('input[name="subjectCode1"]').val().trim();
+      var noLecHoursInput = $('input[name="noLecHours1"]').val().trim();
+      var noTutHoursInput = $('input[name="noTutHours1"]').val().trim();
+      var noLabHoursInput = $('input[name="noLabHours1"]').val().trim();
+      var noEveHoursInput = $('input[name="noEveHours1"]').val().trim();
+
+      if (offeredYearInput && offeredSemesterInput && subjectNameInput && subjectCodeInput && noLecHoursInput && noTutHoursInput && noLabHoursInput && noEveHoursInput ) {
+          // Create Ajax Call
+          $.ajax({
+              url: '{% url "subject_create" %}',
+              data: {
+                'offeredYear':offeredYearInput,
+                'offeredSemester':offeredSemesterInput,
+                'subjectName':subjectNameInput,
+                'subjectCode':subjectCodeInput,
+                'noLecHours':noLecHoursInput,
+                'noTutHours':noTutHoursInput,
+                'noLabHours':noLabHoursInput,
+                'noEveHours':noEveHoursInput
+              },
+              dataType: 'json',
+              success: function (data) {
+               
+                console.log(data.subject);
+
+                  if (data.subject) {
+                    appendToUsrTable(data.subject);
+                    alert("'Data Added'")
+                    
+                  }
+                  
+              }
+          });
+        } else {
+          alert("All fields must have a valid value.");
+      }
+      $('form#addLecturer').trigger("reset");
+      return false;
+  });
+  
+  function appendToUsrTable(subject) {
+    $("#userTable > tbody:last-child").append(`
+          <tr id="user-${subject.id}">
+              <td class="lecName userData" name="offeredYear">${subject.offeredYear}</td>
+              '<td class="lecCenter userData" name="offeredSemester">${subject.offeredSemester}</td>
+              '<td class="lecEmployee_id userData" name="subjectName">${subject.subjectName}</td>
+              '<td class="lecBuilding userData" name="subjectCode">${subject.subjectCode}</td>
+              '<td class="lecFaculty userData" name="noLecHours">${subject.noLecHours}</td>
+              '<td class="lecLevel userData" name="noTutHours">${subject.noTutHours}</td>
+              '<td class="lecDepartment userData" name="noLabHours">${subject.noLabHours}</td>
+              '<td class="lecRank userData"" name="noEveHours">${subject.noEveHours}</td>
+              
+
+              '<td align="center">
+                  <button class="btn btn-success form-control" onClick="editUser(${subject.id})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+              </td>
+              <td align="center">
+                  <button class="btn btn-danger form-control" onClick="deleteUser(${subject.id})">DELETE</button>
+              </td>
+          </tr>l
+      `);
+  }
+
+  $("form#updateUser").submit(function() {
+
+    var idInput = $('input[name="formId"]').val().trim();
+    var offeredYearInput = $('input[name="offeredYear2"]').val();
+    var offeredSemesterInput = $('input[name="offeredSemester2"]').val().trim();
+    var subjectNameInput = $('input[name="subjectName2"]').val().trim();
+    var subjectCodeInput = $('input[name="subjectCode2"]').val().trim();
+    var noLecHoursInput = $('input[name="noLecHours2"]').val().trim();
+    var noTutHoursInput = $('input[name="noTutHours2"]').val().trim();
+    var noLabHoursInput = $('input[name="noLabHours2"]').val().trim();
+    var noEveHoursInput = $('input[name="noEveHours2"]').val().trim();
+
+    if (offeredYearInput && offeredSemesterInput && subjectNameInput && subjectCodeInput && noLecHoursInput && noTutHoursInput && noLabHoursInput && noEveHoursInput) {
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "subject_update" %}',
+            data: {
+              'id':idInput,
+              'offeredYear':offeredYearInput,
+              'offeredSemester':offeredSemesterInput,
+              'subjectName':subjectNameInput,
+              'subjectCode':subjectCodeInput,
+              'noLecHours':noLecHoursInput,
+              'noTutHours':noTutHoursInput,
+              'noLabHours':noLabHoursInput,
+              'noEveHours':noEveHoursInput
+
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.subject) {
+                  
+                  updateToUserTabel(data.subject);
+                  
+                }
+            }
+        });
+       } else {
+        alert("All fields must have a valid value.");
+    }
+    $('form#updateUser').trigger("reset");
+    $('#myModal').modal('hide');
+    return false;
+});
+
+
+function editUser(id) {
+  if (id) {
+    tr_id = "#user-" + id;
+    offeredYear1 = $(tr_id).find(".lecName").text();
+    offeredSemester1 = $(tr_id).find(".lecCenter").text();
+    subjectName1 = $(tr_id).find(".lecEmployee_id").text();
+    noLecHours1 = $(tr_id).find(".lecBuilding").text();
+    subjectCode1 = $(tr_id).find(".lecFaculty").text();
+    noTutHours1 = $(tr_id).find(".lecLevel").text();
+    noLabHours1 = $(tr_id).find(".lecDepartment").text();
+    noEveHours1 = $(tr_id).find(".lecRank").text();
+    
+    $('#form-id').val(id);
+    $('#form-name').val(offeredYear1);
+    $('#form-center').val(offeredSemester1);
+    $('#form-employee_id').val(subjectName1);
+    $('#form-building').val(noLecHours1);
+    $('#form-faculty').val(subjectCode1);
+    $('#form-level').val(noTutHours1);
+    $('#form-department').val(noLabHours1);
+    $('#form-rank').val(noEveHours1);
+ 
+  }
+}
+
+function updateToUserTabel(subject){
+    $("#userTable #user-" + subject.id).children(".userData").each(function() {
+        var attr = $(this).attr("name");
+
+        if (attr == "offeredYear") {
+          $(this).text(subject.offeredYear);
+
+        } else if (attr == "offeredSemester") {
+          $(this).text(subject.offeredSemester);
+
+        } else if (attr == "subjectName") {
+          $(this).text(subject.subjectName);
+
+        } else if (attr == "subjectCode") {
+          $(this).text(subject.subjectCode);
+
+        } else if (attr == "noLecHours") {
+          $(this).text(subject.noLecHours);
+
+        } else if (attr == "noTutHours") {
+          $(this).text(subject.noTutHours);
+
+        } else if (attr == "noLabHours") {
+          $(this).text(subject.noLabHours);
+
+        } else {
+          $(this).text(subject.noEveHours);
+        }
+      });
+}
+
+function deleteUser(id) {
+  var action = confirm("Are you sure you want to delete this user?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "subject_delete" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.deleted) {
+              $("#userTable #user-" + id).remove();
+            }
+        }
+    });
+  }
+}
+</script>
+{% endblock javascript %}
+
+
