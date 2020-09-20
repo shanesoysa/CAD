@@ -648,6 +648,13 @@ class UpdateSubGroupsView(View):
 class AssignSessionsView(generic.ListView):
     model =  Session
     template_name = 'sessions/assign-sessions.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)    
+        context['tags_list'] = Tags.objects.all()
+        context['subject_list'] = Subjects1.objects.all()
+        context['lecturer_list'] = Lecturer1.objects.all()
+        context['group_list'] = Group.objects.exclude(generated_group = None)
+        return context
 
 class ConsecutiveSessionsView(generic.ListView):
     model =  Session

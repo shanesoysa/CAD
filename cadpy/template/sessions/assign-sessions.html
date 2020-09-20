@@ -2,7 +2,45 @@
 
 {% block title %}Blocking Sessions{% endblock title %}
 
-{% block stylesheet %}{% endblock stylesheet %}
+{% block stylesheet %}
+<style>
+.some {
+    line-height: 0.5;
+}
+@media only screen and (max-width: 600px) {
+    .some {
+        line-height: 1.5;
+    }
+}
+
+.left{
+    float: left;
+    width: 65%;
+}
+.right{
+    float: left;
+    width: 35%;
+}
+.boxed{
+    border: 4px dotted purple;
+}
+.topcornerright{
+    position:absolute;
+    margin: 12px;
+    top: 0;
+    right:0;
+    color: #33344a;
+}
+
+.topcornerleft{
+    position:absolute;
+    margin: 7px;
+    top:0;
+    left:0;
+    color: #33344a;
+}
+</style>
+{% endblock stylesheet %}
 
 {% block content %}
 <div class="container-fluid main bg-light">
@@ -11,40 +49,107 @@
     </div>
     <div class="card shadow p-3 mb-5 bg-white rounded">
         <div class="card-body">
-            <form class="row">
-                <div class="col form-group">
-                    <label for="groupId" class="text-black font-weight-bold">Group</label>
-                    <select id="groupId" class="form-control" name="group">
-                        <option value="default" disabled>Select Group</option>
-                    </select>
+            <form>
+                <div class="row">
+                    <div class="col form-group">
+                        <label for="groupId" class="text-black font-weight-bold">Group</label>
+                        <select id="groupId" class="form-control" name="group">
+                            <option value="default" disabled selected>Select Group</option>
+                            {% for group in group_list %}
+                            <option value="{{group.id}}">{{ group.generated_group }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="lecturerId" class="text-black font-weight-bold">Lecturer</label>
+                        <select id="lecturerId" class="form-control" name="lecturer">
+                            <option value="default" disabled selected>Select Lecturer</option>
+                            {% for lecturer in lecturer_list %}
+                            <option value="{{lecturer.id}}">{{ lecturer.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="subjectId" class="text-black font-weight-bold">Subject</label>
+                        <select id="subjectId" class="form-control" name="subject">
+                            <option value="default" disabled selected>Select Subject</option>
+                            {% for subject in subject_list %}
+                            <option value="{{subject.id}}">{{ subject.subjectCode }} - {{ subject.subjectName }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="tagId" class="text-black font-weight-bold">Tag</label>
+                        <select id="tagId" class="form-control" name="tag">
+                            <option value="default" disabled selected>Select Tag</option>
+                            {% for tag in tags_list %}
+                            <option value="{{tag.id}}">{{ tag.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <div class="col form-group">
-                    <label for="lecturerId" class="text-black font-weight-bold">Lecturer</label>
-                    <select id="lecturerId" class="form-control" name="lecturer">
-                        <option value="default" disabled>Select Lecturer</option>
-                    </select>
-                </div>
-                <div class="col form-group">
-                    <label for="subjectId" class="text-black font-weight-bold">Subject</label>
-                    <select id="subjectId" class="form-control" name="subject">
-                        <option value="default" disabled>Select Subject</option>
-                    </select>
-                </div>
-                <div class="col form-group">
-                    <label for="tagId" class="text-black font-weight-bold">Tag</label>
-                    <select id="tagId" class="form-control" name="tag">
-                        <option value="default" disabled>Select Tag</option>
-                    </select>
+                <div class="row justify-content-md-center">
+                    <button onclick="reset()" class="btn btn-secondary col-2">Reset</button> &nbsp;
+                    <button onclick="search()" class="btn btn-primary col-2">Search</button>
                 </div>
             </form>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="left">
+            <div class="row">
+                {% for session in session_list %}
+                <div class="bg-white col-5 shadow text-black my-4 mr-4 some">
+                    <div>
+                        <i id="add_icon" class="fas fa-plus topcornerleft"  data-toggle="tool-tip" title="Assign Session"></i>
+                        <i id="hamburger_icon" class="fas fa-ellipsis-v topcornerright"></i>
+                    </div>
+                    <div class="pt-4 pl-4 pr-2 pb-2 m-2">
+                        {% if session.group_id %}
+                            <p style="font-weight: 500; ">{{ session.group_id.generated_group}}</p>
+                        {% else %}
+                            <p>{{ session.subgroup_id.generated_subgroup}}</p>
+                        {% endif %}
+                        <p>{{ session.subject.subjectName}}-{{ session.subject.subjectCode}} <span style="color:{{session.tag.color}};">({{ session.tag.label}})</span></p>
+                        <p>{{ session.student_count}} ({{ session.duration}})</p>
+                    </div>
+                </div> 
+                {% endfor%}
+            </div>
+        </div>
+        
+        <div class="right">
+            <form>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input id="pid1" class="custom-control-input" type="radio" name="parallel" value="true" checked>
+                    <label for="pid1" class="custom-control-label">Parallel</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input id="pid2" class="custom-control-input" type="radio" name="parallel" value="false">
+                    <label for="pid2" class="custom-control-label">Non Parallel</label>
+                </div>
+            </form>
+            <div class="boxed m-1 p-3">
+
+                <button class="btn btn-primary" style="float: right;" disabled> Save </button>
+            </div>
         </div>
     </div>
 </div>
 {% endblock content %}
 
+
 {% block javascript%}
+<script>
+    $(function() {
+        $('[data-toggle="tool-tip"]').tooltip();
+    });
 
-
-
-
+    function reset() {
+        $("#groupId").val("default");
+        $("#lecturerId").val("default");
+        $("#subjectId").val("default");
+        $("#tagId").val("default");
+    }
+</script>
 {% endblock javascript %}
