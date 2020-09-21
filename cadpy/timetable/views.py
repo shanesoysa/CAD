@@ -698,7 +698,7 @@ class BlockTimeSlotsView(generic.ListView):
 
 
 def addBuilding(request):
-    return render(request, 'add_building.html')
+    return render(request, 'locations/add_building.html')
 
 
 class CreateBuilding(View):
@@ -835,17 +835,17 @@ class UpdateRoom(View):
 
 class Buildings(ListView):
     model = BuildingModel
-    template_name = 'all_buildings.html'
+    template_name = 'locations/all_buildings.html'
     context_object_name = 'buildings'
 
 
 class BuildingDetail(DetailView):
     model = BuildingModel
-    template_name = 'building_detail.html'
+    template_name = 'locations/building_detail.html'
 
 
 def lecturerStatistics(request):
-    return render(request, 'lecturer_statistics.html')
+    return render(request, 'statistics/lecturer_statistics.html')
 
 
 def lecturerCount(reuqest):
@@ -894,7 +894,7 @@ def subjectCount(request):
 
 
 def subjectStatistics(request):
-    return render(request, 'subject_statistics.html')
+    return render(request, 'statistics/subject_statistics.html')
 
 
 def allSubjectStatistics(request):
@@ -903,7 +903,7 @@ def allSubjectStatistics(request):
 
 
 def studentStatistics(request):
-    return render(request, 'student_statistics.html')
+    return render(request, 'statistics/student_statistics.html')
 
 
 def allProgrammeStatistics(request):
@@ -927,7 +927,7 @@ def allSubGroupStatistics(request):
 
 
 def statistics(request):
-    return render(request, 'statistics.html')
+    return render(request, 'statistics/statistics.html')
 
 # ranul
 #########################################################################################
