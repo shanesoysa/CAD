@@ -129,5 +129,6 @@ urlpatterns = [
     path('statistics/allSubGroupStatistics',
          views.allSubGroupStatistics, name='allSubGroupStatistics'),
 
+    # ranul
     #################################################################################
 ]
