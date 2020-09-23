@@ -102,10 +102,9 @@
                     </div>
                 </div> 
             </div>
-            <div class="right">
+            <div class="right" id="session_2">
                 <h5 class="card-title">Session 2</h5>
-                <div id="session_2">
-                </div>
+                
             </div>
             <button class="btn btn-primary bottom col-1"> Set </button>
         </div>
@@ -121,7 +120,7 @@
 <script>
 $(document).ready(function(){
 
-    $('input[type="radio"][name="batch"]').change(function(){
+    $('input[type="radio"][name="batch"]').click(function(){
         var value = $('input[name="batch"]:checked').val();
         var group
         if(value == 'group'){
@@ -168,7 +167,8 @@ $(document).ready(function(){
         }
     }
 
-    $('#search_btn').click(function(){
+    $('#search_btn').click(function(e){
+        e.preventDefault();
         var batch = $('input[type="radio"][name="batch"]:checked').val()
         var group = $('#groupId').val()
         var subject = $('#subjectId').val()
@@ -197,13 +197,13 @@ $(document).ready(function(){
 
     function displaySession2(data){
         alert('display function executed')
-        $('div #session_2').append(`
+        $('#session_2').append(`
             <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="${data.id}">
-                    <div class="p-4 m-2">
-                        <p style="font-weight: 500; ">${ session1.group}</p>
-                        <p>${session1.subject_name}-${ session1.subject_code} <span style="color:${session1.tag_color};">(${ session1.tag_label})</span></p>
-                        <p>${session1.student_count} (${ session1.duration})</p>
-                    </div>
+                <div class="p-4 m-2">
+                    <p style="font-weight: 500; ">${ data.group}</p>
+                    <p>${data.subject_name}-${ data.subject_code} <span style="color:${data.tag_color};">(${ data.tag_label})</span></p>
+                    <p>${data.student_count} (${ data.duration})</p>
+                </div>
             </div> 
         `);
     }

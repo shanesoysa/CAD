@@ -105,3 +105,8 @@ class ParallelSession(models.Model):
 class NonParallelSession(models.Model):
     sessions = models.ManyToManyField(Session)
 
+# class ConsecutiveSession(model.Model):
+#     session1 = models.ForeignKey(Session, on_delete=models.CASCADE)    
+#     session2 = models.ForeignKey(Session, on_delete=models.CASCADE)
+
+

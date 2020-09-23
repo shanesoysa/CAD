@@ -756,10 +756,15 @@ def get_consecutive_session(request, pk):
             'subject_name': session1.subject.subjectName,
             'subject_code': session1.subject.subjectCode,
             'tag_label': session1.tag.label,
-            'tag_label': session1.tag.color,
+            'tag_color': session1.tag.color,
             'student_count': session1.student_count,
             'duration': session1.duration
         }
+        if(batch == 'group'):
+            data['group'] = session1.group_id.generated_group
+        else:
+            data['group'] = session1.subgroup_id.generated_subgroup
+                
         return JsonResponse(data)
     except ObjectDoesNotExist as e:
         data = {
