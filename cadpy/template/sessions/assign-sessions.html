@@ -39,6 +39,11 @@
     left:0;
     color: #33344a;
 }
+
+.code{
+    background-color: #FFFFFF;
+    color: #800080;
+}
 </style>
 {% endblock stylesheet %}
 
@@ -53,8 +58,8 @@
                 <div class="row">
                     <div class="col form-group">
                         <label for="groupId" class="text-black font-weight-bold">Group</label>
-                        <select id="groupId" class="form-control" name="group">
-                            <option value="default" disabled selected>Select Group</option>
+                        <select id="groupId" class="form-control selectpicker" name="group" data-live-search="true">
+                            <option value="default" disabled selected>Select Group --</option>
                             {% for group in group_list %}
                             <option value="{{group.id}}">{{ group.generated_group }}</option>
                             {% endfor %}
@@ -62,8 +67,8 @@
                     </div>
                     <div class="col form-group">
                         <label for="lecturerId" class="text-black font-weight-bold">Lecturer</label>
-                        <select id="lecturerId" class="form-control" name="lecturer">
-                            <option value="default" disabled selected>Select Lecturer</option>
+                        <select id="lecturerId" class="form-control selectpicker " name="lecturer" data-live-search="true">
+                            <option value="default" disabled selected>Select Lecturer --</option>
                             {% for lecturer in lecturer_list %}
                             <option value="{{lecturer.id}}">{{ lecturer.name }}</option>
                             {% endfor %}
@@ -71,8 +76,8 @@
                     </div>
                     <div class="col form-group">
                         <label for="subjectId" class="text-black font-weight-bold">Subject</label>
-                        <select id="subjectId" class="form-control" name="subject">
-                            <option value="default" disabled selected>Select Subject</option>
+                        <select id="subjectId" class="form-control selectpicker" name="subject" data-live-search="true">
+                            <option value="default" disabled selected>Select Subject -- </option>
                             {% for subject in subject_list %}
                             <option value="{{subject.id}}">{{ subject.subjectCode }} - {{ subject.subjectName }}</option>
                             {% endfor %}
@@ -80,8 +85,8 @@
                     </div>
                     <div class="col form-group">
                         <label for="tagId" class="text-black font-weight-bold">Tag</label>
-                        <select id="tagId" class="form-control" name="tag">
-                            <option value="default" disabled selected>Select Tag</option>
+                        <select id="tagId" class="form-control selectpicker" name="tag">
+                            <option value="default" disabled selected>Select Tag --</option>
                             {% for tag in tags_list %}
                             <option value="{{tag.id}}">{{ tag.label }}</option>
                             {% endfor %}
@@ -99,11 +104,17 @@
         <div class="left">
             <div class="row">
                 {% for session in session_list %}
-                <div class="bg-white col-5 shadow text-black my-4 mr-4 some">
+                <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="{{session.id}}">
                     <div>
                         <i id="add_icon" class="fas fa-plus topcornerleft"  data-toggle="tool-tip" title="Assign Session"></i>
-                        <i id="hamburger_icon" class="fas fa-ellipsis-v topcornerright"></i>
+                        <i class="fas fa-ellipsis-v topcornerright hamburger_icon dropdown" onmouseover="showMyMenu({{session.id}})">
+                            <div  class="dropdown-menu dropdown-menu-right code shadow">
+                                <a class="dropdown-item " href="#">Block Session</a>
+                                <a class="dropdown-item " href="#">Set Consecutive</a>
+                            </div>
+                        </i>
                     </div>
+
                     <div class="pt-4 pl-4 pr-2 pb-2 m-2">
                         {% if session.group_id %}
                             <p style="font-weight: 500; ">{{ session.group_id.generated_group}}</p>
@@ -143,6 +154,20 @@
 <script>
     $(function() {
         $('[data-toggle="tool-tip"]').tooltip();
+        // $('.hamburger_icon').mouseover(function(){
+            
+        // });
+        $('.hamburger_icon').mouseleave(function(){
+            function hideDrop(){
+                $('.dropdown-menu').hide();
+            }
+
+            setTimeout(hideDrop, 2000);
+        });
+
+        function showMyMenu(id){
+            $('#' + id).find(' .dropdown-menu').show();
+        }
     });
 
     function reset() {

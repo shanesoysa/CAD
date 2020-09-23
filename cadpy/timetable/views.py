@@ -9,6 +9,8 @@ from django.db.utils import IntegrityError
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
 from .models import Session, ParallelSession, Timeslots
+from django.core import serializers
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 # Create your views here.
 def index(request):
      return render(request, 'home.html')
@@ -659,10 +661,154 @@ class AssignSessionsView(generic.ListView):
 class ConsecutiveSessionsView(generic.ListView):
     model =  Session
     template_name = 'sessions/consecutive-sessions.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['session1'] = Session.objects.get(pk= self.kwargs['pk'])
+        context['subject_list'] = Subjects1.objects.all()
+        context['tags_list'] = Tags.objects.all()
+        context['group_list'] = Group.objects.exclude(generated_group = None)
+        context['subgroup_list'] = Subgroup.objects.exclude(generated_subgroup = None)
+        return context
 
 class BlockTimeSlotsView(generic.ListView):
-    model =  Session
+
+    context_object_name  = 'lecturer_list'
+    
+    def get_queryset(self):
+        """Return the lecturer objects with only specified fields"""
+        return Lecturer1.objects.values('id', 'employee_id', 'name')
     template_name = 'sessions/blocked-timeslots.html'
+
+def createConsecutive(request):
+    try:
+        session1 = request.GET.get('session1_id', None)
+        session2 = request.GET.get('session2_id', None)
+
+        session2_obj = Session.objects.get(pk=session2)
+        session1_obj = Session.objects.get(pk=session1)
+        data = {
+            'added': true,
+            'success_stat': 1
+        }  
+        if(session_obj.consecutive_session == None):
+            session1_obj.consecutive_session = session2_obj
+            session1_obj.save()
+        else:
+            data['error_msg'] = 'Consecutive Session already exists for this session'
+        
+        return JsonResponse(data)       
+    except:    
+        data = {
+            'error_msg': 'unexpected error',
+            'success_stat': 0
+        }  
+        return JsonResponse(data)
+
+def get_group_data(request, pk):
+    group = request.GET.get('group', None)      
+
+    if(group ==  'true' ):
+        group_list = Group.objects.exclude(generated_group=None).values('id', 'generated_group')
+        group_type = 'group' 
+    else:
+        group_list = Subgroup.objects.exclude(generated_subgroup=None).values('id', 'generated_subgroup')
+        group_type = 'subgroup' 
+    data = {
+         'groups' : list(group_list),
+         'group_type': group_type
+    } 
+    return JsonResponse(data)
+
+
+def get_group_data_2(request):
+    group = request.GET.get('group_type', None)      
+
+    if(group ==  'G' ):
+        group_list = Group.objects.exclude(generated_group=None).values('id', 'generated_group')
+        group_type = 'group' 
+    elif(group == 'S'):
+        group_list = Subgroup.objects.exclude(generated_subgroup=None).values('id', 'generated_subgroup')
+        group_type = 'subgroup'
+    else:
+        group_list = Lecturer1.objects.values('id', 'employee_id', 'name')
+        group_type = 'lecturer' 
+    data = {
+         'groups' : list(group_list),
+         'group_type': group_type
+    } 
+    return JsonResponse(data)   
+
+def get_consecutive_session(request, pk):
+    try:
+        batch = request.GET.get('batch', None)       
+        group = request.GET.get('group', None)       
+        subject = request.GET.get('subject', None)       
+        tag = request.GET.get('tag', None)     
+
+        if(batch == 'group' ):
+            session1 = Session.objects.get(tag=tag, subject=subject, group_id=group)
+        else:
+            session1 = Session.objects.get(tag=tag, subject=subject, subgroup_id=group)
+
+        data = {
+            'success_stat': 1,
+            'id': session1.id,
+            'subject_name': session1.subject.subjectName,
+            'subject_code': session1.subject.subjectCode,
+            'tag_label': session1.tag.label,
+            'tag_label': session1.tag.color,
+            'student_count': session1.student_count,
+            'duration': session1.duration
+        }
+        return JsonResponse(data)
+    except ObjectDoesNotExist as e:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Session Not Found'
+        }
+        return JsonResponse(data)
+    except MultipleObjectsReturned as ex:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Unexpected Error'
+        }
+        return JsonResponse(data)
+
+#not implemented
+def get_searched_session(request):
+    try:
+        lecturer = request.GET.get('lecturer', None)       
+        group = request.GET.get('group', None)       
+        subject = request.GET.get('subject', None)       
+        tag = request.GET.get('tag', None)  
+ 
+        #use conditions to check if null
+        
+        session1 = Session.objects.filter(tag=tag, subject=subject, group_id=group)
+
+        data = {
+            'success_stat': 1,
+            'id': session1.id,
+            'subject_name': session1.subject.subjectName,
+            'subject_code': session1.subject.subjectCode,
+            'tag_label': session1.tag.label,
+            'tag_label': session1.tag.color,
+            'student_count': session1.student_count,
+            'duration': session1.duration
+        }
+        return JsonResponse(data)
+    except ObjectDoesNotExist as e:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Session Not Found'
+        }
+        return JsonResponse(data)
+    except MultipleObjectsReturned as ex:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Unexpected Error'
+        }
+        return JsonResponse(data)        
 
 
 

@@ -12,7 +12,7 @@
     <div>
         <form onsubmit="methods()">
             <div class="form-check form-check-inline">
-                <input type="radio" class="form-check-input" name="block_name" id="lecturer" value="L"/>
+                <input type="radio" class="form-check-input" name="block_name" id="lecturer" value="L" checked="true"/>
                 <label class="form-check-label" for="lecturer">Lecturer</label>
             </div>
             <div class="form-check form-check-inline">
@@ -23,9 +23,14 @@
                 <input type="radio" class="form-check-input" name="block_name" id="subgroup" value="S"/>
                 <label class="form-check-label" for="subgroup">Subgroup</label>
             </div>
-            <select class="form-control">
-                <option disabled>--Select</option>
-            </select>
+            <div class="col-6 form-check form-check-inline changegroup">
+                <select id="blockId" class="form-control selectpicker" data-live-search="true" name="group">
+                    <option value="default" disabled selected>Select </option>
+                        {% for lecturer in lecturer_list %}
+                        <option value="{{lecturer.id}}">{{ lecturer.employee_id }} - {{ lecturer.name }}</option>
+                        {% endfor %}
+                </select>
+            </div>
             <input type="submit" value="Select Time" />
         </form>
     </div>
@@ -33,9 +38,55 @@
 {% endblock content %}
 
 {% block javascript%}
+<script>
+$(document).ready(function(){
 
+    $('input[type="radio"][name="block_name"]').change(function(){
+        var name = $('input[name="block_name"]:checked').val();
+        $.ajax({
+            url: '{% url "get_group_data_2" %}',
+            data: {
+                group_type: name
+            },
+            dataType: 'json',
+            success: function(data){
+                if(data.groups){
+                    console.log(data.groups)
+                    $('#blockId').empty();
+                    $('#blockId').append($("<option></option>")
+                    .attr({
+                        "value": "default",
+                        "selected": "true",
+                        "disabled": "true"
+                    }).text('Select'));
+                    makeDropdownChange(data.groups, data.group_type);
+                }else{
+                    alert('unexpected error')
+                }
+            }
+        });
+    });
 
+    function makeDropdownChange(groups, group_type){
+        if(group_type == 'group'){
+            $.each(groups, function(index, value){
+                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_group));
+            });
+            $('#blockId').selectpicker('refresh');
 
-
+        }else if(group_type == 'subgroup'){
+            $.each(groups, function(index, value){
+                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_subgroup));
+            });
+            $('#blockId').selectpicker('refresh');
+        }else{
+            $.each(groups, function(index, value){
+                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.employee_id + ' - ' + value.name));
+            });
+            $('#blockId').selectpicker('refresh');            
+        }
+    }
+});
+</script>
 {% endblock javascript %}
 
