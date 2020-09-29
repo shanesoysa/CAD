@@ -93,20 +93,15 @@ class Session(models.Model):
     subgroup_id = models.ForeignKey(Subgroup, on_delete=models.CASCADE, null=True, blank=True)
     student_count = models.IntegerField(default=1)
     duration = models.IntegerField(default=1)
-    consecutive_session = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    consecutive_session = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)#consider session 1 for this feild
 
 class Timeslots(models.Model):
     day = models.DateField()
 
 class ParallelSession(models.Model):
-    id = models.AutoField(primary_key=True)
     sessions = models.ManyToManyField(Session)
 
 class NonParallelSession(models.Model):
     sessions = models.ManyToManyField(Session)
-
-# class ConsecutiveSession(model.Model):
-#     session1 = models.ForeignKey(Session, on_delete=models.CASCADE)    
-#     session2 = models.ForeignKey(Session, on_delete=models.CASCADE)
 
 

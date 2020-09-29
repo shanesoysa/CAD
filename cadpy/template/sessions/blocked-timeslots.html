@@ -9,30 +9,69 @@
     <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
         <h3 style="color: #33344a;" >Block Timeslots </h3>
     </div>
-    <div>
-        <form onsubmit="methods()">
-            <div class="form-check form-check-inline">
-                <input type="radio" class="form-check-input" name="block_name" id="lecturer" value="L" checked="true"/>
-                <label class="form-check-label" for="lecturer">Lecturer</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" class="form-check-input" name="block_name" id="group" value="G"/>
-                <label class="form-check-label" for="group">Group</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" class="form-check-input" name="block_name" id="subgroup" value="S"/>
-                <label class="form-check-label" for="subgroup">Subgroup</label>
-            </div>
-            <div class="col-6 form-check form-check-inline changegroup">
-                <select id="blockId" class="form-control selectpicker" data-live-search="true" name="group">
-                    <option value="default" disabled selected>Select </option>
-                        {% for lecturer in lecturer_list %}
-                        <option value="{{lecturer.id}}">{{ lecturer.employee_id }} - {{ lecturer.name }}</option>
-                        {% endfor %}
-                </select>
-            </div>
-            <input type="submit" value="Select Time" />
-        </form>
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+            <form id="selectGroupForm">
+                <div class="form-check form-check-inline col-1 mr-2">
+                    <input type="radio" class="form-check-input" name="block_name" id="lecturer" value="L" checked="true"/>
+                    <label class="form-check-label" for="lecturer">Lecturer</label>
+                </div>
+                <div class="form-check form-check-inline col-1 mr-2">
+                    <input type="radio" class="form-check-input" name="block_name" id="group" value="G"/>
+                    <label class="form-check-label" for="group">Group</label>
+                </div>
+                <div class="form-check form-check-inline col-2">
+                    <input type="radio" class="form-check-input" name="block_name" id="subgroup" value="S"/>
+                    <label class="form-check-label" for="subgroup">Subgroup</label>
+                </div>
+                <div class="col-4 form-check form-check-inline changegroup">
+                    <select id="blockId" class="form-control selectpicker" data-live-search="true" name="group">
+                        <option value="default" disabled selected>Select </option>
+                            {% for lecturer in lecturer_list %}
+                            <option value="{{lecturer.id}}">{{ lecturer.employee_id }} - {{ lecturer.name }}</option>
+                            {% endfor %}
+                    </select>
+                </div>
+                <button onclick="displayFormInfo()" id="set_btn" class="btn btn-primary col-1"  data-toggle="modal" data-target="#block_sessions_modal11">Select Time </button>
+            </form>
+        </div>
+    </div>
+</div>
+<!--Model in bootstrap-->
+<div class="modal modal-lg" id="block_sessions_modal11" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Block TimeSlot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+            <form id="timeslotForm" action="">
+                <div class="modal-body">
+                    <input id="bId" name="bname" type="hidden" />
+                    <input id="bIdId" name="bIdname" type="hidden" />
+                    <div class="row">
+                        <div class="form-check col-4">
+                            <p>Day(s)</p>
+                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                            <label class="form-check-label" for="defaultCheck1">Default checkbox</label>
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="startTimeId">Start Time</label>
+                            <input type="datetime" id="startTimeId" name="start_time"/>
+                        </div>
+                        <div class="form-group col-4">
+                            <label for="endTimeId">End Time</label>
+                            <input type="datetime" id="endTimeId" name="end_time"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
     </div>
 </div>
 {% endblock content %}
@@ -41,7 +80,7 @@
 <script>
 $(document).ready(function(){
 
-    $('input[type="radio"][name="block_name"]').change(function(){
+    $('input[type="radio"][name="block_name"]').click(function(){
         var name = $('input[name="block_name"]:checked').val();
         $.ajax({
             url: '{% url "get_group_data_2" %}',
@@ -67,25 +106,71 @@ $(document).ready(function(){
         });
     });
 
-    function makeDropdownChange(groups, group_type){
-        if(group_type == 'group'){
-            $.each(groups, function(index, value){
-                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_group));
-            });
-            $('#blockId').selectpicker('refresh');
 
-        }else if(group_type == 'subgroup'){
-            $.each(groups, function(index, value){
-                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_subgroup));
-            });
-            $('#blockId').selectpicker('refresh');
-        }else{
-            $.each(groups, function(index, value){
-                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.employee_id + ' - ' + value.name));
-            });
-            $('#blockId').selectpicker('refresh');            
-        }
+});
+function makeDropdownChange(groups, group_type){
+    if(group_type == 'group'){
+        $.each(groups, function(index, value){
+            $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_group));
+        });
+        $('#blockId').selectpicker('refresh');
+
+    }else if(group_type == 'subgroup'){
+        $.each(groups, function(index, value){
+            $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_subgroup));
+        });
+        $('#blockId').selectpicker('refresh');
+    }else{
+        $.each(groups, function(index, value){
+            $('#blockId').append($("<option></option>").attr("value", value.id).text(value.employee_id + ' - ' + value.name));
+        });
+        $('#blockId').selectpicker('refresh');            
     }
+}
+
+function displayFormInfo(){
+    var block = $('input[type="radio"][name="block_name"]').val();
+    var block_id  = $('#blockId').val();
+    console.log('block: ' + block)
+    console.log('block_id: ' + block_id)
+    $('#bId').val(block);
+    $('#bIdId').val(block_id);
+
+}
+
+
+$("form#block_sessions_modal11").submit(function() {
+
+    var blockInput = $('input[name="formId"]').val().trim();
+    var blockIdInput = $('input[name="formName"]').val();
+    var days = $('input[name="forAbbv"]').val();
+    var startTimeInput = $('input[name="formAbbv"]').val();
+    var endTimeInput = $('input[name="formAbbv"]').val();
+
+    if (startTimeInput && endTimeInput) {
+        $.ajax({
+            url: '{% url "update_tags" %}',
+            data: {
+            'id':idInput,
+            'label':labelInput,
+            'color':colorInput,
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.success_stat == 1) { 
+                updateToUserTabel(data.tags);
+                }else{
+                alert(data.error_msg)
+                }
+            }
+        });
+    } else {
+        alert("All fields must have a valid value.");
+    }
+
+    $('form#timeslotForm').trigger("reset");
+    $('#block_sessions_modal11').modal('hide');
+    return false;
 });
 </script>
 {% endblock javascript %}

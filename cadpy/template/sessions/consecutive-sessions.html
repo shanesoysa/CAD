@@ -106,7 +106,7 @@
                 <h5 class="card-title">Session 2</h5>
                 
             </div>
-            <button class="btn btn-primary bottom col-1"> Set </button>
+            <button class="btn btn-primary bottom col-1" id="save_btn"> Set </button>
         </div>
     </div>
 </div>
@@ -173,7 +173,7 @@ $(document).ready(function(){
         var group = $('#groupId').val()
         var subject = $('#subjectId').val()
         var tag = $('#tagId').val()
-
+        var session1_id = '{{session1.id}}'
         $.ajax({
             url:'{% url "search_consecutive_sessions" session1.id %}',
             data:{
@@ -185,8 +185,13 @@ $(document).ready(function(){
             dataType:'json',
             success: function(data){
                 if(data.success_stat == 1){
-                    alert(data.subject_name)
-                    displaySession2(data)
+                    var session2_list = getSession2IdList()
+                    if(session1_id == data.id)
+                        alert('cannot add a consecutive session to itself')
+                    else if(session2_list.includes(data.id))
+                        alert('Session already exists in the list') 
+                    else    
+                        displaySession2(data)
                 }else{
                     alert(data.error_msg)
                 }
@@ -196,7 +201,6 @@ $(document).ready(function(){
     });
 
     function displaySession2(data){
-        alert('display function executed')
         $('#session_2').append(`
             <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="${data.id}">
                 <div class="p-4 m-2">
@@ -207,6 +211,37 @@ $(document).ready(function(){
             </div> 
         `);
     }
+
+    $('#save_btn').click(function(){
+        session1_id = '{{session1.id}}'
+        var session2_id_list = getSession2IdList()
+        console.log('List obtained' + session2_id_list);
+        var id_list_json = JSON.stringify(session2_id_list)
+        console.log('Json string: ' + id_list_json);
+        $.ajax({
+            url: '{% url "add_consecutive_sessions" session1.id %}',
+            type: 'POST',
+            data:{
+                'session2_id_list': id_list_json
+            },
+            dataType:'json',
+            success: function(data){
+                if(data.success_stat == 1)
+                    window.location.href = '{%url "assign_sessions" %}'
+                else
+                    alert(data.error_msg)
+            }
+
+        });
+    });
+
+    function getSession2IdList(){
+        var session2_id_list = []
+        $('#session_2 > div').each((index, val) => session2_id_list.push(parseInt(val.id)))
+        console.log('list: ' + session2_id_list)
+        return session2_id_list
+    }
+
     $('#reset_btn').click(function(){
         $("#groupId").val("default");
         $("#subjectId").val("default");

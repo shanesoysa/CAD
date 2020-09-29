@@ -71,7 +71,9 @@ urlpatterns = [
     path('timeslots/blocked/group-details', views.get_group_data_2 , name="get_group_data_2"),
     path('sessions/<int:pk>/consecutive', views.ConsecutiveSessionsView.as_view(), name="consecutive_sessions"),
     path('sessions/<int:pk>/consecutive/group-details', views.get_group_data , name="get_group_data"),
-    path('sessions/<int:pk>/consecutive/save', views.createConsecutive, name="add_consecutive_sessions"),
+    path('sessions/<int:pk>/consecutive/add', views.create_consecutive_session , name="add_consecutive_sessions"),
     path('sessions/<int:pk>/consecutive/search', views.get_consecutive_session , name="search_consecutive_sessions"),
+    path('sessions/assign/search', views.get_searched_session , name="search_sessions"),
+    path('sessions/assign/parallel', views.createParallelSession , name="add_parallel_sessions"),
 
 ]

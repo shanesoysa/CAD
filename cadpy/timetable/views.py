@@ -8,9 +8,11 @@ from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
-from .models import Session, ParallelSession, Timeslots
+from .models import Session, ParallelSession, Timeslots, NonParallelSession
 from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.views.decorators.csrf import csrf_exempt
+import json
 # Create your views here.
 def index(request):
      return render(request, 'home.html')
@@ -679,22 +681,26 @@ class BlockTimeSlotsView(generic.ListView):
         return Lecturer1.objects.values('id', 'employee_id', 'name')
     template_name = 'sessions/blocked-timeslots.html'
 
-def createConsecutive(request):
+@csrf_exempt
+def create_consecutive_session(request, pk):
     try:
-        session1 = request.GET.get('session1_id', None)
-        session2 = request.GET.get('session2_id', None)
+       
+        session2_list = request.POST.get('session2_id_list', None)
+        list_json =json.loads(session2_list)
+        session1_obj = Session.objects.get(pk=pk)
 
-        session2_obj = Session.objects.get(pk=session2)
-        session1_obj = Session.objects.get(pk=session1)
+        for session2 in list_json:
+            session2_obj = Session.objects.get(pk=session2)
+            session2_obj.consecutive_session = session1_obj
+            session2_obj.save()
         data = {
-            'added': true,
             'success_stat': 1
         }  
-        if(session_obj.consecutive_session == None):
-            session1_obj.consecutive_session = session2_obj
-            session1_obj.save()
-        else:
-            data['error_msg'] = 'Consecutive Session already exists for this session'
+        # if(session_obj.consecutive_session == None):
+        #     session1_obj.consecutive_session = session2_obj
+        #     session1_obj.save()
+        # else:
+        #     data['error_msg'] = 'Consecutive Session already exists for this session'
         
         return JsonResponse(data)       
     except:    
@@ -779,41 +785,81 @@ def get_consecutive_session(request, pk):
         }
         return JsonResponse(data)
 
-#not implemented
+@csrf_exempt
 def get_searched_session(request):
     try:
-        lecturer = request.GET.get('lecturer', None)       
-        group = request.GET.get('group', None)       
-        subject = request.GET.get('subject', None)       
-        tag = request.GET.get('tag', None)  
- 
-        #use conditions to check if null
+        lecturer = request.POST.get('lecturer', None)       
+        group = request.POST.get('group', None)       
+        subject = request.POST.get('subject', None)       
+        tag = request.POST.get('tag', None)  
+        conditions_list = {}
         
-        session1 = Session.objects.filter(tag=tag, subject=subject, group_id=group)
+        #use conditions to check if null
+        if (group):
+            conditions_list['group_id_id'] = group
 
+        if (tag):
+            conditions_list['tag_id'] = tag
+
+        if (subject):
+            conditions_list['subject_id'] = subject
+
+        if (lecturer):
+            conditions_list['lecturers'] = lecturer
+
+        sessions = Session.objects.filter(**conditions_list)
+        sessions_list = []
+
+        for session in sessions:
+            sessions_list.append({'id': session.id, 
+            'group': session.group_id.generated_group, 
+            'subgroup': session.subgroup_id.generated_subgroup if session.subgroup_id != None else None,
+            'subject_name': session.subject.subjectName,
+            'subject_code': session.subject.subjectCode,
+            'tag_label': session.tag.label, 
+            'tag_color': session.tag.color,
+            'student_count': session.student_count,
+            'duration': session.duration
+            })        
+        #print(serializers.serialize('json', sessions_list)) Used only for classes
         data = {
             'success_stat': 1,
-            'id': session1.id,
-            'subject_name': session1.subject.subjectName,
-            'subject_code': session1.subject.subjectCode,
-            'tag_label': session1.tag.label,
-            'tag_label': session1.tag.color,
-            'student_count': session1.student_count,
-            'duration': session1.duration
+            'sessions_list': sessions_list
         }
         return JsonResponse(data)
-    except ObjectDoesNotExist as e:
-        data = {
-            'success_stat': 0,
-            'error_msg': 'Session Not Found'
-        }
-        return JsonResponse(data)
-    except MultipleObjectsReturned as ex:
+    except Exception as e:
         data = {
             'success_stat': 0,
             'error_msg': 'Unexpected Error'
         }
-        return JsonResponse(data)        
+        return JsonResponse(data)  
+
+@csrf_exempt
+def createParallelSession(request):
+    try:
+        parallel = request.POST.get('parallel', None) 
+        session_list = request.POST.get('parallel_session_list', None) 
+        
+        parallel_py = json.loads(parallel)
+        session_list_py = json.loads(session_list)
+
+        sobj = ParallelSession() if parallel_py == True else NonParallelSession()
+        sobj.save()
+
+        for index, session in enumerate(session_list_py):
+            psession = Session.objects.get(pk = session)
+            sobj.sessions.add(psession)   
+
+        data = {
+            'success_stat': 1
+        }
+        return JsonResponse(data)
+    except Exception as e:  
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Unexpected Error'
+        }
+        return JsonResponse(data)                  
 
 
 
