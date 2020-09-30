@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.template import RequestContext
 from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
@@ -8,11 +9,24 @@ from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
+from .models import Session as Session1
 from .models import Session, ParallelSession, Timeslots
+
 # Create your views here.
+
+
 def index(request):
-     return render(request, 'home.html')
-    
+    return render(request, 'home.html')
+
+
+def Validations(request):
+    employee_id1 = request.GET.get('employee_id1', None)
+    data = {
+         'is_taken': Lecturer1.objects.filter(employee_id__iexact=employee_id1).exists()
+        }
+        
+    return JsonResponse(data)
+
 
 class Lecturer(ListView):
     model = Lecturer1
@@ -20,11 +34,9 @@ class Lecturer(ListView):
     context_object_name = 'lecturers'
 
 
-
-
 class AddLecturer(View):
-    def  get(self, request):
-        
+    def get(self, request):
+
         try:
             name1 = request.GET.get('name', None)
             center1 = request.GET.get('center', None)
@@ -34,7 +46,7 @@ class AddLecturer(View):
             level1 = request.GET.get('level', None)
             department1 = request.GET.get('department', None)
             rank1 = request.GET.get('rank', None)
-            
+
             obj = Lecturer1.objects.create(
                 name=name1,
                 center=center1,
@@ -45,9 +57,9 @@ class AddLecturer(View):
                 department=department1,
                 rank=rank1
             )
-            
 
-            lecturer = {'id':obj.id,'name':obj.name,'center':obj.center,'employee_id':obj.employee_id,'building':obj.building,'faculty':obj.faculty,'level':obj.level,'department':obj.department,'rank':obj.rank}
+            lecturer = {'id': obj.id, 'name': obj.name, 'center': obj.center, 'employee_id': obj.employee_id,
+                        'building': obj.building, 'faculty': obj.faculty, 'level': obj.level, 'department': obj.department, 'rank': obj.rank}
 
             data = {
                 'lecturer': lecturer
@@ -57,13 +69,14 @@ class AddLecturer(View):
             return JsonResponse(data)
 
         except:
-            
+
             print("fail adding data")
             pass
 
+
 class UpdateLecturer(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
             name1 = request.GET.get('name', None)
             center1 = request.GET.get('center', None)
@@ -83,25 +96,26 @@ class UpdateLecturer(View):
             obj.level = level1
             obj.department = department1
             obj.rank = rank1
-            
+
             obj.save()
 
-            lecturer = {'id':obj.id,'name':obj.name,'center':obj.center,'employee_id':obj.employee_id,'building':obj.building,'faculty':obj.faculty,'level':obj.level,'department':obj.department,'rank':obj.rank}
+            lecturer = {'id': obj.id, 'name': obj.name, 'center': obj.center, 'employee_id': obj.employee_id,
+                        'building': obj.building, 'faculty': obj.faculty, 'level': obj.level, 'department': obj.department, 'rank': obj.rank}
 
             data = {
                 'lecturer': lecturer
             }
             return JsonResponse(data)
-            
+
     except:
-        
+
         print("lecturer update failed")
         pass
-    
+
 
 class DeleteLecturer(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
             Lecturer1.objects.get(id=id1).delete()
             data = {
@@ -109,21 +123,20 @@ class DeleteLecturer(View):
             }
             return JsonResponse(data)
     except:
-        
+
         print("lecturer delete failed")
         pass
+
 
 class Subjects(ListView):
     model = Subjects1
     template_name = 'list_subjects.html'
     context_object_name = 'subjects'
 
-    
-
 
 class AddSubjects(View):
-    def  get(self, request):
-        
+    def get(self, request):
+
         try:
             offeredYear1 = request.GET.get('offeredYear', None)
             offeredSemester1 = request.GET.get('offeredSemester', None)
@@ -133,7 +146,7 @@ class AddSubjects(View):
             noTutHours1 = request.GET.get('noTutHours', None)
             noLabHours1 = request.GET.get('noLabHours', None)
             noEveHours1 = request.GET.get('noEveHours', None)
-            
+
             obj = Subjects1.objects.create(
                 offeredYear=offeredYear1,
                 offeredSemester=offeredSemester1,
@@ -144,9 +157,9 @@ class AddSubjects(View):
                 noLabHours=noLabHours1,
                 noEveHours=noEveHours1
             )
-            
 
-            subject = {'id':obj.id,'offeredYear':obj.offeredYear,'offeredSemester':obj.offeredSemester,'subjectName':obj.subjectName,'subjectCode':obj.subjectCode,'noLecHours':obj.noLecHours,'noTutHours':obj.noTutHours,'noLabHours':obj.noLabHours,'noEveHours':obj.noEveHours}
+            subject = {'id': obj.id, 'offeredYear': obj.offeredYear, 'offeredSemester': obj.offeredSemester, 'subjectName': obj.subjectName,
+                       'subjectCode': obj.subjectCode, 'noLecHours': obj.noLecHours, 'noTutHours': obj.noTutHours, 'noLabHours': obj.noLabHours, 'noEveHours': obj.noEveHours}
 
             data = {
                 'subject': subject
@@ -159,9 +172,10 @@ class AddSubjects(View):
             print("fail adding data")
             pass
 
+
 class UpdateSubject(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
             offeredYear1 = request.GET.get('offeredYear', None)
             offeredSemester1 = request.GET.get('offeredSemester', None)
@@ -176,31 +190,31 @@ class UpdateSubject(View):
             obj.offeredYear = offeredYear1
             obj.offeredSemester = offeredSemester1
             obj.subjectName = subjectName1
-            obj.subjectCode = subjectCode1            
+            obj.subjectCode = subjectCode1
             obj.noLecHours = noLecHours1
             obj.noTutHours = noTutHours1
             obj.noLabHours = noLabHours1
             obj.noEveHours = noEveHours1
-           
-            
+
             obj.save()
 
-            subject = {'id':obj.id,'offeredYear':obj.offeredYear,'offeredSemester':obj.offeredSemester,'subjectName':obj.subjectName,'subjectCode':obj.subjectCode,'noLecHours':obj.noLecHours,'noTutHours':obj.noTutHours,'noLabHours':obj.noLabHours,'noEveHours':obj.noEveHours}
+            subject = {'id': obj.id, 'offeredYear': obj.offeredYear, 'offeredSemester': obj.offeredSemester, 'subjectName': obj.subjectName,
+                       'subjectCode': obj.subjectCode, 'noLecHours': obj.noLecHours, 'noTutHours': obj.noTutHours, 'noLabHours': obj.noLabHours, 'noEveHours': obj.noEveHours}
 
             data = {
                 'subject': subject
             }
             return JsonResponse(data)
-            
+
     except:
-        
+
         print("subject update failed")
         pass
-    
+
 
 class DeleteSubject(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
             Subjects1.objects.get(id=id1).delete()
             data = {
@@ -208,15 +222,37 @@ class DeleteSubject(View):
             }
             return JsonResponse(data)
     except:
-        
+
         print("lecturer delete failed")
         pass
 
 
-#Rehani's    
+class Session(generic.ListView):
+    model = Session1
+    template_name = 'session_allocate.html'
+    context_object_name = 'sessions'
+
+    def get_context_data(self, **kwargs):
+        context = super(Session, self).get_context_data(**kwargs)
+        context.update({
+            'lecturers': Lecturer1.objects.all(),
+            'tags': Tags.objects.all(),
+            'subjects': Subjects1.objects.all(),
+            'groups': Group.objects.all(),
+            'subgroups': Subgroup.objects.select_related('group'),
+            # 'more_context': Model.objects.all(),
+        })
+        return context
+
+    # def get_queryset(self):
+    #     return Session1.objects.order_by('id')
+
+
+# Rehani's
 class TagsView(generic.ListView):
     model = Tags
     template_name = 'tags/tags.html'
+
 
 class DDView(generic.ListView):
     model = Tags
@@ -225,7 +261,7 @@ class DDView(generic.ListView):
 
 class DeleteTags(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
             Tags.objects.get(id=id1).delete()
             data = {
@@ -236,8 +272,9 @@ class DeleteTags(View):
         print("tag delete failed")
         pass
 
+
 class AddTagsView(View):
-    def  get(self, request):
+    def get(self, request):
         try:
             pname = request.GET.get('label', None)
             pabbv = request.GET.get('color', None)
@@ -245,7 +282,7 @@ class AddTagsView(View):
                 label=pname,
                 color=pabbv
             )
-            tags = {'id': obj.id, 'label': obj.label, 'color': obj.color }
+            tags = {'id': obj.id, 'label': obj.label, 'color': obj.color}
             data = {
                 'success_stat': 1,
                 'student_tags': tags
@@ -253,16 +290,17 @@ class AddTagsView(View):
             return JsonResponse(data)
         except IntegrityError as e:
             data = {
-                'success_stat':0,
+                'success_stat': 0,
                 'error_msg': 'Tag label or color already exists'
             }
             return JsonResponse(data)
         except Exception as ex:
             print("fail adding data")
-            pass   
+            pass
+
 
 class UpdateTags(View):
-    def  get(self, request):
+    def get(self, request):
         try:
             id1 = request.GET.get('id', None)
             pname = request.GET.get('label', None)
@@ -272,12 +310,12 @@ class UpdateTags(View):
             obj.label = pname
             obj.color = pabbv
             obj.save()
-            tags = {'id':obj.id, 'label':obj.label, 'color':obj.color}
+            tags = {'id': obj.id, 'label': obj.label, 'color': obj.color}
             data = {
                 'success_stat': 1,
                 'tags': tags
             }
-            return JsonResponse(data)    
+            return JsonResponse(data)
         except IntegrityError as e:
             data = {
                 'success_stat': 0,
@@ -294,50 +332,54 @@ class UpdateTags(View):
 
 
 class StudentsView(generic.ListView):
-    context_object_name  = 'group_list'
-    
+    context_object_name = 'group_list'
+
     def get_queryset(self):
         """Return the last five published questions."""
-        return Group.objects.exclude(generated_group = None)
+        return Group.objects.exclude(generated_group=None)
     template_name = 'students/students.html'
 
+
 class StudentsGenerationView(generic.ListView):
-    context_object_name  = 'group_list'
-    
+    context_object_name = 'group_list'
+
     def get_queryset(self):
         """Return the last five published questions."""
-        listOfGroups = Group.objects.filter(generated_group = None)
+        listOfGroups = Group.objects.filter(generated_group=None)
         for group in listOfGroups:
             print(group.pk)
             #group_obj = Group.objects.get(pk=group.pk)
             group_id = group.generate_group_id()
             group.generated_group = group_id
             group.save()
-        return Group.objects.exclude(generated_group = None)
+        return Group.objects.exclude(generated_group=None)
 
     template_name = 'students/students.html'
 
+
 class StudentsSubGroupGenerationView(generic.ListView):
-    context_object_name  = 'group_list'
-    
+    context_object_name = 'group_list'
+
     def get_queryset(self):
         """Return the last five published questions."""
-        groupy = Group.objects.get(id = self.kwargs['pk'])
+        groupy = Group.objects.get(id=self.kwargs['pk'])
         for subgroup in groupy.subgroup_set.all():
             #group_obj = Group.objects.get(pk=group.pk)
             subgroup_id = subgroup.generate_subgroup_id()
             subgroup.generated_subgroup = subgroup_id
             subgroup.save()
-        return Group.objects.exclude(generated_group = None)
+        return Group.objects.exclude(generated_group=None)
 
-    template_name = 'students/students.html'    
+    template_name = 'students/students.html'
+
 
 class ProgrammesView(generic.ListView):
     model = Programme
     template_name = 'students/programmes.html'
 
+
 class AddProgramme(View):
-    def  get(self, request):
+    def get(self, request):
         try:
             pname = request.GET.get('programme_name', None)
             pabbv = request.GET.get('programme_abbv', None)
@@ -347,27 +389,29 @@ class AddProgramme(View):
                 programme_name=pname,
                 programme_abbv=pabbv
             )
-            programme = {'id': obj.id, 'programme_name': obj.programme_name, 'programme_abbv': obj.programme_abbv }
+            programme = {'id': obj.id, 'programme_name': obj.programme_name,
+                         'programme_abbv': obj.programme_abbv}
             data = {
                 'success_stat': 1,
                 'programme': programme
             }
             return JsonResponse(data)
-        except:        
+        except:
             data = {
                 'success': 0,
                 'error': 'Cannot save duplicate programme abbreviation'
             }
             print("fail adding data")
-            return JsonResponse(data)   
+            return JsonResponse(data)
+
 
 class DeleteProgramme(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
-           
+
             Programme.objects.get(id=id1).delete()
-            
+
             data = {
                 'deleted': True
             }
@@ -378,7 +422,7 @@ class DeleteProgramme(View):
 
 
 class UpdateProgramme(View):
-    def  get(self, request):
+    def get(self, request):
         try:
             id1 = request.GET.get('id', None)
             pname = request.GET.get('programme_name', None)
@@ -388,18 +432,20 @@ class UpdateProgramme(View):
             obj.programme_name = pname
             obj.programme_abbv = pabbv
             obj.save()
-            programme = {'id':obj.id,'programme_name':obj.programme_name,'programme_abbv':obj.programme_abbv}
+            programme = {'id': obj.id, 'programme_name': obj.programme_name,
+                         'programme_abbv': obj.programme_abbv}
             data = {
                 'success_stat': 1,
                 'programme': programme
             }
-            return JsonResponse(data)    
+            return JsonResponse(data)
         except:
             data = {
                 'success_stat': 0,
                 'error_msg': 'Cannot save duplicate programme abbreviation'
             }
-            return JsonResponse(data)  
+            return JsonResponse(data)
+
 
 class AcademicYearSemesterView(generic.ListView):
     model = AcademicYearSemester
@@ -407,8 +453,8 @@ class AcademicYearSemesterView(generic.ListView):
 
 
 class AddAcademicYearSemesterView(View):
-    def  get(self, request):
-        
+    def get(self, request):
+
         try:
             ayear = request.GET.get('academic_year', None)
             asemester = request.GET.get('academic_semester', None)
@@ -416,8 +462,9 @@ class AddAcademicYearSemesterView(View):
                 academic_year=ayear,
                 academic_semester=asemester
             )
-            
-            academicyearsemester = {'id': obj.id, 'academic_year': obj.academic_year, 'academic_semester': obj.academic_semester }
+
+            academicyearsemester = {
+                'id': obj.id, 'academic_year': obj.academic_year, 'academic_semester': obj.academic_semester}
             data = {
                 'success_stat': 1,
                 'academicyearsemester': academicyearsemester
@@ -431,11 +478,12 @@ class AddAcademicYearSemesterView(View):
             }
             return JsonResponse(data)
 
+
 class DeleteAcademicYearSemesterView(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
-           
+
             AcademicYearSemester.objects.get(pk=id1).delete()
             data = {
                 'deleted': True
@@ -447,7 +495,7 @@ class DeleteAcademicYearSemesterView(View):
 
 
 class UpdateAcademicYearSemesterView(View):
-    def  get(self, request):
+    def get(self, request):
         try:
             id1 = request.GET.get('id', None)
             ayear = request.GET.get('academic_year', None)
@@ -457,39 +505,39 @@ class UpdateAcademicYearSemesterView(View):
             obj.academic_year = ayear
             obj.academic_semester = asemester
             obj.save()
-            academicyearsemester = {'id':obj.id ,'academic_year':obj.academic_year ,'academic_semester':obj.academic_semester}
+            academicyearsemester = {
+                'id': obj.id, 'academic_year': obj.academic_year, 'academic_semester': obj.academic_semester}
             data = {
                 'success_stat': 1,
                 'academicyearsemester': academicyearsemester
             }
-            return JsonResponse(data)    
+            return JsonResponse(data)
         except:
             print("Academic year-semester update failed")
             data = {
-                    'success_stat': 0,
-                    'error_msg': 'Cannot save duplicate academic year and semester'
+                'success_stat': 0,
+                'error_msg': 'Cannot save duplicate academic year and semester'
             }
             return JsonResponse(data)
 
 
 class GroupsView(generic.ListView):
-    context_object_name  = 'group_list'
+    context_object_name = 'group_list'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)    
+        context = super().get_context_data(**kwargs)
         context['programme_ll'] = Programme.objects.all()
         context['academic_ll'] = AcademicYearSemester.objects.all()
         return context
-    
+
     def get_queryset(self):
         """Return the last five published questions."""
-        return Group.objects.filter(generated_group = None)
+        return Group.objects.filter(generated_group=None)
     template_name = 'students/generate-groups.html'
 
 
-
 class AddStudentsView(View):
-    def  get(self, request):  
+    def get(self, request):
         try:
             semester = request.GET.get('academic_year_semester', None)
             prog = request.GET.get('programme', None)
@@ -504,7 +552,8 @@ class AddStudentsView(View):
                 group_no=group_num,
                 student_count=count
             )
-            student = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year': obj.academic_year_semester.academic_year, 'academic_semester': obj.academic_year_semester.academic_semester, 'programme': obj.programme.programme_abbv}
+            student = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year': obj.academic_year_semester.academic_year,
+                       'academic_semester': obj.academic_year_semester.academic_semester, 'programme': obj.programme.programme_abbv}
             data = {
                 'success_stat': 1,
                 'student': student
@@ -517,8 +566,9 @@ class AddStudentsView(View):
             }
             return JsonResponse(data)
 
+
 class UpdateGroupsView(View):
-    def  get(self, request):
+    def get(self, request):
         try:
             id1 = request.GET.get('id', None)
             academics = request.GET.get('academic_year_semester', None)
@@ -535,12 +585,13 @@ class UpdateGroupsView(View):
             obj.group_no = ggroup
             obj.student_count = scount
             obj.save()
-            group = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year': obj.academic_year_semester.academic_year, 'academic_semester': obj.academic_year_semester.academic_semester, 'programme': obj.programme.programme_abbv}
+            group = {'id': obj.id, 'group_no': obj.group_no, 'student_count': obj.student_count, 'academic_year': obj.academic_year_semester.academic_year,
+                     'academic_semester': obj.academic_year_semester.academic_semester, 'programme': obj.programme.programme_abbv}
             data = {
                 'success_stat': 1,
                 'group': group
             }
-            return JsonResponse(data)    
+            return JsonResponse(data)
         except Exception as e:
             print(e)
             print("update of group failed")
@@ -550,11 +601,12 @@ class UpdateGroupsView(View):
             }
             return JsonResponse(data)
 
+
 class DeleteStudentsView(View):
     try:
-        def  get(self, request):
+        def get(self, request):
             id1 = request.GET.get('id', None)
-           
+
             Group.objects.get(id=id1).delete()
             data = {
                 'deleted': True
@@ -563,13 +615,15 @@ class DeleteStudentsView(View):
     except:
         print("Students delete failed")
         pass
-    
+
+
 class SubGroupsView(generic.DetailView):
     model = Group
     template_name = 'students/generate-subgroups.html'
-        
+
+
 class AddSubGroups(View):
-    def  get(self, request, pk):
+    def get(self, request, pk):
         try:
             gp = request.GET.get('group', None)
             subgp = request.GET.get('subgroup_no', None)
@@ -578,11 +632,12 @@ class AddSubGroups(View):
             groupObj = Group.objects.get(pk=pk)
             print(groupObj)
             obj = Subgroup.objects.create(
-                group = groupObj,
-                subgroup_no = subgp,
+                group=groupObj,
+                subgroup_no=subgp,
             )
             print('created')
-            subgroup = {'id': obj.id, 'group': obj.group.generated_group, 'group_id': obj.group.id, 'subgroup_no': obj.subgroup_no }
+            subgroup = {'id': obj.id, 'group': obj.group.generated_group,
+                        'group_id': obj.group.id, 'subgroup_no': obj.subgroup_no}
             data = {
                 'success_stat': 1,
                 'subgroup': subgroup
@@ -598,14 +653,15 @@ class AddSubGroups(View):
             print("fail adding data")
             return JsonResponse(data)
         except Exception as ex:
-            print('Error: ', ex)    
-            pass   
+            print('Error: ', ex)
+            pass
+
 
 class DeleteSubGroups(View):
-    def  get(self, request, pk):
+    def get(self, request, pk):
         try:
             id1 = request.GET.get('id', None)
-            Subgroup.objects.get(id=id1).delete()  
+            Subgroup.objects.get(id=id1).delete()
             data = {
                 'deleted': True
             }
@@ -616,11 +672,10 @@ class DeleteSubGroups(View):
                 'deleted': False
             }
             return JsonResponse(data)
-       
 
 
 class UpdateSubGroupsView(View):
-    def  get(self, request, pk):
+    def get(self, request, pk):
         try:
             id1 = request.GET.get('id', None)
             pabbv = request.GET.get('subgroup_no', None)
@@ -628,12 +683,12 @@ class UpdateSubGroupsView(View):
             obj = Subgroup.objects.get(id=id1)
             obj.subgroup_no = pabbv
             obj.save()
-            subgroup = {'id':obj.id,'subgroup_no':obj.subgroup_no}
+            subgroup = {'id': obj.id, 'subgroup_no': obj.subgroup_no}
             data = {
                 'success_stat': 1,
                 'subgroup': subgroup
             }
-            return JsonResponse(data)    
+            return JsonResponse(data)
         except IntegrityError as e:
             print("subgroup update failed")
             data = {
@@ -642,20 +697,20 @@ class UpdateSubGroupsView(View):
             }
             return JsonResponse(data)
         except Exception as ex:
-            print('Error: ', ex)    
-            pass        
-        
+            print('Error: ', ex)
+            pass
+
+
 class AssignSessionsView(generic.ListView):
-    model =  Session
+    model = Session
     template_name = 'sessions/assign-sessions.html'
 
+
 class ConsecutiveSessionsView(generic.ListView):
-    model =  Session
+    model = Session
     template_name = 'sessions/consecutive-sessions.html'
 
+
 class BlockTimeSlotsView(generic.ListView):
-    model =  Session
+    model = Session
     template_name = 'sessions/blocked-timeslots.html'
-
-
-

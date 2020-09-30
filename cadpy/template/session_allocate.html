@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sessions{% endblock %}
+
+{% block content %}
+
+
+
+<div class="row">
+  <div class="cycle-tab-container">
+    <ul class="nav nav-tabs">
+    <li class="cycle-tab-item active">
+      <a class="nav-link" role="tab" id="addsection" data-toggle="tab" href="">Add New Session</a>
+    </li>
+    <li class="cycle-tab-item"> 
+      <a class="nav-link" role="tab" id="viewsection" data-toggle="tab" href="">View Added Sessions</a>
+    </li>
+
+  </ul>
+  </div>
+</div>
+
+<div id="addingform">
+  <div class="row">
+    <div class="col mt-3 text-center">
+      <h2>Add New Session</h2>
+    </div>
+    <hr/>
+  </div>
+
+
+<form action="" class="container" id="addsession" name="addsession">
+  {% csrf_token %}
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+        <h5>Lecturers</h5>
+          <select
+            class="form-control select2"
+            id="loadlecturers"
+            name="loadlecturers"
+            multiple="multiple"
+          >
+          <!-- <option class="d-none" disabled></option> -->
+          {% for lecturer in lecturers %}
+    
+          <option style="color:black;" value="{{lecturer.name}}">{{lecturer.name}}</option>
+          {% endfor %}
+
+        </select>
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <div class="col-5">
+          <h5>Subjects</h5>
+          <select
+            class="form-control select2"
+            id="loadsubjects"
+            name="loadsubjects"
+          >
+          <option class="d-none" disabled selected></option>
+          {% for subject in subjects %}
+    
+          <option style="color:black;" value="{{subject.subjectCode}}">{{subject.subjectName}}</option>
+          {% endfor %}          
+        </select>
+
+        </div>
+  
+    </div>
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+      
+
+        <h5>Tags</h5>
+          <select
+          class="form-control select2"
+          id="loadtags"
+          name="loadtags"
+        >
+        <option class="d-none" disabled selected></option>
+
+        {% for tag in tags %}
+    
+          <option style="color:black;" value="{{tag.label}}">{{tag.label}}</option>
+          {% endfor %}        
+       
+      </select>
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <div class="col-5">
+          <h5>Number Of Students</h5>
+          <input
+            value=""
+            class="form-control"
+            type="text"
+            name="nostudents"
+            
+           
+          />
+        </div>
+  
+    </div>
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+        <h5>Group Details</h5>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" checked type="radio" name="groups" id="inlineRadio1" value="1">
+          <label class="form-check-label" for="inlineRadio1">Group</label>
+        </div>
+        
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="groups" id="inlineRadio2" value="2">
+          <label class="form-check-label" for="inlineRadio2">Sub Group</label>
+        </div>
+        <div id="divgroup">
+        <select
+        class="form-control select2"
+        id="loadgroups"
+       name="loadgroups"
+      >
+      <option class="d-none" disabled selected></option>
+
+      {% for group in groups %}
+    
+          <option style="color:black;" value="{{group.generated_group}}"> {{group.generated_group}}&nbsp; |&nbsp;{{group.student_count}}</option>
+      {% endfor %}
+      
+     
+    </select>
+    </div>
+    <div id="divsubgroup">
+    <select
+        class="form-control select2"
+        id="loadsubgroups"
+       name="loadsubgroups"
+      >
+      <option class="d-none" disabled selected></option>
+
+      {% for subgroup in subgroups %}
+    
+          <option style="color:black;" value="{{subgroup.generated_subgroup}}">{{subgroup.generated_subgroup}}&nbsp; |&nbsp;{{subgroup.group.student_count}}</option>
+      {% endfor %}
+      
+     
+    </select>
+    </div>
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <div class="col-5">
+      
+
+
+      <h5>Time Duration</h5>
+      <input
+
+        class="form-control OnlyNumber"
+        type="number"
+        name="employee_id1"
+        id="employee_id1"
+      
+      />
+        </div>
+  
+    </div>
+    <div class="row p-2">
+      <div class="col-1">
+
+      </div>
+      <div class="col-5">
+        <!-- <h5>Department</h5>
+        <select
+        class="form-control"
+        id="department1"
+        name="department1"
+      >
+      <option class="d-none" disabled selected></option>
+      <option  value="Information technology">Information technology</option>
+      <option  value="Software Engineering">Software Engineering</option>
+      <option  value="Cyber Security">Cyber Security</option>
+      <option value="Interactive Media">Interactive Media </option>
+         
+    </select> -->
+      </div>
+      <div class="col-1">
+ 
+      </div>
+      <!-- <div class="col-5">
+          <h5>Rank</h5>
+          <input
+            value=""
+            class="form-control"
+            type="text"
+            name="rank1"
+            readonly
+           
+          />
+        </div> -->
+  
+    </div>
+    
+    
+
+    <div class="row p-2">
+      <div class="col-12">
+      <center>
+          
+          <button type="submit" name="" id="addlec" class="btn btn-primary" btn-lg btn-block">Add Lecturer</button>
+         
+      </center>
+      </div>
+  
+    </div>
+   
+ 
+      </div>
+    </div>
+
+    
+    
+  </form>
+</div>
+
+</div>
+
+<div class="container d-none" id="tablediv">
+
+  <div class="row">
+  <div class="col-4">
+  <h3>Lecturers</h3>
+</div>
+<div class="col-4">
+  
+</div>
+
+  <div class="col-4" style="float: left;">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
+      </div>
+      <input type="text" class="form-control" id="myInput" placeholder="Search..." aria-label="Username" aria-describedby="basic-addon1">
+    </div>
+    
+  </div>
+
+</div>
+<div class="row">
+<div class="col-12">
+  
+
+  <table id="userTable" class="table table-striped">
+    <tr>
+      <th>Name</th>
+      <th>center</th>
+      <th>employee_id</th>
+      <th>building</th>
+      <th>faculty</th>
+      <th>level</th>
+      <th>department</th>
+      <th>rank</th>
+      <th colspan="3">Actions</th>
+    </tr>
+    {% if lecturers %}
+    {% for lecturer in lecturers %}
+    <tr id="user-{{lecturer.id}}">
+        <td class="lecName userData" name="name">{{lecturer.name}}</td>
+        <td class="lecCenter userData" name="center">{{lecturer.center}}</td>
+        <td class="lecEmployee_id userData" name="employee_id">{{lecturer.employee_id}}</td>
+        <td class="lecBuilding userData" name="building">{{lecturer.building}}</td>
+        <td class="lecFaculty userData" name="faculty">{{lecturer.faculty}}</td>
+        <td class="lecLevel userData" name="level">{{lecturer.level}}</td>
+        <td class="lecDepartment userData" name="department">{{lecturer.department}}</td>
+        <td class="lecRank userData" name="rank">{{lecturer.rank}}</td>
+
+        <td align="center">
+            <button class="btn btn-success form-control" onClick="editUser({{lecturer.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+        </td>
+        <td align="center">
+            <button class="btn btn-danger form-control" onClick="deleteUser({{lecturer.id}})">X</button>
+        </td>
+    </tr>
+    {% endfor %}
+    {% else %}
+      No Users
+    {% endif %}
+  </table>
+</div>
+</div>
+</div> 
+</div>
+</div>
+
+
+
+  
+
+
+{% endblock %}
+{% block javascript %}
+
+<script>
+
+  
+  $(document).ready(function() {
+    $('.select2').select2({
+          placeholder: 'Select an option',
+          theme: "classic",
+          
+
+    });
+    $("#divsubgroup").addClass('d-none');
+    $("#divgroup").removeClass('d-none');
+
+    
+
+  });
+
+   $('input[name="groups"]').change(function(){
+    var value = $('input[name="groups"]:checked').val();
+
+    if(value==1){
+      $("#divsubgroup").addClass('d-none');
+      $("#divgroup").removeClass('d-none');
+      $('#loadgroups option:eq(0)').attr('selected','selected');
+
+     console.log("pressed 1");
+
+
+    }else{
+      console.log("pressed 2");
+      $("#divsubgroup").removeClass('d-none');
+      $("#divgroup").addClass('d-none');
+      
+
+    }
+    
+  });
+  
+
+  </script>
+{% endblock javascript %}
+
+

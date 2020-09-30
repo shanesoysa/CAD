@@ -5,91 +5,6 @@
 
 {% block content %}
 
-<!-- <div class="container">
-    <h1>Add Lecturer</h1>
-    <div class="row">
-      <div class="col-md-4 ">
-        <h3>ADD USER</h3>
-        <form id="addLecturer" action="">
-
-          <div class="form-group">
-            <input class="form-control" type="text" name="name1" placeholder="Name" >
-          </div>
-
-          <div class="form-group">
-            <input class="form-control" type="text" name="center1" placeholder="center" >
-          </div>
-
-          <div class="form-group">
-            <input class="form-control" type="number" name="employee_id1" placeholder="employee_id" >
-          </div>
-
-          <div class="form-group">
-            <input class="form-control" type="text" name="faculty1" placeholder="faculty" >
-          </div>
-
-          <div class="form-group">
-            <input class="form-control" type="text" name="building1" placeholder="building" >
-          </div>
-
-          <div class="form-group">
-            <input class="form-control" type="text" name="level1" placeholder="level" >
-          </div>
-
-          <div class="form-group">
-            <input class="form-control" type="text" name="department1" placeholder="department" >
-          </div>
-
-          <div class="form-group">
-            <input class="form-control" type="number" name="rank1" placeholder="rank" >
-          </div>
-         
-
-          <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
-        </form>
-      </div>
-      <div class="col-md-8">
-        <h3>USERS</h3>
-        <table id="userTable" class="table table-striped">
-          <tr>
-            <th>Name</th>
-            <th>center</th>
-            <th>employee_id</th>
-            <th>building</th>
-            <th>faculty</th>
-            <th>level</th>
-            <th>department</th>
-            <th>rank</th>
-            <th colspan="3">Actions</th>
-          </tr>
-          {% if lecturers %}
-          {% for lecturer in lecturers %}
-          <tr id="user-{{lecturer.id}}">
-              <td class="lecName userData" name="name">{{lecturer.name}}</td>
-              <td class="lecCenter userData" name="center">{{lecturer.center}}</td>
-              <td class="lecEmployee_id userData" name="employee_id">{{lecturer.employee_id}}</td>
-              <td class="lecBuilding userData" name="building">{{lecturer.building}}</td>
-              <td class="lecFaculty userData" name="faculty">{{lecturer.faculty}}</td>
-              <td class="lecLevel userData" name="level">{{lecturer.level}}</td>
-              <td class="lecDepartment userData" name="department">{{lecturer.department}}</td>
-              <td class="lecRank userData" name="rank">{{lecturer.rank}}</td>
-
-              <td align="center">
-                  <button class="btn btn-success form-control" onClick="editUser({{lecturer.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
-              </td>
-              <td align="center">
-                  <button class="btn btn-danger form-control" onClick="deleteUser({{lecturer.id}})">DELETE</button>
-              </td>
-          </tr>
-          {% endfor %}
-          {% else %}
-            No Users
-          {% endif %}
-        </table>
-      </div>
-    </div>
-  </div> -->
-  <!-- Modal -->
 
 <div class="row">
   <div class="cycle-tab-container">
@@ -112,7 +27,8 @@
     <hr/>
   </div>
 
-<form action="" class="container" id="addLecturer">
+<form action="" class="container" id="addLecturer" name="addLecturer">
+  {% csrf_token %}
     <div class="row p-2">
       <div class="col-1">
 
@@ -136,7 +52,7 @@
             id="center1"
             name="center1"
           >
-          <option disabled selected></option>
+          <option class="d-none" disabled selected></option>
           <option value="Malabe">Malabe</option>
           <option value="Metro">Metro</option>
           <option  value="Jaffna">Matara</option>
@@ -168,7 +84,7 @@
           id="level1"
           name="level1"
         >
-        <option disabled selected></option>
+        <option class="d-none" disabled selected></option>
         <option value="1">Professor</option>
         <option value="2">Assistant Professor</option>
         <option value="3">Senior Lecturer(HG)</option>
@@ -189,7 +105,7 @@
           class="form-control"
           name="building1"
         >
-        <option disabled selected></option>
+        <option class="d-none" disabled selected></option>
         <option value="New Building">New Building</option>
         <option value="IT Building">IT Building</option>
         <option value="Engineering Building">Engineering Building</option>
@@ -211,7 +127,7 @@
         id="faculty1"
        name="faculty1"
       >
-      <option disabled selected></option>
+      <option class="d-none" disabled selected></option>
       <option value="Computing">Computing</option>
       <option value="Engineering">Engineering</option>
       <option value="Business">Business</option>
@@ -244,9 +160,10 @@
       <h5>Employee ID</h5>
       <input
 
-        class="form-control"
+        class="form-control OnlyNumber"
         type="number "
         name="employee_id1"
+        id="employee_id1"
       
       />
         </div>
@@ -263,7 +180,7 @@
         id="department1"
         name="department1"
       >
-      <option disabled selected></option>
+      <option class="d-none" disabled selected></option>
       <option  value="Information technology">Information technology</option>
       <option  value="Software Engineering">Software Engineering</option>
       <option  value="Cyber Security">Cyber Security</option>
@@ -294,7 +211,7 @@
       <div class="col-12">
       <center>
           
-          <button type="submit" name="" id="" class="btn btn-primary" btn-lg btn-block">Add Lecturer</button>
+          <button type="submit" name="" id="addlec" class="btn btn-primary" btn-lg btn-block">Add Lecturer</button>
          
       </center>
       </div>
@@ -497,6 +414,29 @@
 {% block javascript %}
 
 <script>
+  
+//-------------- start duplicate check function ----------------------------
+$('#employee_id1').on('keyup', function(e) {
+
+  var employee_id1 = $('#employee_id1').val();
+  
+  $.ajax({
+      url: '{% url "validations" %}',
+      data: {
+        employee_id1: employee_id1
+      },
+     
+      dataType: 'json',
+      success: function(data) {
+        if (data.is_taken == true) {
+          swal("Error","Employee ID exisit", "error");
+          $('#employee_id1').val("");
+
+        }
+      }
+  });
+  });
+  //-------------- end duplicate check function ----------------------------
 
 
   
@@ -512,6 +452,10 @@
 
   });
 
+
+
+  
+
   $(document).ready(function(){
     $("#myInput").on("keyup", function() {
       var value = $(this).val().toLowerCase();
@@ -526,10 +470,10 @@
     var $empID = $('input[name="employee_id1"]');
     var $rank = $('input[name="rank1"]');
 
-    
-    $empID.add($level).keyup(function() {
+    $empID.add($level).change(function() {
       $rank.val($level.val() + '.' + $empID.val());
     });
+    
   
   });
 
@@ -540,6 +484,7 @@
       var nameInput = $('input[name="name1"]').val();
       var centerInput = $('select#center1').val();
       var employee_idInput = $('input[name="employee_id1"]').val();
+      var employee_id_count = employee_idInput.length;
       var buildingInput = $('select#building1').val();
       var facultyInput = $('select#faculty1').val();
       var levelInput = $('select#level1').val();
@@ -550,6 +495,7 @@
 
       if (nameInput && centerInput && employee_idInput && buildingInput && facultyInput && levelInput && departmentInput && rankInput ) {
           // Create Ajax Call
+          if(employee_id_count==6){
           console.log("inside");
           $.ajax({
               url: '{% url "lecturer_create" %}',
@@ -564,21 +510,30 @@
                 'rank':rankInput
               },
               dataType: 'json',
+              beforeSend: function() {
+                $.LoadingOverlay("show");
+
+              },
               success: function (data) {
                
-                console.log(data.lecturer);
-
                   if (data.lecturer) {
                     appendToUsrTable(data.lecturer);
-                    alert("'Data Added'")
+                    $.LoadingOverlay("hide");
+                    swal("Success!", "New Lecturer Added", "success");
+                    
                     
                   }
                   
               }
           });
+        }else{
+          swal("Error","Please enter 6 digit number for Employee ID", "error");
+          return false;
+        }
+
         } else {
-          alert("All fields must have a valid value.");
-      }
+          swal("Error","Null Fileds Found!", "error");
+        }
       $('form#addLecturer').trigger("reset");
       return false;
   });
@@ -665,17 +620,24 @@ function editUser(id) {
 
             },
             dataType: 'json',
+            beforeSend: function() {
+              $.LoadingOverlay("show");
+
+            },
             success: function (data) {
                 if (data.lecturer) {
                   
                   updateToUserTabel(data.lecturer);
+                  $.LoadingOverlay("hide");
+                  swal("Success!", "Lecturer Details Changed!", "success");
+
                   
                 }
             }
         });
        } else {
-        alert("All fields must have a valid value.");
-    }
+        swal("Error","Null Fileds Found!", "error");
+      }
     $('form#updateUser').trigger("reset");
     $('#myModal').modal('hide');
     
@@ -710,21 +672,41 @@ function updateToUserTabel(lecturer){
 }
 
 function deleteUser(id) {
-  var action = confirm("Are you sure you want to delete this user?");
-  if (action != false) {
-    $.ajax({
+
+  swal({
+    title: "Are you sure?",
+    text: "You will not be able to recover",
+    icon: "warning",
+    buttons: [
+      'No, cancel it!',
+      'Yes, I am sure!'
+    ],
+    dangerMode: true,
+  }).then(function(isConfirm) {
+    if (isConfirm) {
+      $.ajax({
         url: '{% url "lecturer_delete" %}',
         data: {
             'id': id,
         },
         dataType: 'json',
+        beforeSend: function() {
+          $.LoadingOverlay("show");
+      
+        },
         success: function (data) {
             if (data.deleted) {
               $("#userTable #user-" + id).remove();
+              $.LoadingOverlay("hide");
+              swal("Success!", "Record Successfully Deleted", "success");
             }
         }
     });
-  }
+    } else {
+      
+    }
+  })
+
 }
   </script>
 {% endblock javascript %}
