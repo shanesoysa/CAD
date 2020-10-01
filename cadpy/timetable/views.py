@@ -681,6 +681,14 @@ class BlockTimeSlotsView(generic.ListView):
         return Lecturer1.objects.values('id', 'employee_id', 'name')
     template_name = 'sessions/blocked-timeslots.html'
 
+class ParallelSessionsView(generic.ListView):
+    model = ParallelSession
+    template_name = 'sessions/parallel-sessions.html'    
+
+class NonParallelSessionsView(generic.ListView):
+    model = NonParallelSession
+    template_name = 'sessions/non-parallel-sessions.html'    
+
 @csrf_exempt
 def create_consecutive_session(request, pk):
     try:
@@ -859,7 +867,9 @@ def createParallelSession(request):
             'success_stat': 0,
             'error_msg': 'Unexpected Error'
         }
-        return JsonResponse(data)                  
+        return JsonResponse(data)        
+
+
 
 
 

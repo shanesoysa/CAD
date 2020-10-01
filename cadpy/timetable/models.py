@@ -98,10 +98,37 @@ class Session(models.Model):
 class Timeslots(models.Model):
     day = models.DateField()
 
+class GroupBlockedTimeslots(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    subgroup = models.ForeignKey(Subgroup, on_delete=models.CASCADE, null=True, blank=True)
+    day = models.CharField(max_length=20)
+    starttime = models.CharField(max_length=50)
+    endtime = models.CharField(max_length=50)
+
+class LecturerBlockedTimeslots(models.Model):
+    lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    day = models.CharField(max_length=20)
+    starttime = models.CharField(max_length=50)
+    endtime = models.CharField(max_length=50)
+
+class SessionBlockedTimeslots(models.Model):
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    day = models.CharField(max_length=20)
+    starttime = models.CharField(max_length=50)
+    endtime = models.CharField(max_length=50)
+
 class ParallelSession(models.Model):
     sessions = models.ManyToManyField(Session)
 
 class NonParallelSession(models.Model):
     sessions = models.ManyToManyField(Session)
+
+class MockWorkingDays(models.Model):
+    nubdays = models.IntegerField(blank=True, null=True)
+    days = models.CharField(max_length=255, null=True, blank=True)
+    starttime = models.CharField(max_length=255, null=True, blank=True)
+    endtime = models.CharField(max_length=255, null=True, blank=True)
+    slot = models.CharField(max_length=255, null=True, blank=True )
+    
 
 

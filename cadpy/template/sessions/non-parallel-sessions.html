@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}NonParallel Sessions{% endblock title %}
+
+{% block stylesheet %}
+<style>
+.some {
+    line-height: 0.5;
+}
+
+@media only screen and (max-width: 600px) {
+    .some {
+        line-height: 1.5;
+    }
+}
+
+</style>
+{% endblock stylesheet %}
+
+{% block content %}
+<div class="container-fluid main bg-light">
+    <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
+        <h3 style="color: #33344a;" >Non - Parallel Sessions </h3>
+    </div>
+    <hr>
+    <div class="container-fluid">
+        {% for psessions in nonparallelsession_list %}
+        <div class="row" id="sessions_list_id">
+            <i style="font-weight: 500; font-size: medium; color: #33344a;">{{ forloop.counter }} .</i>&nbsp; &nbsp;
+            {% for session in psessions.sessions.all %}
+            <div class="bg-white col-3 shadow text-black my-4 mr-4 some" id="{{session.id}}">
+                <div class="pt-4 pl-4 pr-2 pb-2 m-2">
+                    {% if session.group_id %}
+                        <p style="font-weight: 500; ">{{ session.group_id.generated_group}}</p>
+                    {% else %}
+                        <p style="font-weight: 500; ">{{ session.subgroup_id.generated_subgroup}}</p>
+                    {% endif %}
+                    <p>{{ session.subject.subjectName}}-{{ session.subject.subjectCode}} <span style="color:{{session.tag.color}};">({{ session.tag.label}})</span></p>
+                    <p>{{ session.student_count}} ({{ session.duration}})</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <hr/>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block javascript%}
+<script>
+$(function(){
+
+    
+
+});
+</script>
+{% endblock javascript %}
