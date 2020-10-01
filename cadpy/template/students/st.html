@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            html,
+            body {
+              height: 100%;
+            }
+            .sidebar ul {
+              list-style: none;
+              margin: 0;
+              height: 100vh;
+              padding: 0;
+            }
+            .sidebar ul i,
+            li {
+              color: white;
+            }
+            .sidebar {
+              width: 5.4rem;
+              background-color: #33344a;
+              float: left;
+            }
+            .sidebar-button:hover {
+              background-color: #4c4260;
+            }
+            .sidebar-button {
+              display: block;
+              font-size: 1.2rem;
+              height: 4.6rem;
+              position: relative;
+              text-align: center;
+              text-decoration: none;
+              background: 0;
+              border: 0;
+              /* height: 100%; */
+              width: 100%;
+              padding: 0.1rem 0.4rem;
+            }
+            .sidebar-button:focus {
+              background-image: linear-gradient(
+                  180deg,
+                  rgba(60, 62, 93, 0.6),
+                  rgba(60, 62, 93, 0) 33%
+                ),
+                linear-gradient(
+                  225deg,
+                  rgba(60, 62, 93, 0.6) 33%,
+                  rgba(60, 62, 93, 0) 70%
+                ),
+                linear-gradient(
+                  270deg,
+                  rgba(60, 62, 93, 0.6) 70%,
+                  rgba(60, 62, 93, 0) 94%
+                ),
+                linear-gradient(
+                  315deg,
+                  rgba(60, 62, 93, 0.6) 33%,
+                  rgba(60, 62, 93, 0) 70%
+                ),
+                linear-gradient(
+                  360deg,
+                  rgba(60, 62, 93, 0.6),
+                  rgba(60, 62, 93, 0) 33%
+                ),
+                linear-gradient(
+                  90deg,
+                  rgba(98, 100, 167, 0.75) 6%,
+                  rgba(98, 100, 167, 0) 70%
+                );
+            }
+            .sidebar-button:focus {
+              outline: 0;
+            }
+            .sidebar-text {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              display: block;
+              font-size: 0.8rem;
+              text-rendering: optimizeLegibility;
+              /* margin-top: -1.3rem; */
+              text-decoration: none;
+              opacity: 0.63;
+              color: white;
+            }
+            .sidebar-button:hover * {
+              opacity: 1;
+            }
+            .sidebar-icon {
+              opacity: 0.63;
+            }
+            .main {
+              background: #f3f2f1;
+              height: 100%;
+            }
+          </style>
+    </head>
+    <body>
+        <div class="sidebar text-center">
+            <ul>
+              <li>
+                <button class="sidebar-button">
+                  <i class="fas fa-1x fa-home sidebar-icon"></i>
+                  <span class="sidebar-text"> Home </span>
+                  <a href="" class="stretched-link"></a>
+                </button>
+              </li>
+              <li>
+                <button class="sidebar-button">
+                  <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
+                  <span class="sidebar-text"> Working</span>
+                  <span class="sidebar-text"> Days</span>
+                </button>
+              </li>
+              <li>
+                <button class="sidebar-button">
+                  <i class="fas fa-1x fa-users sidebar-icon"></i>
+                  <span class="sidebar-text"> Lecturers</span>
+                </button>
+              </li>
+              <li>
+                <button class="sidebar-button">
+                  <i class="fas fa-1x fa-book sidebar-icon"></i>
+                  <span class="sidebar-text"> Subjects </span>
+                </button>
+              </li>
+              <li>
+                <button class="sidebar-button">
+                  <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
+                  <span class="sidebar-text"> Students </span>
+                </button>
+              </li>
+              <li>
+                <button class="sidebar-button">
+                  <i class="fas fa-1x fa-tags sidebar-icon"></i>
+                  <span class="sidebar-text"> Tags </span>
+                </button>
+              </li>
+              <li>
+                <button class="sidebar-button">
+                  <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
+                  <span class="sidebar-text"> Locations </span>
+                  <a href="" class="stretched-link"></a>
+                </button>
+              </li>
+              <li>
+                <button class="sidebar-button" autofocus>
+                  <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
+                  <span class="sidebar-text"> Statistics </span>
+                  <a href="" class="stretched-link"></a>
+                </button>
+              </li>
+            </ul>
+        </div>
+    </body>
+</html>

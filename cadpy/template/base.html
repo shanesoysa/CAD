@@ -191,6 +191,7 @@
           <button class="sidebar-button">
             <i class="fas fa-1x fa-home sidebar-icon"></i>
             <span class="sidebar-text"> Home </span>
+            <a href="{% url 'index'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
@@ -205,24 +206,28 @@
           <button class="sidebar-button">
             <i class="fas fa-1x fa-users sidebar-icon"></i>
             <span class="sidebar-text"> Lecturers</span>
+            <a href="{% url 'lecturer'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-book sidebar-icon"></i>
             <span class="sidebar-text"> Subjects </span>
+            <a href="{% url 'subject'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
             <span class="sidebar-text"> Students </span>
+            <a href="{% url 'students'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-tags sidebar-icon"></i>
             <span class="sidebar-text"> Tags </span>
+            <a href="{% url 'tags'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
@@ -273,6 +278,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
     <script>
       if (window.module) module = window.module;
     </script>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>CAD Timetable</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
@@ -59,7 +59,7 @@
             <div class="card-body text-white py-5">
               <i class="fas fa-users c-text fa-4x icon"></i>
               <h2 class="m-0 c-text">Lecturers</h2>
-              <a href="" class="stretched-link"></a>
+              <a href="{% url 'lecturer' %}" class="stretched-link"></a>
             </div>
           </div>
         </div>
@@ -68,7 +68,7 @@
             <div class="card-body text-white py-5">
               <i class="fas fa-book c-text fa-4x icon"></i>
               <h2 class="m-0 c-text">Subjects</h2>
-              <a href="" class="stretched-link"></a>
+              <a href="{% url 'subject' %}" class="stretched-link"></a>
             </div>
           </div>
         </div>
@@ -79,7 +79,7 @@
             <div class="card-body text-white py-5">
               <i class="fas fa-user-friends c-text fa-4x icon"></i>
               <h2 class="m-0 c-text">Students</h2>
-              <a href="" class="stretched-link"></a>
+              <a href="{% url 'students' %}" class="stretched-link"></a>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@
             <div class="card-body text-white py-5">
               <i class="fas fa-tags c-text fa-4x icon"></i>
               <h2 class="m-0 c-text">Tags</h2>
-              <a href="" class="stretched-link"></a>
+              <a href="{% url 'tags' %}" class="stretched-link"></a>
             </div>
           </div>
         </div>
