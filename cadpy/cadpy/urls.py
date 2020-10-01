@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from os import name
 from django.contrib import admin
 from django.urls import path
 from timetable import views
@@ -128,6 +129,49 @@ urlpatterns = [
          views.allGroupStatistics, name='allGroupStatistics'),
     path('statistics/allSubGroupStatistics',
          views.allSubGroupStatistics, name='allSubGroupStatistics'),
+
+    # rooms
+    path('rooms/lecturerRooms', views.lecturerRooms, name='lecturerRooms'),
+    path('rooms/tagRooms', views.tagRooms, name='tagRooms'),
+    path('rooms/loadLecturers', views.loadLecturers, name='loadLecturers'),
+    path('rooms/loadRooms', views.loadRooms, name='loadRooms'),
+    path('rooms/groupRooms', views.groupRooms, name='groupRooms'),
+    path('rooms/sessionRooms', views.sessionRooms, name='sessionRooms'),
+    path('rooms/consecutiveSessionRooms',
+         views.consecutiveSessionRooms, name='consecutiveSessionRooms'),
+    path('rooms/subjectRooms', views.subjectRooms, name='subjectRooms'),
+    path('rooms/timeRooms', views.timeRooms, name='timeRooms'),
+    path('rooms/addUnavailableRooms',
+         views.addUnavailableRooms.as_view(), name='adddUnavailableRooms'),
+    path('rooms/deleteAllUnavailableRooms',
+         views.deleteAllUnavailableRooms, name='deleteAllUnavailableRooms'),
+    path('rooms/deleteUnavailableRoom',
+         views.deleteUnavailableRoom, name='deleteUnavailableRoom'),
+    path('rooms/addLecturerRooms',
+         views.addLecturerRooms.as_view(), name='addLecturerRooms'),
+    path('rooms/deleteLecturerRooms',
+         views.deleteLecturerRooms, name='deleteLecturerRooms'),
+    path('rooms/deleteAllLecturerRooms',
+         views.deleteAllLecturerRooms, name='deleteAllLecturerRooms'),
+    path('rooms/loadGroups', views.loadGroups, name='loadGroups'),
+    path('rooms/loadSubGroups', views.loadSubGroups, name='loadSubGroups'),
+    path('rooms/loadTags', views.loadTags, name='loadTags'),
+    path('rooms/addTagRoom', views.addTagRoom, name='addTagRoom'),
+    path('rooms/deleteTagRoom', views.deleteTagRoom, name='deleteTagRoom'),
+    path('rooms/deleteAllTagRooms',
+         views.deleteAllTagRooms, name='deleteAllTagRooms'),
+    path('rooms/addGroupRoom', views.addGroupRoom, name='addGroupRoom'),
+    path('rooms/addSubGroupRoom', views.addSubGroupRoom, name='addSubGroupRoom'),
+    path('rooms/deleteGroupRooms', views.deleteGroupRooms, name='deleteGroupRooms'),
+    path('rooms/deleteSubGroupRooms',
+         views.deleteSubGroupRooms, name='deleteSubGroupRooms'),
+    path('rooms/deleteAllGroupRooms',
+         views.deleteAllGroupRooms, name='deleteAllGroupRooms'),
+    path('rooms/loadSubjects', views.loadSubjects, name='loadSubjects'),
+    path('rooms/addSubjectTagRoom',
+         views.addSubjectTagRoom, name='addSubjectTagRoom'),
+    path('rooms/deleteSubjectTagRoom',
+         views.deleteSubjectTagRoom, name='deleteSubjectTagRoom'),
 
     # ranul
     #################################################################################

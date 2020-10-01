@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.deletion import CASCADE
+from django.db.models.fields.related import ForeignKey
 
 # Create your models here.
 
@@ -102,16 +104,16 @@ class Subgroup(models.Model):
     # str not defined
 
 
-class Subjects(models.Model):
-    offeredYear = models.CharField(max_length=4, blank=True)
-    offeredSemester = models.CharField(max_length=100, blank=True)
-    subjectName = models.CharField(max_length=100, blank=True)
-    subjectCode = models.CharField(max_length=10, blank=True)
-    noLecHours = models.IntegerField(blank=True, null=True)
-    noTutHours = models.IntegerField(blank=True, null=True)
-    noLabHours = models.IntegerField(blank=True, null=True)
-    noEveHours = models.IntegerField(blank=True, null=True)
-    objects = models.Manager()
+# class Subjects(models.Model):
+#     offeredYear = models.CharField(max_length=4, blank=True)
+#     offeredSemester = models.CharField(max_length=100, blank=True)
+#     subjectName = models.CharField(max_length=100, blank=True)
+#     subjectCode = models.CharField(max_length=10, blank=True)
+#     noLecHours = models.IntegerField(blank=True, null=True)
+#     noTutHours = models.IntegerField(blank=True, null=True)
+#     noLabHours = models.IntegerField(blank=True, null=True)
+#     noEveHours = models.IntegerField(blank=True, null=True)
+#     objects = models.Manager()
 
 
 class Session(models.Model):
@@ -159,5 +161,56 @@ class Room(models.Model):
             models.UniqueConstraint(
                 fields=['name', 'building'], name='unique_row'),
         ]
+
+
+class UnavailableRoom(models.Model):
+    day = models.CharField(max_length=10)
+    start_time = models.CharField(max_length=10)
+    end_time = models.CharField(max_length=10)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
+
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=['day', 'start_time', 'end_time', 'room', 'building'], name='unavailableroom_unique_row'),
+    #     ]
+
+
+class LecturerRoom(models.Model):
+    lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
+
+
+class GroupRoom(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
+
+
+class SubGroupRoom(models.Model):
+    subgroup = models.ForeignKey(Subgroup, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
+
+
+class TagRoom(models.Model):
+    tag = models.ForeignKey(Tags, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
+
+
+class SubjectTagRoom(models.Model):
+    subject = models.ForeignKey(Subjects, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tags, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
 
 #########################################################################
