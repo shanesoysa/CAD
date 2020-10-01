@@ -129,6 +129,9 @@ class MockWorkingDays(models.Model):
     starttime = models.CharField(max_length=255, null=True, blank=True)
     endtime = models.CharField(max_length=255, null=True, blank=True)
     slot = models.CharField(max_length=255, null=True, blank=True )
+
+    def get_all_days(self):
+        return self.days.split(',')
     
 
 

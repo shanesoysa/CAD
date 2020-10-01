@@ -42,7 +42,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Block TimeSlot</h5>
+                <h5 class="modal-title">Block Timeslot</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         </div>
         <div class="modal-body">
@@ -51,11 +51,17 @@
                     <input id="bId" name="bname" type="hidden" />
                     <input id="bIdId" name="bIdname" type="hidden" />
                     <div class="row">
-                        <div class="form-check col-4">
+                        {% for days in work_days %}
+                        <div class="col-4" id="col_day">
                             <p>Day(s)</p>
-                            <input class="form-check-input check_count" type="checkbox" value="" id="defaultCheck1">
-                            <label class="form-check-label" for="defaultCheck1">Default checkbox</label>
+                            {% for day in days.get_all_days %}
+                            <div class="form-check">
+                                <input class="form-check-input check_count" type="checkbox" value="{{day}}" id="d-{{day}}">
+                                <label class="form-check-label" for="d-{{day}}">{{day}}</label>
+                            </div>
+                            {% endfor %}
                         </div>
+                        {% endfor %}
                         <div class="form-group col-4">
                             <div class="md-form md-outline">
                                 <label for="startTimeId">Start Time</label>
@@ -73,7 +79,7 @@
             </form>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="submit" id="save_btn" class="btn btn-primary">Save changes</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
     </div>
@@ -140,26 +146,77 @@ $(document).ready(function(){
 
         if(block_id){
             $.ajax({
-                url: '{% url "update_tags" %}',
+                url: '{% url "view_blocked_timeslots" %}',
                 data: {
-                'id':idInput,
-                'label':labelInput,
-                'color':colorInput,
+                'block_id':block_id,
+                'block':block,
                 },
                 dataType: 'json',
                 success: function (data) {
                     if (data.success_stat == 1) { 
-                    updateToUserTabel(data.tags);
+                        alert('Function Call is success')
+                        console.log(data.blocks)
                     }else{
-                    alert(data.error_msg)
+                        alert(data.error_msg)
                     }
                 }
             });
         }
     });
+
+
+
+
+    $("#save_btn").click(function() {
+        alert('Submit triggered')
+        var blockInput = $('input[name="bname"]').val();
+        var blockIdInput = $('input[name="bIdname"]').val();
+
+        var days = [];
+        $('#col_day > .form-check > input:checked').each(function(index, val){
+            var id = $(this).val()
+            days.push(id)
+            });
+
+        var days_json = JSON.stringify(days)
+
+        var startTimeInput = $('input[name="startTime"]').val();
+        var endTimeInput = $('input[name="endTime"]').val();
+        console.log('Here ' + blockInput)
+        console.log('Here ' + blockIdInput)
+        console.log('Here ' + startTimeInput)
+        console.log('Here ' + endTimeInput)
+        console.log('days ' + days)
+
+        if (startTimeInput && endTimeInput) {
+            $.ajax({
+                url: '{% url "add_blocked_timeslots" %}',
+                type: 'POST',
+                data: {
+                'days_list':days_json,
+                'block':blockInput,
+                'block_id':blockIdInput,
+                'start_time':startTimeInput,
+                'end_time':endTimeInput,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success_stat == 1) { 
+                        alert('Method call was a success')
+                    }else{
+                        alert(data.error_msg)
+                    }
+                }
+            });
+        } else {
+            alert("All fields must have a valid value.");
+        }
+
+        $('form#timeslotForm').trigger("reset");
+        $('#block_sessions_modal11').modal('hide');
+        return false;
+    });
 });
-
-
 
 function displayFormInfo(){
     var block = $('input[type="radio"][name="block_name"]:checked').val();
@@ -170,45 +227,6 @@ function displayFormInfo(){
     $('#bIdId').val(block_id);
 
 }
-
-
-$("form#timeslotForm").submit(function() {
-
-    var blockInput = $('input[name="bname"]').val();
-    var blockIdInput = $('input[name="bIdname"]').val();
-    var days = $('input[name="forAbbv"]').val();
-    var startTimeInput = $('input[name="startTime"]').val();
-    var endTimeInput = $('input[name="endTime"]').val();
-    console.log('Here ' + blockInput)
-    console.log('Here ' + blockIdInput)
-    console.log('Here ' + startTimeInput)
-    console.log('Here ' + endTimeInput)
-
-    if (startTimeInput && endTimeInput) {
-        $.ajax({
-            url: '{% url "update_tags" %}',
-            data: {
-            'id':idInput,
-            'label':labelInput,
-            'color':colorInput,
-            },
-            dataType: 'json',
-            success: function (data) {
-                if (data.success_stat == 1) { 
-                updateToUserTabel(data.tags);
-                }else{
-                alert(data.error_msg)
-                }
-            }
-        });
-    } else {
-        alert("All fields must have a valid value.");
-    }
-
-    $('form#timeslotForm').trigger("reset");
-    $('#block_sessions_modal11').modal('hide');
-    return false;
-});
 </script>
 {% endblock javascript %}
 

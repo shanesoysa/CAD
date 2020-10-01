@@ -3,19 +3,20 @@ from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
-from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags
+from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
 from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
 from .models import Session, ParallelSession, Timeslots, NonParallelSession
+from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
 from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 import json
 # Create your views here.
 def index(request):
-     return render(request, 'home.html')
+    return render(request, 'home.html')
     
 
 class Lecturer(ListView):
@@ -675,11 +676,16 @@ class ConsecutiveSessionsView(generic.ListView):
 class BlockTimeSlotsView(generic.ListView):
 
     context_object_name  = 'lecturer_list'
+    template_name = 'sessions/blocked-timeslots.html'
     
     def get_queryset(self):
         """Return the lecturer objects with only specified fields"""
         return Lecturer1.objects.values('id', 'employee_id', 'name')
-    template_name = 'sessions/blocked-timeslots.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)    
+        context['work_days'] = MockWorkingDays.objects.all()
+        return context
 
 class ParallelSessionsView(generic.ListView):
     model = ParallelSession
@@ -867,7 +873,111 @@ def createParallelSession(request):
             'success_stat': 0,
             'error_msg': 'Unexpected Error'
         }
-        return JsonResponse(data)        
+        return JsonResponse(data)       
+
+@csrf_exempt
+def create_blocked_session(request):
+    try:
+        days = request.POST.get('days_list', None)
+        block = request.POST.get('block', None)
+        block_id = request.POST.get('block_id', None)
+        start_time = request.POST.get('start_time', None)
+        end_time = request.POST.get('end_time', None)
+        days_py = json.loads(days)
+
+        obj = {}
+        return_list = []
+        if(block == 'L'):
+            obj = Lecturer1.objects.get(pk=block_id)
+            for d in days_py:
+                LecturerBlockedTimeslots.objects.create(
+                    lecturer=obj,
+                    day = d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+        elif(block == 'G'):
+            obj = Group.objects.get(pk=block_id)
+            for d in days_py:
+                GroupBlockedTimeslots.objects.create(
+                    group = obj,
+                    day=d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+        elif(block == 'S'):
+            obj = Subgroup.objects.get(pk=block_id)
+            for d in days_py:
+                GroupBlockedTimeslots.objects.create(
+                    group=obj.group,
+                    subgroup=obj,
+                    day=d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+        else:
+            obj = Session.objects.get(pk=id)    
+            print(obj.id)
+            for d in days_py:
+                SessionBlockedTimeslots.objects.create(
+                    session=obj,
+                    day=d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+
+        data = {
+            'success_stat': 1
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        data = {
+            'success_stat': 0
+        }
+        print(e)
+        return JsonResponse(data)
+
+
+def view_blocked_timeslots(request):
+    try:
+        block = request.GET.get('block', None)
+        block_id = request.GET.get('block_id', None)
+        obj = {}
+        return_list = []
+
+        if(block=='L'):
+            obj = Lecturer1.objects.get(pk = block_id)
+            lobjs = LecturerBlockedTimeslots.objects.filter(lecturer=obj)
+            for l in lobjs:
+                lecturer_info = {'id': l.lecturer.employee_id, 'name': l.lecturer.name, 'day': l.day, 'start_time': l.starttime, 'end_time': l.endtime}
+                return_list.append(lecturer_info)
+        elif(block=='G'):
+            obj = Group.objects.get(pk = block_id)
+            group_objs = GroupBlockedTimeslots.objects.filter(group=obj)
+            for g in group_objs:
+                group_info = {'id': g.group.id, 'name': g.group.generated_group, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(group_info)            
+        elif(block=='S'):
+            obj = Subgroup.objects.get(pk = block_id)
+            subgroup_objs = GroupBlockedTimeslots.objects.exclude(subgroup=None).filter(subgroup=obj)
+            for g in subgroup_objs:
+                subgroup_info = {'id': g.subgroup.id, 'name': g.subgroup.generated_subgroup, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(subgroup_info)            
+
+        data = {
+            'success_stat': 1,
+            'blocks': return_list
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Unexpected Error'
+        }
+        print(e)
+        return JsonResponse(data)
+
+
 
 
 
