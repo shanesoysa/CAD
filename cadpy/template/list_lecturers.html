@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Lecturers{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Add Lecturer</h1>
+    <div class="row">
+      <div class="col-md-4 ">
+        <h3>ADD USER</h3>
+        <form id="addLecturer" action="">
+
+          <div class="form-group">
+            <input class="form-control" type="text" name="name1" placeholder="Name" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="text" name="center1" placeholder="center" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="number" name="employee_id1" placeholder="employee_id" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="text" name="faculty1" placeholder="faculty" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="text" name="building1" placeholder="building" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="text" name="level1" placeholder="level" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="text" name="department1" placeholder="department" >
+          </div>
+
+          <div class="form-group">
+            <input class="form-control" type="number" name="rank1" placeholder="rank" >
+          </div>
+         
+
+          <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
+        </form>
+      </div>
+      <div class="col-md-8">
+        <h3>USERS</h3>
+        <table id="userTable" class="table table-striped">
+          <tr>
+            <th>Name</th>
+            <th>center</th>
+            <th>employee_id</th>
+            <th>building</th>
+            <th>faculty</th>
+            <th>level</th>
+            <th>department</th>
+            <th>rank</th>
+            <th colspan="3">Actions</th>
+          </tr>
+          {% if lecturers %}
+          {% for lecturer in lecturers %}
+          <tr id="user-{{lecturer.id}}">
+              <td class="lecName userData" name="name">{{lecturer.name}}</td>
+              <td class="lecCenter userData" name="center">{{lecturer.center}}</td>
+              <td class="lecEmployee_id userData" name="employee_id">{{lecturer.employee_id}}</td>
+              <td class="lecBuilding userData" name="building">{{lecturer.building}}</td>
+              <td class="lecFaculty userData" name="faculty">{{lecturer.faculty}}</td>
+              <td class="lecLevel userData" name="level">{{lecturer.level}}</td>
+              <td class="lecDepartment userData" name="department">{{lecturer.department}}</td>
+              <td class="lecRank userData" name="rank">{{lecturer.rank}}</td>
+
+              <td align="center">
+                  <button class="btn btn-success form-control" onClick="editUser({{lecturer.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+              </td>
+              <td align="center">
+                  <button class="btn btn-danger form-control" onClick="deleteUser({{lecturer.id}})">DELETE</button>
+              </td>
+          </tr>
+          {% endfor %}
+          {% else %}
+            No Users
+          {% endif %}
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+          <h4 class="modal-title" id="myModalLabel">Update User</h4>
+        </div>
+        <form id="updateUser" action="">
+        <div class="modal-body">
+            <input class="form-control" id="form-id" type="hidden" name="formId"/>
+            <label for="name">Name</label>
+            <input class="form-control" id="form-name" type="text" name="formName"/>
+            <label for="address">Center</label>
+            <input class="form-control" id="form-center" type="text" name="formCenter"/>
+            <label for="age">Employee ID</label>
+            <input class="form-control" id="form-employee_id" type="number" name="formEmployee_id" >
+            <label for="name">Faculty</label>
+            <input class="form-control" id="form-building" type="text" name="formBuilding"/>
+            <label for="address">Building</label>
+            <input class="form-control" id="form-faculty" type="text" name="formFaculty"/>
+            <label for="age">Level</label>
+            <input class="form-control" id="form-level" type="number" name="formLevel" >
+            <label for="address">Department</label>
+            <input class="form-control" id="form-department" type="text" name="formDepartment"/>
+            <label for="age">Rank</label>
+            <input class="form-control" id="form-rank" type="number" name="formRank" >
+            
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" >Save changes</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block javascript %}
+
+<script>
+  // Create Django Ajax Call
+  $("form#addLecturer").submit(function() {
+      var nameInput = $('input[name="name1"]').val();
+      var centerInput = $('input[name="center1"]').val().trim();
+      var employee_idInput = $('input[name="employee_id1"]').val().trim();
+      var buildingInput = $('input[name="building1"]').val().trim();
+      var facultyInput = $('input[name="faculty1"]').val().trim();
+      var levelInput = $('input[name="level1"]').val().trim();
+      var departmentInput = $('input[name="department1"]').val().trim();
+      var rankInput = $('input[name="rank1"]').val().trim();
+
+      if (nameInput && centerInput && employee_idInput && buildingInput && facultyInput && levelInput && departmentInput && rankInput ) {
+          // Create Ajax Call
+          $.ajax({
+              url: '{% url "lecturer_create" %}',
+              data: {
+                'name':nameInput,
+                'center':centerInput,
+                'employee_id':employee_idInput,
+                'building':buildingInput,
+                'faculty':facultyInput,
+                'level':levelInput,
+                'department':departmentInput,
+                'rank':rankInput
+              },
+              dataType: 'json',
+              success: function (data) {
+               
+                console.log(data.lecturer);
+
+                  if (data.lecturer) {
+                    appendToUsrTable(data.lecturer);
+                    alert("'Data Added'")
+                    
+                  }
+                  
+              }
+          });
+        } else {
+          alert("All fields must have a valid value.");
+      }
+      $('form#addLecturer').trigger("reset");
+      return false;
+  });
+  
+  function appendToUsrTable(lecturer) {
+    $("#userTable > tbody:last-child").append(`
+          <tr id="user-${lecturer.id}">
+              <td class="userName" name="name">${lecturer.name}</td>
+              '<td class="userAddress" name="center">${lecturer.center}</td>
+              '<td class="userAge" name="employee_id">${lecturer.employee_id}</td>
+              '<td class="userAddress" name="building">${lecturer.building}</td>
+              '<td class="userAge" name="faculty">${lecturer.faculty}</td>
+              '<td class="userAddress" name="level">${lecturer.level}</td>
+              '<td class="userAge" name="department">${lecturer.department}</td>
+              '<td class="userAddress" name="rank">${lecturer.rank}</td>
+              
+
+              '<td align="center">
+                  <button class="btn btn-success form-control" onClick="editUser(${lecturer.id})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+              </td>
+              <td align="center">
+                  <button class="btn btn-danger form-control" onClick="deleteUser(${lecturer.id})">DELETE</button>
+              </td>
+          </tr>
+      `);
+  }
+
+  $("form#updateUser").submit(function() {
+
+    var idInput = $('input[name="formId"]').val().trim();
+    var nameInput = $('input[name="formName"]').val();
+    var centerInput = $('input[name="formCenter"]').val().trim();
+    var employee_idInput = $('input[name="formEmployee_id"]').val().trim();
+    var buildingInput = $('input[name="formBuilding"]').val().trim();
+    var facultyInput = $('input[name="formFaculty"]').val().trim();
+    var levelInput = $('input[name="formLevel"]').val().trim();
+    var departmentInput = $('input[name="formDepartment"]').val().trim();
+    var rankInput = $('input[name="formRank"]').val().trim();
+
+    if (nameInput && centerInput && employee_idInput && buildingInput && facultyInput && levelInput && departmentInput && rankInput) {
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "lecturer_update" %}',
+            data: {
+              'id':idInput,
+              'name':nameInput,
+              'center':centerInput,
+              'employee_id':employee_idInput,
+              'building':buildingInput,
+              'faculty':facultyInput,
+              'level':levelInput,
+              'department':departmentInput,
+              'rank':rankInput
+
+            },
+            dataType: 'json',
+            success: function (data) {
+                if (data.lecturer) {
+                  
+                  updateToUserTabel(data.lecturer);
+                  
+                }
+            }
+        });
+       } else {
+        alert("All fields must have a valid value.");
+    }
+    $('form#updateUser').trigger("reset");
+    $('#myModal').modal('hide');
+    return false;
+});
+
+
+function editUser(id) {
+  if (id) {
+    tr_id = "#user-" + id;
+    name1 = $(tr_id).find(".lecName").text();
+    center1 = $(tr_id).find(".lecCenter").text();
+    employee_id1 = $(tr_id).find(".lecEmployee_id").text();
+    building1 = $(tr_id).find(".lecBuilding").text();
+    faculty1 = $(tr_id).find(".lecFaculty").text();
+    level1 = $(tr_id).find(".lecLevel").text();
+    department1 = $(tr_id).find(".lecDepartment").text();
+    rank1 = $(tr_id).find(".lecRank").text();
+    
+    $('#form-id').val(id);
+    $('#form-name').val(name1);
+    $('#form-center').val(center1);
+    $('#form-employee_id').val(employee_id1);
+    $('#form-building').val(building1);
+    $('#form-faculty').val(faculty1);
+    $('#form-level').val(level1);
+    $('#form-department').val(department1);
+    $('#form-rank').val(rank1);
+ 
+  }
+}
+
+function updateToUserTabel(lecturer){
+    $("#userTable #user-" + lecturer.id).children(".userData").each(function() {
+        var attr = $(this).attr("name");
+        if (attr == "name") {
+          $(this).text(lecturer.name);
+        } else if (attr == "center") {
+          $(this).text(lecturer.center);
+        } else if (attr == "employee_id") {
+          $(this).text(lecturer.employee_id);
+        } else if (attr == "building") {
+          $(this).text(lecturer.building);
+        } else if (attr == "faculty") {
+          $(this).text(lecturer.faculty);
+        } else if (attr == "level") {
+          $(this).text(lecturer.level);
+        } else if (attr == "department") {
+          $(this).text(lecturer.department);
+        }    
+        else {
+          $(this).text(lecturer.rank);
+        }
+      });
+}
+
+function deleteUser(id) {
+  var action = confirm("Are you sure you want to delete this user?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "lecturer_delete" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.deleted) {
+              $("#userTable #user-" + id).remove();
+            }
+        }
+    });
+  }
+}
+  </script>
+{% endblock javascript %}
+
+

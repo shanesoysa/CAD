@@ -15,9 +15,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from timetable import views
+
+
 urlpatterns = [
-     path('',include('workingDays.urls')),
+    
     path('admin/', admin.site.urls),
-   
+    path('', views.home, name='home'),
+    path('side/', views.side, name='side'),
+    path('lec/',  views.Lecturer.as_view(), name='lecturer'),
+    path('workingdays/',views.Workingdays.as_view(),name='Workingdays'),
+    path('adddays/',views.Adddays.as_view(),name='workingdays_create'),
+    path('updatedays/',views.Updatedays.as_view(),name='workingdays_update'),
+    path('deletedays/',views.Deletedays.as_view(),name='workingdays_delete'),
+    path('addlec/',  views.AddLecturer.as_view(), name='lecturer_create'),
+    path('updatelec/',  views.UpdateLecturer.as_view(), name='lecturer_update'),
+    path('deletelec/', views.DeleteLecturer.as_view(), name='lecturer_delete'),
+    path('timetables/', views.timetables,name='timetable')
 ]
 
