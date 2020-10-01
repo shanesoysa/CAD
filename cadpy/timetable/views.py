@@ -22,9 +22,9 @@ def index(request):
 def Validations(request):
     employee_id1 = request.GET.get('employee_id1', None)
     data = {
-         'is_taken': Lecturer1.objects.filter(employee_id__iexact=employee_id1).exists()
-        }
-        
+        'is_taken': Lecturer1.objects.filter(employee_id__iexact=employee_id1).exists()
+    }
+
     return JsonResponse(data)
 
 
@@ -246,6 +246,45 @@ class Session(generic.ListView):
 
     # def get_queryset(self):
     #     return Session1.objects.order_by('id')
+
+
+class AddSession(View):
+    def get(self, request):
+
+        try:
+            # lecturers = request.GET.get('lecturers', None)
+            subjects = request.GET.get('subjects', None)
+            tags = request.GET.get('tags', None)
+            students = request.GET.get('students', None)
+            groups = request.GET.get('groups', None)
+
+            result = 'success'
+            # print(lecturers)
+            return JsonResponse(result)
+
+            # obj = Subjects1.objects.create(
+            #     offeredYear=offeredYear1,
+            #     offeredSemester=offeredSemester1,
+            #     subjectName=subjectName1,
+            #     subjectCode=subjectCode1,
+            #     noLecHours=noLecHours1,
+            #     noTutHours=noTutHours1,
+            #     noLabHours=noLabHours1,
+            #     noEveHours=noEveHours1
+            # )
+
+            # subject = {'id': obj.id, 'offeredYear': obj.offeredYear, 'offeredSemester': obj.offeredSemester, 'subjectName': obj.subjectName,
+            #            'subjectCode': obj.subjectCode, 'noLecHours': obj.noLecHours, 'noTutHours': obj.noTutHours, 'noLabHours': obj.noLabHours, 'noEveHours': obj.noEveHours}
+
+            # data = {
+            #     'subject': subject
+            # }
+
+        #     return JsonResponse(data)
+
+        except:
+            print("fail adding data")
+            pass
 
 
 # Rehani's

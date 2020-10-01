@@ -38,8 +38,9 @@ urlpatterns = [
     path('subjects/deletesubject/',
          views.DeleteSubject.as_view(), name='subject_delete'),
 
-    path('sessions/',
-         views.Session.as_view(), name='sessions'),
+    path('sessions/', views.Session.as_view(), name='sessions'),
+    path('sessions/add', views.AddSession.as_view(), name='session_create'),
+
 
     path('programmes/', views.ProgrammesView.as_view(), name='programmes'),
     path('programmes/add', views.AddProgramme.as_view(), name='add_programmes'),

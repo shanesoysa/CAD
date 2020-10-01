@@ -7,6 +7,7 @@
 
 
 
+
 <div class="row">
   <div class="cycle-tab-container">
     <ul class="nav nav-tabs">
@@ -39,7 +40,7 @@
       <div class="col-5">
         <h5>Lecturers</h5>
           <select
-            class="form-control select2"
+            class="form-control sel2"
             id="loadlecturers"
             name="loadlecturers"
             multiple="multiple"
@@ -47,7 +48,7 @@
           <!-- <option class="d-none" disabled></option> -->
           {% for lecturer in lecturers %}
     
-          <option style="color:black;" value="{{lecturer.name}}">{{lecturer.name}}</option>
+          <option style="color:black;" value="{{lecturer.id}}">{{lecturer.name}}</option>
           {% endfor %}
 
         </select>
@@ -58,14 +59,14 @@
       <div class="col-5">
           <h5>Subjects</h5>
           <select
-            class="form-control select2"
+            class="form-control sel2"
             id="loadsubjects"
             name="loadsubjects"
           >
           <option class="d-none" disabled selected></option>
           {% for subject in subjects %}
     
-          <option style="color:black;" value="{{subject.subjectCode}}">{{subject.subjectName}}</option>
+          <option style="color:black;" value="{{subject.id}}">{{subject.subjectName}}</option>
           {% endfor %}          
         </select>
 
@@ -81,7 +82,7 @@
 
         <h5>Tags</h5>
           <select
-          class="form-control select2"
+          class="form-control sel2"
           id="loadtags"
           name="loadtags"
         >
@@ -89,7 +90,7 @@
 
         {% for tag in tags %}
     
-          <option style="color:black;" value="{{tag.label}}">{{tag.label}}</option>
+          <option style="color:black;" value="{{tag.id}}">{{tag.label}}</option>
           {% endfor %}        
        
       </select>
@@ -104,6 +105,7 @@
             class="form-control"
             type="text"
             name="nostudents"
+            id="nostudents"
             
            
           />
@@ -127,7 +129,7 @@
         </div>
         <div id="divgroup">
         <select
-        class="form-control select2"
+        class="form-control sel2"
         id="loadgroups"
        name="loadgroups"
       >
@@ -135,7 +137,7 @@
 
       {% for group in groups %}
     
-          <option style="color:black;" value="{{group.generated_group}}"> {{group.generated_group}}&nbsp; |&nbsp;{{group.student_count}}</option>
+          <option style="color:black;" value="{{group.id}}"> {{group.generated_group}}&nbsp; |&nbsp;{{group.student_count}}</option>
       {% endfor %}
       
      
@@ -143,7 +145,7 @@
     </div>
     <div id="divsubgroup">
     <select
-        class="form-control select2"
+        class="form-control sel2"
         id="loadsubgroups"
        name="loadsubgroups"
       >
@@ -151,7 +153,7 @@
 
       {% for subgroup in subgroups %}
     
-          <option style="color:black;" value="{{subgroup.generated_subgroup}}">{{subgroup.generated_subgroup}}&nbsp; |&nbsp;{{subgroup.group.student_count}}</option>
+          <option style="color:black;" value="{{subgroup.id}}">{{subgroup.generated_subgroup}}&nbsp; |&nbsp;{{subgroup.group.student_count}}</option>
       {% endfor %}
       
      
@@ -219,7 +221,7 @@
       <div class="col-12">
       <center>
           
-          <button type="submit" name="" id="addlec" class="btn btn-primary" btn-lg btn-block">Add Lecturer</button>
+          <button type="submit" name="" id="addses" class="btn btn-primary" btn-lg btn-block">Add Session</button>
          
       </center>
       </div>
@@ -316,9 +318,9 @@
 
   
   $(document).ready(function() {
-    $('.select2').select2({
+    $('.sel2').select2({
           placeholder: 'Select an option',
-          theme: "classic",
+          
           
 
     });
@@ -329,21 +331,98 @@
 
   });
 
+
+  $("form#addsession").submit(function() {
+    var lecturers = $('#loadlecturers').val();
+    var subjects = $('#loadsubjects').val();
+    var tags = $('#loadtags').val();
+    var students = $('#nostudents').val();
+    var groups = $('#loadgroups').val();
+    var subgroups= $('#loadsubgroups').val();
+    var radiovalue = $('input[name="groups"]:checked').val();
+
+    console.log("lec :"+lecturers+"subject :"+subjects+"tags :"+tags+"student :"+students+"groups :"+groups+"subgroups :"+subgroups);
+    if (lecturers && subjects && tags && students && (groups || subgroups)) {
+      if(radiovalue == 1)
+        // Create Ajax Call
+        {
+          $.ajax({
+            url: '{% url "session_create" %}',
+            data: {
+              'lecturers':lecturers,
+              'subjects':subjects,
+              'tags':tags,
+              'students':students,
+              'groups':groups
+              
+            },
+            dataType: 'json',
+            beforeSend: function() {
+              $.LoadingOverlay("show");
+
+            },
+            success: function (data) {
+             
+              console.log(data.subject);
+
+              $.LoadingOverlay("hide");
+
+              swal("success","request sent sessions 2", "success");
+                
+            }
+        });
+      }else{
+        $.ajax({
+          url: '{% url "session_create" %}',
+          data: {
+            'lecturers':lecturers,
+            'subjects':subjects,
+            'tags':tags,
+            'students':students,
+            'groups':subgroups
+          },
+          dataType: 'json',
+          beforeSend: function() {
+            $.LoadingOverlay("show");
+
+          },
+          success: function (r) {
+            $.LoadingOverlay("hide");
+
+            swal("success","request sent sessions 1", "success");
+
+              
+          }
+      });
+
+      }
+
+      } else {
+        swal("Error","Null Fileds Found!", "error");
+    }
+    $('form#addLecturer').trigger("reset");
+    return false;
+});
+
+
    $('input[name="groups"]').change(function(){
     var value = $('input[name="groups"]:checked').val();
+    var lecturers = $('#loadlecturers').val();
 
     if(value==1){
+
       $("#divsubgroup").addClass('d-none');
       $("#divgroup").removeClass('d-none');
-      $('#loadgroups option:eq(0)').attr('selected','selected');
-
      console.log("pressed 1");
 
 
     }else{
+
       console.log("pressed 2");
+
       $("#divsubgroup").removeClass('d-none');
       $("#divgroup").addClass('d-none');
+
       
 
     }
