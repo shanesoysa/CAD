@@ -696,7 +696,7 @@ class NonParallelSessionsView(generic.ListView):
 def create_consecutive_session(request, pk):
     try:
         list_json = request.POST.get('session2_id_list', None)
-        session2_list =json.loads(session2_list)
+        session2_list =json.loads(list_json)
         session1_obj = Session.objects.get(pk=pk)
 
         for session2 in session2_list:
@@ -716,7 +716,8 @@ def create_consecutive_session(request, pk):
             'success_stat': 0
         }  
         return JsonResponse(data)      
-    except Exception as ex:    
+    except Exception as ex:  
+        print(ex)  
         data = {
             'error_msg': 'unexpected error',
             'success_stat': 0
@@ -755,8 +756,9 @@ def get_group_data_2(request):
          'groups' : list(group_list),
          'group_type': group_type
     } 
-    return JsonResponse(data)   
-#problementho
+    return JsonResponse(data)  
+
+#get searched consecutive session
 def get_consecutive_session(request, pk):
     try:
         batch = request.GET.get('batch', None)       
@@ -765,7 +767,7 @@ def get_consecutive_session(request, pk):
         tag = request.GET.get('tag', None)     
 
         if(batch == 'group' ):
-            session1 = Session.objects.get(tag=tag, subject=subject, group_id=group)
+            session1 = Session.objects.filter(subgroup_id=None).get(tag=tag, subject=subject, group_id=group)
         else:
             session1 = Session.objects.get(tag=tag, subject=subject, subgroup_id=group)
 
@@ -890,31 +892,37 @@ def create_blocked_session(request):
         if(block == 'L'):
             obj = Lecturer1.objects.get(pk=block_id)
             for d in days_py:
-                LecturerBlockedTimeslots.objects.create(
+                l = LecturerBlockedTimeslots.objects.create(
                     lecturer=obj,
                     day = d,
                     starttime=start_time,
                     endtime=end_time
                 )
+                lecturer_info = {'id': l.lecturer.employee_id, 'name': l.lecturer.name, 'day': l.day, 'start_time': l.starttime, 'end_time': l.endtime}
+                return_list.append(lecturer_info)
         elif(block == 'G'):
             obj = Group.objects.get(pk=block_id)
             for d in days_py:
-                GroupBlockedTimeslots.objects.create(
+                g = GroupBlockedTimeslots.objects.create(
                     group = obj,
                     day=d,
                     starttime=start_time,
                     endtime=end_time
                 )
+                group_info = {'id': g.group.id, 'name': g.group.generated_group, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(group_info)                            
         elif(block == 'S'):
             obj = Subgroup.objects.get(pk=block_id)
             for d in days_py:
-                GroupBlockedTimeslots.objects.create(
+                g = GroupBlockedTimeslots.objects.create(
                     group=obj.group,
                     subgroup=obj,
                     day=d,
                     starttime=start_time,
                     endtime=end_time
                 )
+                subgroup_info = {'id': g.subgroup.id, 'name': g.subgroup.generated_subgroup, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(subgroup_info)  
         else:
             obj = Session.objects.get(pk=block_id)    
             for d in days_py:
@@ -925,8 +933,22 @@ def create_blocked_session(request):
                     endtime=end_time
                 )
 
+        timeobj = MockWorkingDays.objects.get()
+        start_time = datetime.strptime(timeobj.starttime, '%H:%M')              
+        end_time = datetime.strptime(timeobj.endtime, '%H:%M')
+        day_list = timeobj.get_all_days()
+        time_arr = []
+
+        if(timeobj.slot == '30 min slots'):
+            time_arr = get_time_range(start_time, end_time, 30)
+        else:
+            time_arr = get_time_range(start_time, end_time, 60)
+        
+
         data = {
-            'success_stat': 1
+            'success_stat': 1,
+            'blocks': return_list,
+            'day_list': day_list
         }
         return JsonResponse(data)
     except Exception as e:
@@ -972,10 +994,6 @@ def view_blocked_timeslots(request):
             time_arr = get_time_range(start_time, end_time, 30)
         else:
             time_arr = get_time_range(start_time, end_time, 60)
-        print(return_list)
-        print(time_arr)
-        print(list(day_list))
-        print(day_list)
         data = {
             'success_stat': 1,
             'blocks': return_list,

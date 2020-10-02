@@ -105,9 +105,8 @@
             <div class="row" id="sessions_list_id">
                 {% for session in session_list %}
                 <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="{{session.id}}">
-                    <div>
+                    <div class="all_icons">
                         <i class="fas fa-plus topcornerleft add_icon"  data-toggle="tool-tip" title="Assign Session"></i>
-                        <i class="icon-remove-circle topcornerright remove_icon" hidden="true" data-toggle="tool-tip" title="Remove Session"></i>
                         <i class="fas fa-ellipsis-v topcornerright hamburger_icon dropdown">
                             <div  class="dropdown-menu dropdown-menu-right code shadow">
                                 <span data-toggle="modal" data-target="#block_sessions_modal11" class="blocking"><a class="dropdown-item ">Block Session</a></span>
@@ -131,6 +130,23 @@
         </div>
         
         <div class="right">
+            <div class="card bg-light shadow-sm mb-2">
+                <div class="card-body">
+                    <h4 style="color: #33344a;">Quick Navigation</h4>
+                    <hr>
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                          <a class="nav-link" href="{%url 'parallel_sessions' %}">Parallel Sessions <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{%url 'non_parallel_sessions' %}">Non - Parallel Sessions</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{%url 'blocked_timeslots' %}">Blocked Timeslots</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <form class=""> 
                 <div class="custom-control custom-radio custom-control-inline">
                     <input id="pid1" class="custom-control-input" type="radio" name="parallel" value="true" checked>
@@ -225,17 +241,22 @@
 
         $('.add_icon').click(function(){
             var id = $(this).parent().parent().attr('id');
-            $(this).hide();
+            
             var idList = JSON.stringify(getSession2IdList());
             if(idList.includes(id)){
                 alert('Session already added to list')
             }else{
                 $('.boxed #boxes').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'));
-               // $('#boxes > #' + id + ' > .hamburger_icon').html('<p>hey</p>');
-              //  $('#boxes #' + id + '.add_icon').remove();
-               // $('#boxes #' + id + '.remove_icon').show();
+                $('#boxes #' + id).find('.all_icons').html('<i class="icon-remove topcornerright remove_icon"></i>');
+                $(this).hide();
                 $('#parallel_btn').prop('disabled', false);
             }
+        });
+
+        $('.remove_icon').click(function(){
+            var id = $(this).parent().parent().attr('id');
+            $('#boxes #' + id).remove()
+            $('#sessions_list_id #' + id + '.add_icon').show();
         });
 
         $('.boxed > button').click(function(){
@@ -309,8 +330,6 @@
                 dataType: 'json',
                 success: function(data) {
                     if(data.success_stat){
-                        alert('Method Call is a success');
-                        console.log(data.sessions_list)
                         AddSearchedSessions(data.sessions_list)
                     }else{
                         alert(data.error_msg);
