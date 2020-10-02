@@ -3,15 +3,21 @@ from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
-from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags
+from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
 from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
-from .models import Session, ParallelSession, Timeslots
+from .models import Session, ParallelSession, NonParallelSession, ConsecutiveSession
+from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
+from django.core import serializers
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from django.views.decorators.csrf import csrf_exempt
+import json
+from datetime import datetime, timedelta
 # Create your views here.
 def index(request):
-     return render(request, 'home.html')
+    return render(request, 'home.html')
     
 
 class Lecturer(ListView):
@@ -217,11 +223,6 @@ class DeleteSubject(View):
 class TagsView(generic.ListView):
     model = Tags
     template_name = 'tags/tags.html'
-
-class DDView(generic.ListView):
-    model = Tags
-    template_name = 'students/st.html'
-
 
 class DeleteTags(View):
     try:
@@ -648,14 +649,383 @@ class UpdateSubGroupsView(View):
 class AssignSessionsView(generic.ListView):
     model =  Session
     template_name = 'sessions/assign-sessions.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)    
+        context['tags_list'] = Tags.objects.all()
+        context['subject_list'] = Subjects1.objects.all()
+        context['lecturer_list'] = Lecturer1.objects.all()
+        context['work_days'] = MockWorkingDays.objects.all()
+        context['group_list'] = Group.objects.exclude(generated_group = None)
+        return context
 
 class ConsecutiveSessionsView(generic.ListView):
     model =  Session
     template_name = 'sessions/consecutive-sessions.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['session1'] = Session.objects.get(pk= self.kwargs['pk'])
+        context['subject_list'] = Subjects1.objects.all()
+        context['tags_list'] = Tags.objects.all()
+        context['group_list'] = Group.objects.exclude(generated_group = None)
+        context['subgroup_list'] = Subgroup.objects.exclude(generated_subgroup = None)
+        return context
 
 class BlockTimeSlotsView(generic.ListView):
-    model =  Session
+
+    context_object_name  = 'lecturer_list'
     template_name = 'sessions/blocked-timeslots.html'
+    
+    def get_queryset(self):
+        """Return the lecturer objects with only specified fields"""
+        return Lecturer1.objects.values('id', 'employee_id', 'name')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)    
+        context['work_days'] = MockWorkingDays.objects.all()
+        return context
+
+class ParallelSessionsView(generic.ListView):
+    model = ParallelSession
+    template_name = 'sessions/parallel-sessions.html'    
+
+class NonParallelSessionsView(generic.ListView):
+    model = NonParallelSession
+    template_name = 'sessions/non-parallel-sessions.html'    
+
+@csrf_exempt
+def create_consecutive_session(request, pk):
+    try:
+        list_json = request.POST.get('session2_id_list', None)
+        session2_list =json.loads(list_json)
+        session1_obj = Session.objects.get(pk=pk)
+
+        for session2 in session2_list:
+            session2_obj = Session.objects.get(pk=session2)
+            ConsecutiveSession.objects.create(
+                session1=session1_obj,
+                session2=session2_obj
+            )
+            
+        data = {
+            'success_stat': 1
+        }  
+        return JsonResponse(data) 
+    except IntegrityError as e:
+        data = {
+            'error_msg': 'Consecutive Session already exists',
+            'success_stat': 0
+        }  
+        return JsonResponse(data)      
+    except Exception as ex:  
+        print(ex)  
+        data = {
+            'error_msg': 'unexpected error',
+            'success_stat': 0
+        }  
+        return JsonResponse(data)
+
+def get_group_data(request, pk):
+    group = request.GET.get('group', None)      
+
+    if(group ==  'true' ):
+        group_list = Group.objects.exclude(generated_group=None).values('id', 'generated_group')
+        group_type = 'group' 
+    else:
+        group_list = Subgroup.objects.exclude(generated_subgroup=None).values('id', 'generated_subgroup')
+        group_type = 'subgroup' 
+    data = {
+         'groups' : list(group_list),
+         'group_type': group_type
+    } 
+    return JsonResponse(data)
+
+
+def get_group_data_2(request):
+    group = request.GET.get('group_type', None)      
+
+    if(group ==  'G' ):
+        group_list = Group.objects.exclude(generated_group=None).values('id', 'generated_group')
+        group_type = 'group' 
+    elif(group == 'S'):
+        group_list = Subgroup.objects.exclude(generated_subgroup=None).values('id', 'generated_subgroup')
+        group_type = 'subgroup'
+    else:
+        group_list = Lecturer1.objects.values('id', 'employee_id', 'name')
+        group_type = 'lecturer' 
+    data = {
+         'groups' : list(group_list),
+         'group_type': group_type
+    } 
+    return JsonResponse(data)  
+
+#get searched consecutive session
+def get_consecutive_session(request, pk):
+    try:
+        batch = request.GET.get('batch', None)       
+        group = request.GET.get('group', None)       
+        subject = request.GET.get('subject', None)       
+        tag = request.GET.get('tag', None)     
+
+        if(batch == 'group' ):
+            session1 = Session.objects.filter(subgroup_id=None).get(tag=tag, subject=subject, group_id=group)
+        else:
+            session1 = Session.objects.get(tag=tag, subject=subject, subgroup_id=group)
+
+        data = {
+            'success_stat': 1,
+            'id': session1.id,
+            'subject_name': session1.subject.subjectName,
+            'subject_code': session1.subject.subjectCode,
+            'tag_label': session1.tag.label,
+            'tag_color': session1.tag.color,
+            'student_count': session1.student_count,
+            'duration': session1.duration
+        }
+        if(batch == 'group'):
+            data['group'] = session1.group_id.generated_group
+        else:
+            data['group'] = session1.subgroup_id.generated_subgroup
+                
+        return JsonResponse(data)
+    except ObjectDoesNotExist as e:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Session Not Found'
+        }
+        return JsonResponse(data)
+    except MultipleObjectsReturned as ex:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Multiple Sessions exists for search criteria'
+        }
+        return JsonResponse(data)
+
+@csrf_exempt
+def get_searched_session(request):
+    try:
+        lecturer = request.POST.get('lecturer', None)       
+        group = request.POST.get('group', None)       
+        subject = request.POST.get('subject', None)       
+        tag = request.POST.get('tag', None)  
+        conditions_list = {}
+        
+        #conditions to check if null
+        if (group):
+            conditions_list['group_id_id'] = group
+
+        if (tag):
+            conditions_list['tag_id'] = tag
+
+        if (subject):
+            conditions_list['subject_id'] = subject
+
+        if (lecturer):
+            conditions_list['lecturers'] = lecturer
+
+        sessions = Session.objects.filter(**conditions_list)
+        sessions_list = []
+
+        for session in sessions:
+            sessions_list.append({'id': session.id, 
+            'group': session.group_id.generated_group, 
+            'subgroup': session.subgroup_id.generated_subgroup if session.subgroup_id != None else None,
+            'subject_name': session.subject.subjectName,
+            'subject_code': session.subject.subjectCode,
+            'tag_label': session.tag.label, 
+            'tag_color': session.tag.color,
+            'student_count': session.student_count,
+            'duration': session.duration
+            })        
+        #print(serializers.serialize('json', sessions_list)) Used only for classes
+        data = {
+            'success_stat': 1,
+            'sessions_list': sessions_list
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Unexpected Error'
+        }
+        return JsonResponse(data)  
+
+@csrf_exempt
+def createParallelSession(request):
+    try:
+        parallel = request.POST.get('parallel', None) 
+        session_list = request.POST.get('parallel_session_list', None) 
+        
+        parallel_py = json.loads(parallel)
+        session_list_py = json.loads(session_list)
+
+        sobj = ParallelSession() if parallel_py == True else NonParallelSession()
+        sobj.save()
+
+        for index, session in enumerate(session_list_py):
+            psession = Session.objects.get(pk = session)
+            sobj.sessions.add(psession)   
+
+        data = {
+            'success_stat': 1,
+            'parallel': parallel,
+        }
+        return JsonResponse(data)
+    except Exception as e:  
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Unexpected Error'
+        }
+        return JsonResponse(data)       
+
+@csrf_exempt
+def create_blocked_session(request):
+    try:
+        days = request.POST.get('days_list', None)
+        block = request.POST.get('block', None)
+        block_id = request.POST.get('block_id', None)
+        start_time = request.POST.get('start_time', None)
+        end_time = request.POST.get('end_time', None)
+        days_py = json.loads(days)
+
+        obj = {}
+        return_list = []
+        if(block == 'L'):
+            obj = Lecturer1.objects.get(pk=block_id)
+            for d in days_py:
+                l = LecturerBlockedTimeslots.objects.create(
+                    lecturer=obj,
+                    day = d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+                lecturer_info = {'id': l.lecturer.employee_id, 'name': l.lecturer.name, 'day': l.day, 'start_time': l.starttime, 'end_time': l.endtime}
+                return_list.append(lecturer_info)
+        elif(block == 'G'):
+            obj = Group.objects.get(pk=block_id)
+            for d in days_py:
+                g = GroupBlockedTimeslots.objects.create(
+                    group = obj,
+                    day=d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+                group_info = {'id': g.group.id, 'name': g.group.generated_group, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(group_info)                            
+        elif(block == 'S'):
+            obj = Subgroup.objects.get(pk=block_id)
+            for d in days_py:
+                g = GroupBlockedTimeslots.objects.create(
+                    group=obj.group,
+                    subgroup=obj,
+                    day=d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+                subgroup_info = {'id': g.subgroup.id, 'name': g.subgroup.generated_subgroup, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(subgroup_info)  
+        else:
+            obj = Session.objects.get(pk=block_id)    
+            for d in days_py:
+                SessionBlockedTimeslots.objects.create(
+                    session=obj,
+                    day=d,
+                    starttime=start_time,
+                    endtime=end_time
+                )
+
+        timeobj = MockWorkingDays.objects.get()
+        start_time = datetime.strptime(timeobj.starttime, '%H:%M')              
+        end_time = datetime.strptime(timeobj.endtime, '%H:%M')
+        day_list = timeobj.get_all_days()
+        time_arr = []
+
+        if(timeobj.slot == '30 min slots'):
+            time_arr = get_time_range(start_time, end_time, 30)
+        else:
+            time_arr = get_time_range(start_time, end_time, 60)
+        
+
+        data = {
+            'success_stat': 1,
+            'blocks': return_list,
+            'day_list': day_list
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        data = {
+            'success_stat': 0
+        }
+        return JsonResponse(data)
+
+
+def view_blocked_timeslots(request):
+    try:
+        block = request.GET.get('block', None)
+        block_id = request.GET.get('block_id', None)
+        obj = {}
+        return_list = []
+
+        if(block=='L'):
+            obj = Lecturer1.objects.get(pk = block_id)
+            lobjs = LecturerBlockedTimeslots.objects.filter(lecturer=obj)
+            for l in lobjs:
+                lecturer_info = {'id': l.lecturer.employee_id, 'name': l.lecturer.name, 'day': l.day, 'start_time': l.starttime, 'end_time': l.endtime}
+                return_list.append(lecturer_info)
+        elif(block=='G'):
+            obj = Group.objects.get(pk = block_id)
+            group_objs = GroupBlockedTimeslots.objects.filter(group=obj)
+            for g in group_objs:
+                group_info = {'id': g.group.id, 'name': g.group.generated_group, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(group_info)            
+        elif(block=='S'):
+            obj = Subgroup.objects.get(pk = block_id)
+            subgroup_objs = GroupBlockedTimeslots.objects.exclude(subgroup=None).filter(subgroup=obj)
+            for g in subgroup_objs:
+                subgroup_info = {'id': g.subgroup.id, 'name': g.subgroup.generated_subgroup, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
+                return_list.append(subgroup_info)  
+
+        timeobj = MockWorkingDays.objects.get()
+        start_time = datetime.strptime(timeobj.starttime, '%H:%M')              
+        end_time = datetime.strptime(timeobj.endtime, '%H:%M')
+        day_list = timeobj.get_all_days()
+        time_arr = []
+
+        if(timeobj.slot == '30 min slots'):
+            time_arr = get_time_range(start_time, end_time, 30)
+        else:
+            time_arr = get_time_range(start_time, end_time, 60)
+        data = {
+            'success_stat': 1,
+            'blocks': return_list,
+            'time_list': time_arr,
+            'day_list': day_list
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Unexpected Error'
+        }
+        print(e)
+        return JsonResponse(data)
+
+
+def get_time_range(start_time, end_time, time_interval):
+    time_arr = []
+    current_time = start_time
+    while (current_time < end_time):
+        stime = current_time.strftime('%H:%M')
+        time_arr.append(stime)
+        current_time += timedelta(minutes=time_interval)
+
+    time_arr.append(end_time.strftime('%H:%M'))
+    return time_arr
+
+
+
+
+
+
 
 
 
