@@ -24,26 +24,86 @@
 
     
     <div class="row">
-      <div class="col-md-4" id="formadddiv">
-        <h1 id="subjectTitle" class="">Add Subjects</h1>
+      <div class="col-md-12" id="formadddiv">
+        <h1 id="subjectTitle" class="">Subjects</h1>
         <form id="addLecturer" action="" >
+       
+    
+          
 
-          <div class="form-group">
-            <input class="form-control" type="text" name="offeredYear1" placeholder="Offered Year" >
+          <div class="form-group row">
+            <div class="col-6">
+              <h4>Planning</h4>
+              <!-- <input class="form-control" type="text" name="offeredYear1" placeholder="Offered Year" > -->
+
+              <select
+              class="form-control"
+              id="offeredYear1"
+              name="offeredYear1"
+              placeholder="Offered Year"
+            >
+            <option disabled selected>Offered Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option  value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          
+          </select>
+
+            </div>
+
+
+            <div class="col-6">
+              <h4>Time Planning</h4>
+              <input class="form-control" type="number" name="noLecHours1" placeholder="Number of Hours" >
+            </div>
           </div>
 
-          <div class="form-group">
-            <input class="form-control" type="text" name="offeredSemester1" placeholder="Offered Semester" >
+          <div class="form-group row">
+            <div class="col-6">
+            <!-- <input class="form-control" type="text" name="offeredSemester1" placeholder="Offered Semester" > -->
+
+            <select
+            class="form-control"
+            id="offeredSemester1"
+            name="offeredSemester1"
+            
+          >
+          <option disabled selected>Offered Semester</option>
+          <option value="1">1st Semester</option>
+          <option value="2">2nd Semester</option>
+          
+        
+        </select>
+
+            </div>
+            <div class="col-6">
+              <input class="form-control" type="number" name="noTutHours1" placeholder="No of tute hours" >
+            </div>
           </div>
 
-          <div class="form-group">
+          <h4>Subject Details</h4>
+          <div class="form-group row">
+            <div class="col-6">
             <input class="form-control" type="text" name="subjectName1" placeholder="Subject Name" >
+            </div>
+            <div class="col-6">
+            <input class="form-control" type="number" name="noLabHours1" placeholder="No of Lab Hours" > 
+            </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group row">
+            <div class="col-6">
             <input class="form-control" type="text" name="subjectCode1" placeholder="Subject Code" >
+            </div>
+            <div class="col-6">
+              <input class="form-control" type="number" name="noEveHours1" placeholder="No of Evaluation Hours" >
+            </div>
           </div>
 
+          
+          <!-- <h4>Time Planning</h4>
+        
           <div class="form-group">
             <input class="form-control" type="number" name="noLecHours1" placeholder="Number of Hours" >
           </div>
@@ -58,10 +118,21 @@
 
           <div class="form-group">
             <input class="form-control" type="number" name="noEveHours1" placeholder="No of Evaluation Hours" >
-          </div>
+          </div> -->
          
+          <div class="form-group row">
+            <div class="col-4">
+        
+            </div>
+            <div class="col-4">
+              <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
+            </div>
+            <div class="col-4">
+        
+            </div>
+          </div>
 
-          <button class="btn btn-primary form-control" type="submit">SUBMIT</button>
+        
         </form>
       </div>
 
@@ -247,8 +318,8 @@
 
   // Create Django Ajax Call
   $("form#addLecturer").submit(function() {
-      var offeredYearInput = $('input[name="offeredYear1"]').val();
-      var offeredSemesterInput = $('input[name="offeredSemester1"]').val().trim();
+      var offeredYearInput = $('#offeredYear1').val();
+      var offeredSemesterInput = $('#offeredSemester1').val();
       var subjectNameInput = $('input[name="subjectName1"]').val().trim();
       var subjectCodeInput = $('input[name="subjectCode1"]').val().trim();
       var noLecHoursInput = $('input[name="noLecHours1"]').val().trim();

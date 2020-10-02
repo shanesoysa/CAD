@@ -153,14 +153,31 @@
 
       </div>
       <div class="col-5">
-        <h5>Employee ID</h5>
+        <!-- <h5>Employee ID</h5>
         <input
 
           class="form-control"
           type="number "
           name="employee_id1"
         
-        />
+        /> -->
+
+        <h5>Level</h5>
+          <select
+          class="form-control"
+          id="level1"
+          name="level1"
+        >
+        <option disabled selected></option>
+        <option value="1">Professor</option>
+        <option value="2">Assistant Professor</option>
+        <option value="3">Senior Lecturer(HG)</option>
+        <option value="4">Senior Lecturer</option>
+        <option value="5">Lecturer</option>
+        <option value="6">Assistant Lecturer</option>
+        <option value="7">Instructors</option>
+       
+      </select>
       </div>
       <div class="col-1">
  
@@ -206,7 +223,7 @@
  
       </div>
       <div class="col-5">
-          <h5>Level</h5>
+          <!-- <h5>Level</h5>
           <select
           class="form-control"
           id="level1"
@@ -221,7 +238,17 @@
         <option value="6">Assistant Lecturer</option>
         <option value="7">Instructors</option>
        
-      </select>
+      </select> -->
+
+
+      <h5>Employee ID</h5>
+      <input
+
+        class="form-control"
+        type="number "
+        name="employee_id1"
+      
+      />
         </div>
   
     </div>
@@ -393,7 +420,7 @@
           </button>
         </div> -->
        
-               <form id="updateUser" action="">
+        <form id="updateUser" action="">
         <div class="modal-body">
           <input class="form-control" id="form-id" type="hidden" name="formId"/>
           <label for="name">Name</label>
@@ -470,10 +497,12 @@
 {% block javascript %}
 
 <script>
+
+
   
 
   $("#viewsection").click(function(){
-    $("#addingform").hide(500);
+    $("#addingform").hide(1000);
     $("#tablediv").removeClass('d-none');
   });
   
@@ -496,11 +525,12 @@
     var $level = $('select#level1');
     var $empID = $('input[name="employee_id1"]');
     var $rank = $('input[name="rank1"]');
-  
-  
+
+    
     $empID.add($level).keyup(function() {
       $rank.val($level.val() + '.' + $empID.val());
     });
+  
   });
 
   // Create Django Ajax Call
