@@ -10,7 +10,7 @@ from django.db.utils import IntegrityError
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
 from .models import Session as Session1
-from .models import Session, ParallelSession, Timeslots
+from .models import Session, ParallelSession
 
 from .models import Session, ParallelSession, NonParallelSession, ConsecutiveSession
 from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
