@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Sessions{% endblock title %}
+
+{% block stylesheet %}
+<style>
+.some {
+    line-height: 0.5;
+}
+@media only screen and (max-width: 600px) {
+    .some {
+        line-height: 1.5;
+    }
+}
+
+.left{
+    float: left;
+    width: 65%;
+}
+.right{
+    float: left;
+    width: 35%;
+}
+.boxed{
+    border: 4px dotted purple;
+}
+.topcornerright{
+    position:absolute;
+    margin: 12px;
+    top: 0;
+    right:0;
+    color: #33344a;
+}
+
+.topcornerleft{
+    position:absolute;
+    margin: 7px;
+    top:0;
+    left:0;
+    color: #33344a;
+}
+
+.code{
+    background-color: #FFFFFF;
+    color: #800080;
+}
+</style>
+{% endblock stylesheet %}
+
+{% block content %}
+<div class="container-fluid main bg-light">
+    <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
+        <h3 style="color: #33344a;" >Assign Sessions </h3>
+    </div>
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+            <form>
+                <div class="row">
+                    <div class="col form-group">
+                        <label for="groupId" class="text-black font-weight-bold">Group</label>
+                        <select id="groupId" class="form-control selectpicker" name="group" data-live-search="true">
+                            <option value="default" disabled selected>Select Group --</option>
+                            {% for group in group_list %}
+                            <option value="{{group.id}}">{{ group.generated_group }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="lecturerId" class="text-black font-weight-bold">Lecturer</label>
+                        <select id="lecturerId" class="form-control selectpicker " name="lecturer" data-live-search="true">
+                            <option value="default" disabled selected>Select Lecturer --</option>
+                            {% for lecturer in lecturer_list %}
+                            <option value="{{lecturer.id}}">{{ lecturer.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="subjectId" class="text-black font-weight-bold">Subject</label>
+                        <select id="subjectId" class="form-control selectpicker" name="subject" data-live-search="true">
+                            <option value="default" disabled selected>Select Subject -- </option>
+                            {% for subject in subject_list %}
+                            <option value="{{subject.id}}">{{ subject.subjectCode }} - {{ subject.subjectName }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="tagId" class="text-black font-weight-bold">Tag</label>
+                        <select id="tagId" class="form-control selectpicker" name="tag">
+                            <option value="default" disabled selected>Select Tag --</option>
+                            {% for tag in tags_list %}
+                            <option value="{{tag.id}}">{{ tag.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row justify-content-md-center">
+                    <button onclick="reset()" id="reset_btn" class="btn btn-secondary col-2" disabled="true">Reset</button> &nbsp;
+                    <button id="search_btn" class="btn btn-primary col-2" disabled="true">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="left">
+            <div class="row" id="sessions_list_id">
+                {% for session in session_list %}
+                <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="{{session.id}}">
+                    <div class="all_icons">
+                        <i class="fas fa-plus topcornerleft add_icon"  data-toggle="tool-tip" title="Assign Session"></i>
+                        <i class="fas fa-ellipsis-v topcornerright hamburger_icon dropdown">
+                            <div  class="dropdown-menu dropdown-menu-right code shadow">
+                                <span data-toggle="modal" data-target="#block_sessions_modal11" class="blocking"><a class="dropdown-item ">Block Session</a></span>
+                                <a class="dropdown-item " href="{% url 'consecutive_sessions' session.id %}">Set Consecutive</a>
+                            </div>
+                        </i>
+                    </div>
+
+                    <div class="pt-4 pl-4 pr-2 pb-2 m-2">
+                        {% if session.group_id %}
+                            <p style="font-weight: 500; ">{{ session.group_id.generated_group}}</p>
+                        {% else %}
+                            <p>{{ session.subgroup_id.generated_subgroup}}</p>
+                        {% endif %}
+                        <p>{{ session.subject.subjectName}}-{{ session.subject.subjectCode}} <span style="color:{{session.tag.color}};">({{ session.tag.label}})</span></p>
+                        <p>{{ session.student_count}} ({{ session.duration}})</p>
+                    </div>
+                </div> 
+                {% endfor%}
+            </div>
+        </div>
+        
+        <div class="right">
+            <div class="card bg-light shadow-sm mb-2">
+                <div class="card-body">
+                    <h4 style="color: #33344a;">Quick Navigation</h4>
+                    <hr>
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                          <a class="nav-link" href="{%url 'parallel_sessions' %}">Parallel Sessions <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{%url 'non_parallel_sessions' %}">Non - Parallel Sessions</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="{%url 'blocked_timeslots' %}">Blocked Timeslots</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <form class=""> 
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input id="pid1" class="custom-control-input" type="radio" name="parallel" value="true" checked>
+                    <label for="pid1" class="custom-control-label">Parallel</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input id="pid2" class="custom-control-input" type="radio" name="parallel" value="false">
+                    <label for="pid2" class="custom-control-label">Non Parallel</label>
+                </div>
+            </form>
+            <div class="boxed m-1 p-3">
+                <button class="btn btn-primary" id="parallel_btn" style="float: right;" disabled="true"> Save </button>
+                <br>
+                <div id="boxes">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Model in bootstrap-->
+<div class="modal" id="block_sessions_modal11" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Block Timeslot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+            <form id="timeslotForm" action="">
+                <div class="modal-body">
+                    <input id="bIdId" name="bIdname" type="hidden" />
+                    <div class="row">
+                        {% for days in work_days %}
+                        <div class="col-4" id="col_day">
+                            <p>Day(s)</p>
+                            {% for day in days.get_all_days %}
+                            <div class="form-check">
+                                <input class="form-check-input check_count" type="checkbox" value="{{day}}" id="d-{{day}}">
+                                <label class="form-check-label" for="d-{{day}}">{{day}}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                        <div class="form-group col-4">
+                            <div class="md-form md-outline">
+                                <label for="startTimeId">Start Time: </label>
+                                <input type="time" id="startTimeId" class="form-control" name="startTime" placeholder="Select time" min="{{work_days.0.starttime}}" max="{{work_days.0.endtime}}" step="3600">
+                            </div>
+                        </div>
+                        <div class="form-group col-4">
+                            <div class="md-form md-outline">
+                                <label for="endTimeId">End Time</label>
+                                <input type="time" id="endTimeId" class="form-control" name="endTime" placeholder="Select time" min="{{work_days.0.starttime}}" max="{{work_days.0.endtime}}" step="3600">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" id="save_btn" class="btn btn-primary" disabled="true">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block javascript%}
+<script>
+    $(function() {
+
+        $('.hamburger_icon').hover(function(){
+            var id = $(this).parent().parent().attr('id');
+            showMyMenu(id)
+        })
+
+        function showMyMenu(id){
+            $('#' + id).find('.dropdown-menu').show();
+        }
+
+        $('[data-toggle="tool-tip"]').tooltip();
+       
+        $('.hamburger_icon').mouseleave(function(){
+            function hideDrop(){
+                $('.dropdown-menu').hide();
+            }
+
+            setTimeout(hideDrop, 2000);
+        });
+
+        $('.add_icon').click(function(){
+            var id = $(this).parent().parent().attr('id');
+            
+            var idList = JSON.stringify(getSession2IdList());
+            if(idList.includes(id)){
+                alert('Session already added to list')
+            }else{
+                $('.boxed #boxes').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'));
+                $('#boxes #' + id).find('.all_icons').html('<i class="icon-remove topcornerright remove_icon"></i>');
+                $(this).hide();
+                $('#parallel_btn').prop('disabled', false);
+            }
+        });
+
+        $('.remove_icon').click(function(){
+            var id = $(this).parent().parent().attr('id');
+            $('#boxes #' + id).remove()
+            $('#sessions_list_id #' + id + '.add_icon').show();
+        });
+
+        $('.boxed > button').click(function(){
+            var id_list = getSession2IdList();
+            var parallel = $('input[type=radio][name=parallel]:checked').val();
+            var id_list_json =  JSON.stringify(id_list)
+            $.ajax({
+                url: '{% url "add_parallel_sessions"  %}',
+                type: 'POST',
+                data:{
+                    'parallel_session_list': id_list_json,
+                    'parallel': parallel,
+                },
+                dataType:'json',
+                success: function(data){
+                    if(data.success_stat == 1){
+                        var parallel = (data.parallel == 'true')
+                        if(parallel)
+                            window.location.href = '{%url "parallel_sessions" %}'
+                        else
+                            window.location.href = '{%url "non_parallel_sessions" %}'
+                    }       
+                    else{
+                        alert(data.error_msg)
+                    }
+                }
+            });
+        });
+
+
+        function getSession2IdList(){
+            var session_id_list = []
+            $('.boxed #boxes > div').each((index, val) => session_id_list.push(parseInt(val.id)))
+            return session_id_list
+        }
+
+        function reset() {
+            $("#groupId").val("default");
+            $("#lecturerId").val("default");
+            $("#subjectId").val("default");
+            $("#tagId").val("default");
+        }
+
+        $('select').change(function(){
+            if($(this).val() !== 'default'){
+                $('#search_btn').prop('disabled', false);
+                $('#reset_btn').prop('disabled', false);
+            }else{
+                $('#search_btn').prop('disabled', true);
+                $('#reset_btn').prop('disabled', true);
+            }
+        });
+
+        $('#search_btn').click(function(e){
+
+            e.preventDefault();
+            var group = ($('#groupId').val() != undefined)? $('#groupId').val(): null;
+            var tag = ($('#tagId').val() != undefined) ? $('#tagId').val() : null;
+            var subject = ($('#subjectId').val() != undefined) ? $('#subjectId').val() : null;
+            var lecturer =($('#lecturerId').val() != undefined) ? $('#lecturerId').val() : null;
+
+            $.ajax({
+                url: '{% url "search_sessions" %}',
+                type: 'POST',
+                data: {
+                    'lecturer': lecturer,
+                    'group': group,
+                    'subject': subject,
+                    'tag': tag
+                },
+                dataType: 'json',
+                success: function(data) {
+                    if(data.success_stat){
+                        AddSearchedSessions(data.sessions_list)
+                    }else{
+                        alert(data.error_msg);
+                    }
+                }
+            });
+        });
+
+        function AddSearchedSessions(sessions_list){
+            $('#sessions_list_id').children().remove();
+            console.log(Object.prototype.toString.call(sessions_list))
+
+            sessions_list.forEach(function(session, i){
+                if(i == 0){
+                    $('#sessions_list_id').prepend(
+                    `<div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="${session.id}">
+                        <div>
+                            <i class="fas fa-plus topcornerleft add_icon"  data-toggle="tool-tip" title="Assign Session"></i>
+                            <i class="fas fa-ellipsis-v topcornerright hamburger_icon dropdown">
+                                <div  class="dropdown-menu dropdown-menu-right code shadow">
+                                    <a class="dropdown-item " href="{% url 'blocked_timeslots' %}">Block Session</a>
+                                    <a class="dropdown-item " href="sessions/${session.id}/consecutive">Set Consecutive</a>
+                                </div>
+                            </i>
+                        </div>
+
+                        <div class="pt-4 pl-4 pr-2 pb-2 m-2">
+                            <p style="font-weight: 500; ">${session.group != null ? session.group :session.subgroup}</p>
+                            <p>${ session.subject_name }-${ session.subject_code} <span style="color:${session.tag_color};">(${ session.tag_label})</span></p>
+                            <p>${ session.student_count} (${ session.duration})</p>
+                        </div>
+                    </div> `
+                    );
+                }else{
+                    $('#sessions_list_id').append(
+                    `<div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="${session.id}">
+                        <div>
+                            <i class="fas fa-plus topcornerleft add_icon"  data-toggle="tool-tip" title="Assign Session"></i>
+                            <i class="fas fa-ellipsis-v topcornerright hamburger_icon dropdown">
+                                <div  class="dropdown-menu dropdown-menu-right code shadow">
+                                    <a class="dropdown-item " href="{% url 'blocked_timeslots' %}">Block Session</a>
+                                    <a class="dropdown-item " href="sessions/${session.id}/consecutive">Set Consecutive</a>
+                                </div>
+                            </i>
+                        </div>
+
+                        <div class="pt-4 pl-4 pr-2 pb-2 m-2">
+                            <p style="font-weight: 500; ">${session.group != null ? session.group :session.subgroup}</p>
+                            <p>${ session.subject_name }-${ session.subject_code} <span style="color:${session.tag_color};">(${ session.tag_label})</span></p>
+                            <p>${ session.student_count} (${ session.duration})</p>
+                        </div>
+                    </div> `
+                    );
+                }
+
+            });
+
+        }
+
+        $(':input').change(function(){
+        if($('input[name="startTime"]').val() && $('input[name="endTime"]').val() && $("input[type=checkbox]:checked").val())
+            $('#save_btn').prop('disabled', false)
+        })
+
+        $('.blocking').click(function(){
+            var id = $(this).parents().eq(3).attr('id')
+            $('#bIdId').val(id)
+        })
+
+        
+
+        $("#save_btn").click(function() {
+            var blockInput = 'SS';
+            var blockIdInput = $('input[name="bIdname"]').val();
+            var blockId = parseInt(blockIdInput)
+            var days = [];
+            $('#col_day > .form-check > input:checked').each(function(index, val){
+                var id = $(this).val()
+                days.push(id)
+                });
+
+            var days_json = JSON.stringify(days)
+
+            var startTimeInput = $('input[name="startTime"]').val();
+            var endTimeInput = $('input[name="endTime"]').val();
+            if (startTimeInput && endTimeInput) {
+                $.ajax({
+                    url: '{% url "add_blocked_timeslots" %}',
+                    type: 'POST',
+                    data: {
+                    'days_list':days_json,
+                    'block':blockInput,
+                    'block_id':blockId,
+                    'start_time':startTimeInput,
+                    'end_time':endTimeInput,
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success_stat == 1) { 
+                            alert('Blocked Session')
+                        }else{
+                            alert(data.error_msg)
+                        }
+                    }
+                });
+            } else {
+                alert("All fields must have a valid value.");
+            }
+
+            $('form#timeslotForm').trigger("reset");
+            $('#block_sessions_modal11').modal('hide');
+            return false;
+        });
+        
+    });
+</script>
+{% endblock javascript %}

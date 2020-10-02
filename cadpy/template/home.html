@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CAD Timetable</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+      integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        background-color: #33344a;
+      }
+      .card:hover {
+        box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2),
+          0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        opacity: 1;
+      }
+      .card {
+        background-color: #33344a;
+        opacity: 0.63;
+      }
+      .vertical-center {
+        min-height: 100%; /* Fallback for browsers do NOT support vh unit */
+        min-height: 100vh; /* These two lines are counted as one :-)       */
+
+        display: flex;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid h-100">
+      <div class="row d-flex justify-content-around">
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body text-white py-5">
+              <i class="far fa-calendar-alt c-text fa-4x icon"></i>
+              <h2 class="m-0 c-text">Working Days</h2>
+              <a href="" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body text-white py-5">
+              <i class="fas fa-users c-text fa-4x icon"></i>
+              <h2 class="m-0 c-text">Lecturers</h2>
+              <a href="{% url 'lecturer' %}" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body text-white py-5">
+              <i class="fas fa-book c-text fa-4x icon"></i>
+              <h2 class="m-0 c-text">Subjects</h2>
+              <a href="{% url 'subject' %}" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-around">
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body text-white py-5">
+              <i class="fas fa-user-friends c-text fa-4x icon"></i>
+              <h2 class="m-0 c-text">Students</h2>
+              <a href="{% url 'students' %}" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body text-white py-5">
+              <i class="fas fa-tags c-text fa-4x icon"></i>
+              <h2 class="m-0 c-text">Tags</h2>
+              <a href="{% url 'tags' %}" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body text-white py-5">
+              <i class="fas fa-map-marker-alt c-text fa-4x icon"></i>
+              <h2 class="m-0 c-text">Locations</h2>
+              <a href="" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body text-white py-5">
+              <i class="fas fa-chart-pie c-text fa-4x icon"></i>
+              <h2 class="m-0 c-text">Statistics</h2>
+              <a href="" class="stretched-link"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

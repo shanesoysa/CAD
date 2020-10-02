@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Programmes{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid main bg-light">
+    <div >
+        <div class="bg-light text-info" style="padding: 15px 0px; font-weight: 900;">
+            <h3><a href="{% url 'students' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Academic Year & Semester</h3>
+        </div>
+        <hr style="margin-top: 0px; margin-left: 0rem; ">
+        <div class="scrollable bg-light">
+            <div class="card-body bg-light">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <form action="" class="form-inline" id="addAcademics">
+                        <div class="form-group m-4">
+                            <label class="text-black font-weight-bold" for="academicYearId">Academic Year </label>
+                            <input type="number" class="form-control m-3" id="academicYearId" name="academicYear" min="1"/>
+                        </div>
+
+                        <div class="form-group m-4">
+                            <label class="font-weight-bold" for="academicSemesterId">Academic Semester </label>
+                            <input type="number" class="form-control m-3" id="academicSemesterId" name="academicSemester" min="1"/>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group m-4">
+                                <input type="submit" id="mybtn" class="form-control m-3 btn btn-info btn-block" value="  Add  " disabled="true"/>
+                            </div>
+                        </div>
+                      </form>
+                </div>
+                <div class="row row-cols-1 row-cols-md-4 chaa">
+                    {% for academicyearsemester in academicyearsemester_list %}
+                    <div class="col mb-4" id="ays-{{academicyearsemester.id}}">
+                        <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+                            <pre>
+                                <h5>Y<span class="proName userData"name="pname">{{academicyearsemester.academic_year }}</span>.S<span name="pabbv" class="proAbbv userData" >{{ academicyearsemester.academic_semester}}</span>     <span onclick="editAcademics({{academicyearsemester.id}})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt" style="color: #4c4260;"></i></span>   <span onclick="deleteAca({{academicyearsemester.id}})"><i class="far fa-trash-alt" style="color: #4c4260;"></i></span><h5></pre>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--New Model-->
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Update Academic year & Semester</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="updateUser" action="">
+          <div class="modal-body">
+              <input class="form-control" id="form-id" type="hidden" name="formId"/>
+              <label for="name">Academic year</label>
+              <input class="form-control" id="form-name" type="number" name="formName"/>
+              <label for="address">Academic Semester</label>
+              <input class="form-control" id="form-abbv" type="number" name="formAbbv"/>   
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        
+        </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+  $(function(){
+    $(':input[type="number"]').change(function(){
+      if ($('input[name="academicYear"]').val() && $('input[name="academicSemester"]').val()){
+        $("#mybtn").prop("disabled", false);
+      }
+    })
+  });
+
+  $("form#addAcademics").submit(function() {
+
+    var ayear = $('input[name="academicYear"]').val();
+    var asemester = $('input[name="academicSemester"]').val();
+    // Create Ajax Call
+    $.ajax({
+        url: '{% url "add_academics" %}',
+        data: {
+        'academic_year':ayear,
+        'academic_semester':asemester
+        },
+        dataType: 'json',
+        success: function (data) {
+          if(data.success_stat == 1){
+            console.log(data.academicyearsemester);
+            if (data.academicyearsemester) {
+              appendToAcademicsTable(data.academicyearsemester);
+            }
+            $('form#addAcademics').trigger("reset");
+            
+          }else{
+            alert(data.error_msg)
+          }
+          $("#mybtn").prop("disabled", true);
+        }
+    });
+    return false;
+  });
+
+function appendToAcademicsTable(programme) {
+    $(".chaa").append(`
+    <div class="col mb-4" id="ays-${programme.id}">
+        <div class="card shadow p-3 mb-5 bg-white rounded text-center">
+            <pre>
+                <h5>Y${programme.academic_year }.S${ programme.academic_semester}     <span onclick="editAcademics({{academicyearsemester.id}})" data-toggle="modal" data-target="#myModal" ><i class="fas fa-pencil-alt" style="color: #4c4260;"></i></span>   <span onclick="deleteAca(${programme.id})"><i class="far fa-trash-alt" style="color: #4c4260;"></i></span><h5></pre>
+        </div>
+    </div>
+    `);
+}
+
+function deleteAca(id) {
+  var action = confirm("Are you sure you want to delete?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "remove_academics" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+    
+            if (data.deleted) {
+              $("#ays-" + id).remove();
+            }
+        }
+    });
+  }
+}
+
+
+$("form#updateUser").submit(function() {
+
+var idInput = $('input[name="formId"]').val().trim();
+var nameInput = $('input[name="formName"]').val();
+var abbvInput = $('input[name="formAbbv"]').val().trim();
+
+
+if (nameInput && abbvInput) {
+    // Create Ajax Call
+    $.ajax({
+        url: '{% url "update_academics" %}',
+        data: {
+          'id':idInput,
+          'academic_year':nameInput,
+          'academic_semester':abbvInput,
+        },
+        dataType: 'json',
+        success: function (data) {
+          if(data.success_stat == 1){
+            if (data.academicyearsemester) {
+              updateToUserTabel(data.academicyearsemester);
+            }
+          }else{
+            alert(data.error_msg)
+          }
+        }
+    });
+   } else {
+    alert("All fields must have a valid value.");
+}
+
+$('form#updateUser').trigger("reset");
+$('#myModal').modal('hide');
+return false;
+});
+
+
+function editAcademics(id) {
+  
+  if (id) {
+  
+  tr_id = "#ays-" + id;
+  pname = $(tr_id).find(".proName").text();
+  pabbv = $(tr_id).find(".proAbbv").text();
+  
+  $('#form-id').val(id);
+  $('#form-name').val(pname);
+  $('#form-abbv').val(pabbv);
+
+  }
+}
+
+function updateToUserTabel(academicyearsemester){
+  location.reload();
+  $(".chaa #ays-" + academicyearsemester.id).children(".userData").each(function() {
+      var attr = $(this).attr("name");
+      if (attr == "pname") {
+        $(this).text(academicyearsemester.academic_year);
+      } else if (attr == "pabbv") {
+        $(this).text(academicyearsemester.academic_semester);
+      } 
+    });
+}
+
+</script>
+{% endblock javascript %}

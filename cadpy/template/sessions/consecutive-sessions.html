@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Consecutive Sessions{% endblock title %}
+
+{% block stylesheet %}
+<style>
+.some {
+    line-height: 0.5;
+}
+@media only screen and (max-width: 600px) {
+    .some {
+        line-height: 1.5;
+    }
+}
+
+.left{
+    float: left;
+    width: 50%;
+}
+.right{
+    float: left;
+    width: 50%;
+}
+.bottom{
+    position: absolute;
+    right:    21px;
+    bottom:   8px;
+}
+</style>
+{% endblock stylesheet %}
+
+{% block content %}
+<div class="container-fluid main bg-light">
+    <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
+        <h3 style="color: #33344a;" ><a href="{% url 'assign_sessions' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Consecutive Sessions </h3>
+    </div>
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-title" style="color: purple;">Search Session 2</div>
+        <div class="card-body groupy">
+            <form>
+                <div class="row">
+                    <div class="col-6 form-group">
+                        <label class="text-black font-weight-bold">Batch</label>
+                        <br>
+                        <div class="col-2 form-check form-check-inline">
+                            <input id="batchId1" class="form-check-input" type="radio" name="batch" value="group"  checked="true" />
+                            <label for="batchId1" class="form-check-label">Group</label>
+                        </div>
+                        <div class="col-2 form-check form-check-inline">
+                            <input id="batchId2" class="form-check-input" type="radio" name="batch" value="subgroup">
+                            <label for="batchId2" class="form-check-label">Subgroup</label>
+                        </div>
+                        <div class="col-6 form-check form-check-inline changegroup">
+                            <select id="groupId" class="form-control selectpicker" data-live-search="true" name="group">
+                                <option value="default" disabled selected>Select </option>
+                                    {% for group in group_list %}
+                                    <option value="{{group.id}}">{{ group.generated_group }}</option>
+                                    {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3 form-group">
+                        <label for="subjectId" class="text-black font-weight-bold">Subject</label>
+                        <select id="subjectId" class="form-control selectpicker" data-live-search="true" name="subject">
+                            <option value="default" disabled selected>Select Subject</option>
+                            {% for subject in subject_list %}
+                            <option value="{{subject.id}}">{{ subject.subjectCode }} - {{ subject.subjectName }}</option>
+                            {% endfor %}
+                        </select>
+                        </select>
+                    </div>
+                    <div class="col-3 form-group">
+                        <label for="tagId" class="text-black font-weight-bold">Tag</label>
+                        <select id="tagId" class="form-control selectpicker" data-live-search="true" name="tag">
+                            <option value="default" disabled selected>Select Tag</option>
+                            {% for tag in tags_list %}
+                            <option value="{{tag.id}}">{{ tag.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row justify-content-md-center">
+                    <button class="btn btn-secondary col-2" id="reset_btn" disabled="true">Reset</button> &nbsp;
+                    <button class="btn btn-primary col-2" id="search_btn" disabled="true">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body" style="position: relative;">
+            <div class="left">
+                <h5 class="card-title">Session 1</h5>
+                <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="{{session1.id}}">
+                    <div class="p-4 m-2">
+                        {% if session1.group_id %}
+                            <p style="font-weight: 500; ">{{ session1.group_id.generated_group}}</p>
+                        {% else %}
+                            <p>{{ session1.subgroup_id.generated_subgroup}}</p>
+                        {% endif %}
+                        <p>{{ session1.subject.subjectName}}-{{ session1.subject.subjectCode}} <span style="color:{{session1.tag.color}};">({{ session1.tag.label}})</span></p>
+                        <p>{{ session1.student_count}} ({{ session1.duration}})</p>
+                    </div>
+                </div> 
+            </div>
+            <div class="right" >
+                <h5 class="card-title">Session 2</h5>
+                <div id="session_2">
+
+                </div>
+            </div>
+            <button class="btn btn-primary bottom col-1" id="save_btn" disabled="true"> Set </button>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript%}
+<script>
+    var subgroups = '{{subgroup_list|safe}}'
+    var groups = '{{group_list}}'
+</script>
+<script>
+$(document).ready(function(){
+
+    $('select').change(function(){
+            if($(this).val() !== 'default'){
+                $('#search_btn').prop('disabled', false);
+                $('#reset_btn').prop('disabled', false);
+            }else{
+                $('#search_btn').prop('disabled', true);
+                $('#reset_btn').prop('disabled', true);
+            }
+    });
+
+    $('input[type="radio"][name="batch"]').click(function(){
+        var value = $('input[name="batch"]:checked').val();
+        var group
+        if(value == 'group'){
+            group = true
+        }else if(value == 'subgroup'){
+            group = false
+        }
+
+        $.ajax({
+            url: '{% url "get_group_data" session1.id  %}',
+            data:{
+                'group': group
+            },
+            dataType: 'json',
+            success: function(data){
+                if(data.groups){
+                    $('#groupId').empty();
+                    $('#groupId').append($("<option></option>")
+                    .attr({
+                        "value": "default",
+                        "selected": "true",
+                        "disabled": "true"
+                    }).text('Select'));
+                    makeDropdownChange(data.groups, data.group_type);
+                }else{
+                    alert('unexpected error')
+                }
+            }
+        });
+    });
+
+    function makeDropdownChange(groups, group_type){
+        if(group_type == 'group'){
+            $.each(groups, function(index, value){
+                $('#groupId').append($("<option></option>").attr("value", value.id).text(value.generated_group));
+            });
+            $('#groupId').selectpicker('refresh');
+
+        }else if(group_type == 'subgroup'){
+            $.each(groups, function(index, value){
+                $('#groupId').append($("<option></option>").attr("value", value.id).text(value.generated_subgroup));
+            });
+            $('#groupId').selectpicker('refresh');
+        }
+    }
+
+    $('#search_btn').click(function(e){
+        e.preventDefault();
+        var batch = $('input[type="radio"][name="batch"]:checked').val()
+        var group = $('#groupId').val()
+        var subject = $('#subjectId').val()
+        var tag = $('#tagId').val()
+        var session1_id = '{{session1.id}}'
+        $.ajax({
+            url:'{% url "search_consecutive_sessions" session1.id %}',
+            data:{
+                'batch': batch,
+                'group': group,
+                'subject': subject,
+                'tag': tag
+            },
+            dataType:'json',
+            success: function(data){
+                if(data.success_stat == 1){
+                    var session2_list = getSession2IdList()
+                    if(session1_id == data.id)
+                        alert('cannot add a consecutive session to itself')
+                    else if(session2_list.includes(data.id))
+                        alert('Session already exists in the list') 
+                    else{
+                        displaySession2(data)
+                        $('#save_btn').prop('disabled', false);
+                    }    
+                }else{
+                    alert(data.error_msg)
+                }
+            }
+        });
+
+    });
+
+    function displaySession2(data){
+        $('#session_2').append(`
+            <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="${data.id}">
+                <div class="p-4 m-2">
+                    <p style="font-weight: 500; ">${ data.group}</p>
+                    <p>${data.subject_name}-${ data.subject_code} <span style="color:${data.tag_color};">(${ data.tag_label})</span></p>
+                    <p>${data.student_count} (${ data.duration})</p>
+                </div>
+            </div> 
+        `);
+    }
+
+    $('#save_btn').click(function(){
+        session1_id = '{{session1.id}}'
+        var session2_id_list = getSession2IdList()
+        console.log('List obtained' + session2_id_list);
+        var id_list_json = JSON.stringify(session2_id_list)
+        console.log('Json string: ' + id_list_json);
+        $.ajax({
+            url: '{% url "add_consecutive_sessions" session1.id %}',
+            type: 'POST',
+            data:{
+                'session2_id_list': id_list_json
+            },
+            dataType:'json',
+            success: function(data){
+                if(data.success_stat == 1)
+                    window.location.href = '{%url "assign_sessions" %}'
+                else
+                    alert(data.error_msg)
+            }
+
+        });
+    });
+
+    function getSession2IdList(){
+        var session2_id_list = []
+        $('#session_2 > div').each((index, val) => session2_id_list.push(parseInt(val.id)))
+        console.log('list: ' + session2_id_list)
+        return session2_id_list
+    }
+
+    $('#reset_btn').click(function(){
+        $("#groupId").val("default");
+        $("#subjectId").val("default");
+        $("#tagId").val("default");
+    });
+    
+
+});
+</script>
+{% endblock javascript %}

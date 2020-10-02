@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block title %}Blocking Sessions{% endblock title %}
+
+{% block stylesheet %}
+<style>
+
+.left{
+    float: left;
+    width: 85%;
+}
+.right{
+    float: left;
+    width: 10%;
+}
+
+#nonblocked{
+    border: 1px solid grey;
+}
+
+.keyblock{
+    height: 40px;
+    width: 40px;
+}
+
+</style>
+{% endblock stylesheet %}
+
+{% block content %}
+<div class="container-fluid main bg-white">
+    <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
+        <h3 style="color: #33344a;" >Block Timeslots </h3>
+    </div>
+    <div class="card shadow p-3 mb-5 bg-white rounded">
+        <div class="card-body">
+            <form id="selectGroupForm">
+                <div class="form-check form-check-inline col-1 mr-2">
+                    <input type="radio" class="form-check-input" name="block_name" id="lecturer" value="L" checked="true"/>
+                    <label class="form-check-label" for="lecturer">Lecturer</label>
+                </div>
+                <div class="form-check form-check-inline col-1 mr-2">
+                    <input type="radio" class="form-check-input" name="block_name" id="group" value="G"/>
+                    <label class="form-check-label" for="group">Group</label>
+                </div>
+                <div class="form-check form-check-inline col-2">
+                    <input type="radio" class="form-check-input" name="block_name" id="subgroup" value="S"/>
+                    <label class="form-check-label" for="subgroup">Subgroup</label>
+                </div>
+                <div class="col-4 form-check form-check-inline changegroup">
+                    <select id="blockId" class="form-control selectpicker" data-live-search="true" name="group">
+                        <option value="default" disabled selected>Select </option>
+                            {% for lecturer in lecturer_list %}
+                            <option value="{{lecturer.id}}">{{ lecturer.employee_id }} - {{ lecturer.name }}</option>
+                            {% endfor %}
+                    </select>
+                </div>
+                <button type="button" onclick="displayFormInfo()" id="set_btn" class="btn btn-primary col-1"  data-toggle="modal" data-target="#block_sessions_modal11" disabled="true">Select Time </button>
+            </form>
+        </div>
+    </div>
+    <div>
+        <div class="m-2 left" id="timetable">
+        
+        </div>
+        <div class="right" >
+            <div class="card bg-white shadow rounded" style="display: none;" id="keytimetable">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Key</h5>
+                    <div>
+                        <div id="nonblocked" class="keyblock"></div> : Available
+                    </div>
+                    <div>
+                        <div  class="keyblock bg-primary"></div> : Unavailable
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Model in bootstrap-->
+<div class="modal" id="block_sessions_modal11" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Block Timeslot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+            <form id="timeslotForm" action="">
+                <div class="modal-body">
+                    <input id="bId" name="bname" type="hidden" />
+                    <input id="bIdId" name="bIdname" type="hidden" />
+                    <div class="row">
+                        {% for days in work_days %}
+                        <div class="col-4" id="col_day">
+                            <p>Day(s)</p>
+                            {% for day in days.get_all_days %}
+                            <div class="form-check">
+                                <input class="form-check-input check_count" type="checkbox" value="{{day}}" id="d-{{day}}">
+                                <label class="form-check-label" for="d-{{day}}">{{day}}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                        <div class="form-group col-4">
+                            <div class="md-form md-outline">
+                                <label for="startTimeId">Start Time: </label>
+                                <input type="time" id="startTimeId" class="form-control" name="startTime" placeholder="Select time" min="{{work_days.0.starttime}}" max="{{work_days.0.endtime}}" step="3600">
+                            </div>
+                        </div>
+                        <div class="form-group col-4">
+                            <div class="md-form md-outline">
+                                <label for="endTimeId">End Time</label>
+                                <input type="time" id="endTimeId" class="form-control" name="endTime" placeholder="Select time" min="{{work_days.0.starttime}}" max="{{work_days.0.endtime}}" step="3600">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" id="save_btn" class="btn btn-primary" disabled="true">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript%}
+<script>
+$(document).ready(function(){
+
+    $('input[type="radio"][name="block_name"]').click(function(){
+        var name = $('input[name="block_name"]:checked').val();
+        $.ajax({
+            url: '{% url "get_group_data_2" %}',
+            data: {
+                group_type: name
+            },
+            dataType: 'json',
+            success: function(data){
+                if(data.groups){
+                    console.log(data.groups)
+                    $('#blockId').empty();
+                    $('#blockId').append($("<option></option>")
+                    .attr({
+                        "value": "default",
+                        "selected": "true",
+                        "disabled": "true"
+                    }).text('Select'));
+                    makeDropdownChange(data.groups, data.group_type);
+                }else{
+                    alert('unexpected error')
+                }
+            }
+        });
+    });
+
+
+    function makeDropdownChange(groups, group_type){
+        if(group_type == 'group'){
+            $.each(groups, function(index, value){
+                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_group));
+            });
+            $('#blockId').selectpicker('refresh');
+
+        }else if(group_type == 'subgroup'){
+            $.each(groups, function(index, value){
+                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.generated_subgroup));
+            });
+            $('#blockId').selectpicker('refresh');
+        }else if(group_type == 'lecturer'){
+            $.each(groups, function(index, value){
+                $('#blockId').append($("<option></option>").attr("value", value.id).text(value.employee_id + ' - ' + value.name));
+            });
+            $('#blockId').selectpicker('refresh');            
+        }
+    }
+
+
+    $('#blockId').change(function(){
+        var block_id = $('#blockId option:selected').val();
+        var block = $('input[type=radio][name=block_name]:checked').val();
+
+        if(block_id){
+            $.ajax({
+                url: '{% url "view_blocked_timeslots" %}',
+                data: {
+                'block_id':block_id,
+                'block':block,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success_stat == 1) { 
+                        $('#set_btn').prop('disabled', false)
+                        appendToTimeTable(data.blocks, data.time_list, data.day_list)
+                        $('#keytimetable').css('display', 'block')
+                    }else{
+                        alert(data.error_msg)
+                    }
+                }
+            });
+        }
+    });
+
+    $(':input').change(function(){
+        if($('input[name="startTime"]').val() && $('input[name="endTime"]').val() && $("input[type=checkbox]:checked").val())
+            $('#save_btn').prop('disabled', false)
+    })
+
+
+    $("#save_btn").click(function() {
+        var blockInput = $('input[name="bname"]').val();
+        var blockIdInput = $('input[name="bIdname"]').val();
+
+        var days = [];
+        $('#col_day > .form-check > input:checked').each(function(index, val){
+            var id = $(this).val()
+            days.push(id)
+            });
+
+        var days_json = JSON.stringify(days)
+
+        var startTimeInput = $('input[name="startTime"]').val();
+        var endTimeInput = $('input[name="endTime"]').val();
+
+        if (startTimeInput && endTimeInput) {
+            $.ajax({
+                url: '{% url "add_blocked_timeslots" %}',
+                type: 'POST',
+                data: {
+                'days_list':days_json,
+                'block':blockInput,
+                'block_id':blockIdInput,
+                'start_time':startTimeInput,
+                'end_time':endTimeInput,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success_stat == 1) { 
+                        var hash = getListOfDays(data.day_list)
+                        addTimeblocks(hash, data.blocks)
+                    }else{
+                        alert(data.error_msg)
+                    }
+                }
+            });
+        } else {
+            alert("All fields must have a valid value.");
+        }
+
+        $('form#timeslotForm').trigger("reset");
+        $('#block_sessions_modal11').modal('hide');
+        return false;
+    });
+
+    function appendToTimeTable(blocks, timelist, daylist){
+        $('#timetable').html(
+            `<table class="table table-bordered">
+                <thead>
+                    <tr class="table-secondary" id="dayView">
+                        <th scope="col">Time</th>
+                    </tr>
+                </thead>
+                <tbody id="slotsView">
+                </tbody>
+            </table>`
+        );
+        var hash = listOfDays(daylist);
+        var addon = getCells(daylist.length)
+        var mintime
+        var maxindex = timelist.length - 1
+        timelist.forEach(function(value, index){
+            if(index == 0)
+                mintime = value
+            $('tbody').append(`<tr id="${value}"><th scope="row">${value}</th>${addon}<tr>`)
+        })
+
+        addTimeblocks(hash, blocks);
+       // $('#startTimeId').attr({'min': mintime, 'max': timelist[maxindex]});
+       // $('#endTimeId').attr({'min': mintime, 'max': timelist[maxindex]});
+        
+    }
+
+    function listOfDays(daylist){
+        var hash = {}
+        for (i=0; i < daylist.length; i++){
+            $('#dayView').append(
+                `<th id="${daylist[i]}" scope="col">${daylist[i]}</th>`
+            )
+            hash[i+1] = daylist[i]
+        }
+        return hash
+    }
+
+    function getListOfDays(daylist){
+        var hash = {}
+        for (i=0; i < daylist.length; i++){
+            hash[i+1] = daylist[i]
+        }  
+        return hash 
+    }
+
+    function getCells(count){
+        var cells = ''
+        for(var i = 1 ; i <= count ; i++){
+            cells += `<td class="${i}"></td>`
+        }
+        return cells
+    }
+
+    function addTimeblocks(hash, blocks){
+        for (block of blocks){
+            var day = block.day
+            var starttime = block.start_time
+            var endtime = block.end_time
+            var mykey = Object.keys(hash).find(key => hash[key] === day)
+            var time = starttime.split(':')
+            var timeid = time[0] + '\\:' + time[1]
+            $('#'+ timeid + ' > .' + mykey).addClass('bg-primary')
+        }
+    }
+
+    $('input[type="time"][name="startTime"]').change(function(){
+        var minimum = $('input[type="time"][name="startTime"]').val()
+        $('input[type="time"][name="endTime"]').prop('min', minimum)
+    })
+    
+});
+
+function displayFormInfo(){
+    var block = $('input[type="radio"][name="block_name"]:checked').val();
+    var block_id  = $('#blockId').val();
+    $('#bId').val(block);
+    $('#bIdId').val(block_id);
+    var slot = '{{work_days.0.slot}}'
+    var step = 3600
+
+    if(slot == '30 min slots'){
+        step = 1800
+    }
+    console.log('mins: ' + step + ' ' + slot)
+    $('input[type="time"]').prop('step', step)
+}
+</script>
+{% endblock javascript %}
+
