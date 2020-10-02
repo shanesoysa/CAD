@@ -15,10 +15,21 @@ Including another URLconf
 """
 from os import name
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 from timetable import views
 
+
 urlpatterns = [
+    
+     
+    
+    
+    path('workingdays/',views.Workingdays.as_view(),name='Workingdays'),
+    path('adddays/',views.Adddays.as_view(),name='workingdays_create'),
+    path('updatedays/',views.Updatedays.as_view(),name='workingdays_update'),
+    path('deletedays/',views.Deletedays.as_view(),name='workingdays_delete'),
+    path('timetables/', views.timetables,name='timetable')
+
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
     path('lecturer/',  views.Lecturer.as_view(), name='lecturer'),
@@ -187,3 +198,4 @@ urlpatterns = [
     # ranul
     #################################################################################
 ]
+

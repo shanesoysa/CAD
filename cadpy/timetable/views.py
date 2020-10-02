@@ -10,6 +10,7 @@ from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup
 from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
+from .models import WorkingDays 
 from .models import Subjects as Subjects1
 from .models import Session, ParallelSession, Timeslots
 
@@ -122,6 +123,115 @@ class DeleteLecturer(View):
 
         print("lecturer delete failed")
         pass
+        
+
+
+def side(request):
+    return render(request,'side.html')
+
+
+
+class Workingdays(ListView):
+    model = WorkingDays
+    template_name = 'addDays.html'
+    context_object_name = 'days'
+    print(model)
+
+
+
+class Adddays(View):
+    def get(self, request):
+        
+        try:
+            ndays = request.GET.get('numdays', None)
+            workingdays = request.GET.get('workingdays', None)
+            stime = request.GET.get('stime', None)
+            etime = request.GET.get('etime', None)
+            slots = request.GET.get('slots', None)
+
+          #  x = workingdays.split(',')
+           # print(x)
+
+          #  for y in x:
+                 #print(y)
+                 #print("successfull")
+            obj = WorkingDays.objects.create(
+                     nubdays=ndays,
+                     days=workingdays,
+                     starttime=stime,
+                     endtime=etime,
+                     slot=slots,
+                     )
+
+            day = {'id':obj.id,'nubdays':obj.nubdays,'days':obj.days,'starttime':obj.starttime,'endtime':obj.endtime,'slot':obj.slot}
+            data = {
+                     'day': day
+                      }
+                 #print("successfull")
+                 #print(data)
+            return JsonResponse(data)
+            
+        except:
+            
+            print("fail adding data")
+            pass 
+
+
+
+            
+        
+
+class Updatedays(View):
+    def get(self, request):
+        
+        try:
+            id1=request.GET.get('id',None)
+            ndays = request.GET.get('numdays', None)
+            workingdays = request.GET.get('workingdays', None)
+            stime = request.GET.get('stime', None)
+            etime = request.GET.get('etime', None)
+            slots = request.GET.get('slots', None)
+           
+            
+            obj = WorkingDays.objects.get(id=id1)
+            obj.nubdays=ndays
+            obj.days=workingdays
+            obj.starttime=stime
+            obj.endtime=etime
+            obj.slot=slots
+            obj.save()
+               
+            
+            
+
+            day = {'id':obj.id,'nubdays':obj.nubdays,'days':obj.days,'starttime':obj.starttime,'endtime':obj.endtime,'slot':obj.slot}
+
+            data = {
+                'day': day
+            }
+            return JsonResponse(data)
+
+        except:
+        
+            print("days update failed")
+            pass
+
+def home(request):
+    return render(request, 'home.html')
+
+
+class Deletedays(View):
+    def  get(self, request):
+        id1 = request.GET.get('id', None)
+        WorkingDays.objects.get(id=id1).delete()
+        data = {
+            'deleted': True
+        }
+        return JsonResponse(data)
+
+
+def timetables(request):
+    return render(request, 'timetables.html')
 
 
 class Subjects(ListView):

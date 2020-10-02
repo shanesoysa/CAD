@@ -28,6 +28,12 @@ class Subjects(models.Model):
     noEveHours = models.IntegerField(blank=True, null=True)
     objects = models.Manager()
 
+class WorkingDays(models.Model):
+        nubdays = models.IntegerField(blank=True, null=True)
+        days= models.CharField( max_length = 255,null = True,blank = True )
+        starttime=models.CharField(max_length = 255,null = True,blank = True)
+        endtime=models.CharField(max_length = 255,null = True,blank = True)
+        slot= models.CharField( max_length = 255,null = True,blank = True )
 
 class Tags(models.Model):
     label = models.CharField(max_length=25, unique=True)

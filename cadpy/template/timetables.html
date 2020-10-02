@@ -1,0 +1,67 @@
+{% extends 'base.html' %} {% block title %}Blocking Sessions{% endblock title %}
+{% block stylesheet %}{% endblock stylesheet %} {% block content %}
+<div class="container-fluid main bg-white">
+  <div class="bg-light" style="padding: 10px 0px; font-weight: 900">
+    <h3 style="color: #33344a">select timetable</h3>
+  </div>
+  <div class="card shadow p-3 mb-5 bg-white rounded">
+    <div class="card-body">
+      <form id="selectGroupForm">
+        <div class="form-check form-check-inline col-1 mr-2">
+          <input
+            type="radio"
+            class="form-check-input"
+            name="block_name"
+            id="lecturer"
+            value="L"
+            checked="true"
+          />
+          <label class="form-check-label" for="lecturer">Lecturer</label>
+        </div>
+        <div class="form-check form-check-inline col-1 mr-2">
+          <input
+            type="radio"
+            class="form-check-input"
+            name="block_name"
+            id="group"
+            value="G"
+          />
+          <label class="form-check-label" for="group"> Room</label>
+        </div>
+        <div class="form-check form-check-inline col-2">
+          <input
+            type="radio"
+            class="form-check-input"
+            name="block_name"
+            id="room"
+            value="R"
+          />
+          <label class="form-check-label" for="subgroup">Group</label>
+        </div>
+        <div class="col-4 form-check form-check-inline changegroup">
+          <select
+            id="blockId"
+            class="form-control selectpicker"
+            data-live-search="true"
+            name="group"
+          >
+            <option value="default" disabled selected>Select</option>
+            {% for lecturer in lecturer_list %}
+            <option value="{{lecturer.id}}">
+              {{ lecturer.employee_id }} - {{ lecturer.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <button
+          onclick="displayFormInfo()"
+          id="set_btn"
+          class="btn btn-primary col-1"
+        >
+          view timetable
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{%endblock%}
