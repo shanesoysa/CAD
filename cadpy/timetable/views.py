@@ -14,6 +14,8 @@ from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 import json
+from datetime import datetime, timedelta
+from datetime import time
 # Create your views here.
 def index(request):
     return render(request, 'home.html')
@@ -962,11 +964,27 @@ def view_blocked_timeslots(request):
             subgroup_objs = GroupBlockedTimeslots.objects.exclude(subgroup=None).filter(subgroup=obj)
             for g in subgroup_objs:
                 subgroup_info = {'id': g.subgroup.id, 'name': g.subgroup.generated_subgroup, 'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
-                return_list.append(subgroup_info)            
+                return_list.append(subgroup_info)  
 
+        timeobj = MockWorkingDays.objects.get()
+        start_time = datetime.strptime(timeobj.starttime, '%H:%M')              
+        end_time = datetime.strptime(timeobj.endtime, '%H:%M')
+        day_list = timeobj.get_all_days()
+        time_arr = []
+
+        if(timeobj.slot == '30 min slots'):
+            time_arr = get_time_range(start_time, end_time, 30)
+        else:
+            time_arr = get_time_range(start_time, end_time, 60)
+        print(return_list)
+        print(time_arr)
+        print(list(day_list))
+        print(day_list)
         data = {
             'success_stat': 1,
-            'blocks': return_list
+            'blocks': return_list,
+            'time_list': time_arr,
+            'day_list': day_list
         }
         return JsonResponse(data)
     except Exception as e:
@@ -976,6 +994,20 @@ def view_blocked_timeslots(request):
         }
         print(e)
         return JsonResponse(data)
+
+
+def get_time_range(start_time, end_time, time_interval):
+    time_arr = []
+    current_time = start_time
+    while (current_time < end_time):
+        stime = current_time.strftime('%H:%M')
+        time_arr.append(stime)
+        current_time += timedelta(minutes=time_interval)
+
+    time_arr.append(end_time.strftime('%H:%M'))
+    return time_arr
+
+
 
 
 

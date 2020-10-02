@@ -32,9 +32,12 @@
                             {% endfor %}
                     </select>
                 </div>
-                <button type="button" onclick="displayFormInfo()" id="set_btn" class="btn btn-primary col-1"  data-toggle="modal" data-target="#block_sessions_modal11">Select Time </button>
+                <button type="button" onclick="displayFormInfo()" id="set_btn" class="btn btn-primary col-1"  data-toggle="modal" data-target="#block_sessions_modal11" disabled="true">Select Time </button>
             </form>
         </div>
+    </div>
+    <div class="m-2" id="timetable">
+        
     </div>
 </div>
 <!--Model in bootstrap-->
@@ -79,7 +82,7 @@
             </form>
         </div>
         <div class="modal-footer">
-            <button type="submit" id="save_btn" class="btn btn-primary">Save changes</button>
+            <button type="submit" id="save_btn" class="btn btn-primary" disabled="true">Save changes</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
     </div>
@@ -141,8 +144,6 @@ $(document).ready(function(){
     $('#blockId').change(function(){
         var block_id = $('#blockId option:selected').val();
         var block = $('input[type=radio][name=block_name]:checked').val();
-        console.log('block_id ' + block_id)
-        console.log('block ' + block)
 
         if(block_id){
             $.ajax({
@@ -154,8 +155,9 @@ $(document).ready(function(){
                 dataType: 'json',
                 success: function (data) {
                     if (data.success_stat == 1) { 
-                        alert('Function Call is success')
+                        $('#set_btn').prop('disabled', false)
                         console.log(data.blocks)
+                        appendToTimeTable(data.blocks, data.time_list, data.day_list)
                     }else{
                         alert(data.error_msg)
                     }
@@ -164,7 +166,10 @@ $(document).ready(function(){
         }
     });
 
-
+    $(':input').change(function(){
+        if($('input[name="startTime"]').val() && $('input[name="endTime"]').val() && $("input[type=checkbox]:checked").val())
+            $('#save_btn').prop('disabled', false)
+    })
 
 
     $("#save_btn").click(function() {
@@ -202,7 +207,7 @@ $(document).ready(function(){
                 dataType: 'json',
                 success: function (data) {
                     if (data.success_stat == 1) { 
-                        alert('Method call was a success')
+                        appendToTimeTable(data.blocks, data.time_list, data.day_list)
                     }else{
                         alert(data.error_msg)
                     }
@@ -216,13 +221,67 @@ $(document).ready(function(){
         $('#block_sessions_modal11').modal('hide');
         return false;
     });
+
+    function appendToTimeTable(blocks, timelist, daylist){
+        $('#timetable').html(
+            `<table class="table table-bordered">
+                <thead>
+                    <tr class="table-secondary" id="dayView">
+                        <th scope="col">Time</th>
+                    </tr>
+                </thead>
+                <tbody id="slotsView">
+                </tbody>
+            </table>`
+        );
+        var hash = {}
+        for (i=0; i < daylist.length; i++){
+            $('#dayView').append(
+                `<th id="${daylist[i]}" scope="col">${daylist[i]}</th>`
+            )
+            hash[i+1] = daylist[i]
+        }
+        var addon = getCells(daylist.length)
+        var mintime
+        var maxindex = timelist.length - 1
+        timelist.forEach(function(value, index){
+            if(index == 0)
+                mintime = value
+            $('tbody').append(`<tr id="${value}"><th scope="row">${value}</th>${addon}<tr>`)
+        })
+
+        for (block of blocks){
+            var day = block.day
+            var starttime = block.start_time
+            console.log(starttime)
+            var endtime = block.end_time
+            console.log(endtime)
+            var mykey = Object.keys(hash).find(key => hash[key] === day)
+            var time = starttime.split(':')
+            var timeid = time[0] + '\\:' + time[1]
+            $('#'+ timeid + ' > .' + mykey).addClass('bg-primary')
+        }
+
+       // $('#startTimeId').attr({'min': mintime, 'max': timelist[maxindex]});
+       // $('#endTimeId').attr({'min': mintime, 'max': timelist[maxindex]});
+        
+    }
+
+    function getCells(count){
+        var cells = ''
+        for(var i = 1 ; i <= count ; i++){
+            cells += `<td class="${i}"></td>`
+        }
+        return cells
+    }
+
+    
+    
 });
 
 function displayFormInfo(){
     var block = $('input[type="radio"][name="block_name"]:checked').val();
     var block_id  = $('#blockId').val();
-    console.log('block: ' + block)
-    console.log('block_id: ' + block_id)
     $('#bId').val(block);
     $('#bIdId').val(block_id);
 
