@@ -20,36 +20,64 @@ from timetable import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+
+    path('validations/', views.Validations, name='validations'),
+
     path('lecturer/',  views.Lecturer.as_view(), name='lecturer'),
     path('lecturer/addlec/',  views.AddLecturer.as_view(), name='lecturer_create'),
-    path('lecturer/updatelec/',  views.UpdateLecturer.as_view(), name='lecturer_update'),
-    path('lecturer/deletelec/', views.DeleteLecturer.as_view(), name='lecturer_delete'),
+    path('lecturer/updatelec/',  views.UpdateLecturer.as_view(),
+         name='lecturer_update'),
+    path('lecturer/deletelec/', views.DeleteLecturer.as_view(),
+         name='lecturer_delete'),
 
-    
+
     path('subjects/',  views.Subjects.as_view(), name='subject'),
     path('subjects/addsubject/',  views.AddSubjects.as_view(), name='subject_create'),
-    path('subjects/updatesubject/',  views.UpdateSubject.as_view(), name='subject_update'),
-    path('subjects/deletesubject/', views.DeleteSubject.as_view(), name='subject_delete'),
+    path('subjects/updatesubject/',
+         views.UpdateSubject.as_view(), name='subject_update'),
+    path('subjects/deletesubject/',
+         views.DeleteSubject.as_view(), name='subject_delete'),
+
+    path('sessions/', views.Session.as_view(), name='sessions'),
+    path('sessions/add', views.AddSession.as_view(), name='session_create'),
+    #     path('sessions/delete', views.DeleteSession.as_view(), name='session_delete'),
+
+
+
 
     path('programmes/', views.ProgrammesView.as_view(), name='programmes'),
     path('programmes/add', views.AddProgramme.as_view(), name='add_programmes'),
-    path('programmes/delete', views.DeleteProgramme.as_view(), name='remove_programmes'),
-    path('programmes/update', views.UpdateProgramme.as_view(), name='update_programmes'),
-    
+    path('programmes/delete', views.DeleteProgramme.as_view(),
+         name='remove_programmes'),
+    path('programmes/update', views.UpdateProgramme.as_view(),
+         name='update_programmes'),
+
     path('academics/', views.AcademicYearSemesterView.as_view(), name='academics'),
-    path('academics/add', views.AddAcademicYearSemesterView.as_view(), name='add_academics'),
-    path('academics/delete', views.DeleteAcademicYearSemesterView.as_view(), name='remove_academics'),
-    path('academics/update', views.UpdateAcademicYearSemesterView.as_view(), name='update_academics'),
-   
-   
+    path('academics/add', views.AddAcademicYearSemesterView.as_view(),
+         name='add_academics'),
+    path('academics/delete', views.DeleteAcademicYearSemesterView.as_view(),
+         name='remove_academics'),
+    path('academics/update', views.UpdateAcademicYearSemesterView.as_view(),
+         name='update_academics'),
+
+
     path('<int:pk>/subgroups', views.SubGroupsView.as_view(), name='subgroups'),
-    path('<int:pk>/subgroups/add', views.AddSubGroups.as_view(), name='add_subgroups'),
-    path('<int:pk>/subgroups/delete', views.DeleteSubGroups.as_view(), name='remove_subgroups'),
-    path('<int:pk>/subgroups/update', views.UpdateSubGroupsView.as_view(), name='update_subgroups'),
-    path('<int:pk>/subgroups/generate', views.StudentsSubGroupGenerationView.as_view(), name='generate_subgroups'),
+    path('<int:pk>/subgroups/add',
+         views.AddSubGroups.as_view(), name='add_subgroups'),
+    path('<int:pk>/subgroups/delete',
+         views.DeleteSubGroups.as_view(), name='remove_subgroups'),
+    path('<int:pk>/subgroups/update',
+         views.UpdateSubGroupsView.as_view(), name='update_subgroups'),
+    path('<int:pk>/subgroups/generate',
+         views.StudentsSubGroupGenerationView.as_view(), name='generate_subgroups'),
+
+
+    path('dd/', views.DDView.as_view(), name='dd'),
+
 
     path('students/', views.StudentsView.as_view(), name='students'),
-    path('students/generate', views.StudentsGenerationView.as_view(), name='generate_students'),
+    path('students/generate', views.StudentsGenerationView.as_view(),
+         name='generate_students'),
 
 
     path('tags/', views.TagsView.as_view(), name='tags'),
@@ -62,21 +90,34 @@ urlpatterns = [
     path('groups/delete', views.DeleteStudentsView.as_view(), name='remove_groups'),
     path('groups/update', views.UpdateGroupsView.as_view(), name='update_groups'),
 
-    path('sessions/assign', views.AssignSessionsView.as_view(), name="assign_sessions"),
-    path('timeslots/blocked', views.BlockTimeSlotsView.as_view(), name="blocked_timeslots"),
-    path('timeslots/blocked/view', views.view_blocked_timeslots, name="view_blocked_timeslots"),
-    path('timeslots/blocked/add', views.create_blocked_session, name="add_blocked_timeslots"),
-    path('timeslots/blocked/group-details', views.get_group_data_2, name="get_group_data_2"),
+    path('sessions/assign', views.AssignSessionsView.as_view(),
+         name="assign_sessions"),
+    path('timeslots/blocked', views.BlockTimeSlotsView.as_view(),
+         name="blocked_timeslots"),
+    path('timeslots/blocked/view', views.view_blocked_timeslots,
+         name="view_blocked_timeslots"),
+    path('timeslots/blocked/add', views.create_blocked_session,
+         name="add_blocked_timeslots"),
+    path('timeslots/blocked/group-details',
+         views.get_group_data_2, name="get_group_data_2"),
 
-    path('sessions/<int:pk>/consecutive', views.ConsecutiveSessionsView.as_view(), name="consecutive_sessions"),
-    path('sessions/<int:pk>/consecutive/group-details', views.get_group_data, name="get_group_data"),
-    path('sessions/<int:pk>/consecutive/add', views.create_consecutive_session, name="add_consecutive_sessions"),
-    path('sessions/<int:pk>/consecutive/search', views.get_consecutive_session, name="search_consecutive_sessions"),
+    path('sessions/<int:pk>/consecutive',
+         views.ConsecutiveSessionsView.as_view(), name="consecutive_sessions"),
+    path('sessions/<int:pk>/consecutive/group-details',
+         views.get_group_data, name="get_group_data"),
+    path('sessions/<int:pk>/consecutive/add',
+         views.create_consecutive_session, name="add_consecutive_sessions"),
+    path('sessions/<int:pk>/consecutive/search',
+         views.get_consecutive_session, name="search_consecutive_sessions"),
 
-    path('sessions/assign/search', views.get_searched_session, name="search_sessions"),
-    path('sessions/assign/parallel', views.createParallelSession, name="add_parallel_sessions"),
-    
-    path('sessions/parallel', views.ParallelSessionsView.as_view(), name="parallel_sessions"),
-    path('sessions/non-parallel', views.NonParallelSessionsView.as_view(), name="non_parallel_sessions"),
+    path('sessions/assign/search',
+         views.get_searched_session, name="search_sessions"),
+    path('sessions/assign/parallel', views.createParallelSession,
+         name="add_parallel_sessions"),
+
+    path('sessions/parallel', views.ParallelSessionsView.as_view(),
+         name="parallel_sessions"),
+    path('sessions/non-parallel', views.NonParallelSessionsView.as_view(),
+         name="non_parallel_sessions"),
 
 ]
