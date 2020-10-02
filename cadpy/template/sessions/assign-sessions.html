@@ -94,8 +94,8 @@
                     </div>
                 </div>
                 <div class="row justify-content-md-center">
-                    <button onclick="reset()" class="btn btn-secondary col-2">Reset</button> &nbsp;
-                    <button id="search_btn" class="btn btn-primary col-2">Search</button>
+                    <button onclick="reset()" id="reset_btn" class="btn btn-secondary col-2" disabled="true">Reset</button> &nbsp;
+                    <button id="search_btn" class="btn btn-primary col-2" disabled="true">Search</button>
                 </div>
             </form>
         </div>
@@ -142,6 +142,10 @@
             </form>
             <div class="boxed m-1 p-3">
                 <button class="btn btn-primary" style="float: right;"> Save </button>
+                <br>
+                <div id="boxes">
+
+                </div>
             </div>
         </div>
     </div>
@@ -177,17 +181,13 @@
         $('.add_icon').click(function(){
             var id = $(this).parent().parent().attr('id')
             console.log('id' + id)
-            $('.boxed').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'))
+            $('.boxed #boxes').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'))
         });
 
         $('.boxed > button').click(function(){
-            alert('function call')
             var id_list = getSession2IdList();
             var parallel = $('input[type=radio][name=parallel]:checked').val();
             var id_list_json =  JSON.stringify(id_list)
-            console.log('parallel' + parallel)
-            console.log(id_list)
-            console.log(id_list_json)
             $.ajax({
                 url: '{% url "add_parallel_sessions"  %}',
                 type: 'POST',
@@ -197,10 +197,16 @@
                 },
                 dataType:'json',
                 success: function(data){
-                    if(data.success_stat == 1)
-                        window.location.href = '{%url "assign_sessions" %}'
-                    else
+                    if(data.success_stat == 1){
+                        var parallel = (data.parallel == 'true')
+                        if(parallel)
+                            window.location.href = '{%url "parallel_sessions" %}'
+                        else
+                            window.location.href = '{%url "non_parallel_sessions" %}'
+                    }       
+                    else{
                         alert(data.error_msg)
+                    }
                 }
             });
         });
@@ -208,7 +214,7 @@
 
         function getSession2IdList(){
             var session_id_list = []
-            $('.boxed > div').each((index, val) => session_id_list.push(parseInt(val.id)))
+            $('.boxed #boxes > div').each((index, val) => session_id_list.push(parseInt(val.id)))
             return session_id_list
         }
 
@@ -218,6 +224,16 @@
             $("#subjectId").val("default");
             $("#tagId").val("default");
         }
+
+        $('select').change(function(){
+            if($(this).val() !== 'default'){
+                $('#search_btn').prop('disabled', false);
+                $('#reset_btn').prop('disabled', false);
+            }else{
+                $('#search_btn').prop('disabled', true);
+                $('#reset_btn').prop('disabled', true);
+            }
+        });
 
         $('#search_btn').click(function(e){
 

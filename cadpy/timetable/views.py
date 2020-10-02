@@ -8,14 +8,13 @@ from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
-from .models import Session, ParallelSession, Timeslots, NonParallelSession
+from .models import Session, ParallelSession, NonParallelSession
 from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
 from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime, timedelta
-from datetime import time
 # Create your views here.
 def index(request):
     return render(request, 'home.html')
@@ -224,11 +223,6 @@ class DeleteSubject(View):
 class TagsView(generic.ListView):
     model = Tags
     template_name = 'tags/tags.html'
-
-class DDView(generic.ListView):
-    model = Tags
-    template_name = 'students/st.html'
-
 
 class DeleteTags(View):
     try:
@@ -867,7 +861,8 @@ def createParallelSession(request):
             sobj.sessions.add(psession)   
 
         data = {
-            'success_stat': 1
+            'success_stat': 1,
+            'parallel': parallel,
         }
         return JsonResponse(data)
     except Exception as e:  

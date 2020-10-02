@@ -93,10 +93,15 @@ class Session(models.Model):
     subgroup_id = models.ForeignKey(Subgroup, on_delete=models.CASCADE, null=True, blank=True)
     student_count = models.IntegerField(default=1)
     duration = models.IntegerField(default=1)
-    consecutive_session = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)#consider session 1 for this feild
+    consecutive_session = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)#remove this feild
 
-class Timeslots(models.Model):
-    day = models.DateField()
+class ConsecutiveSession(models.Model):
+    session1 = models.ForeignKey(Session, related_name='consecutivesession_session1', on_delete=models.CASCADE,)
+    session2 = models.ForeignKey(Session, related_name='consecutivesession_session2', on_delete=models.CASCADE)
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['session1', 'session2'], name='consecutive_details') 
+        ]
 
 class GroupBlockedTimeslots(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)

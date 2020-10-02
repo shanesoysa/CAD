@@ -48,10 +48,6 @@ urlpatterns = [
     path('<int:pk>/subgroups/update', views.UpdateSubGroupsView.as_view(), name='update_subgroups'),
     path('<int:pk>/subgroups/generate', views.StudentsSubGroupGenerationView.as_view(), name='generate_subgroups'),
 
-
-    path('dd/', views.DDView.as_view(), name='dd'),
-
-
     path('students/', views.StudentsView.as_view(), name='students'),
     path('students/generate', views.StudentsGenerationView.as_view(), name='generate_students'),
 
