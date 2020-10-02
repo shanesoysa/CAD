@@ -19,6 +19,11 @@
       crossorigin="anonymous"
     />
 
+    <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+
     {% block stylesheet %}{% endblock stylesheet %}
     <style>
       html,
@@ -182,6 +187,52 @@
         border-color: transparent !important;
         color: orange;
       }
+
+      /*----------------------------scroll bar styling-----------------------------*/
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background-color: #ebebeb;
+        -webkit-border-radius: 10px;
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        -webkit-border-radius: 10px;
+        border-radius: 10px;
+        background: #c6c6d1;
+      }
+      /* select2 styling */
+      .select2-container--default
+        .select2-selection--multiple
+        .select2-selection__choice {
+        color: #495057;
+      }
+      .select2-container--default
+        .select2-results__option--highlighted.select2-results__option--selectable {
+        color: #495057;
+      }
+      .select2-results__option--selectable {
+        color: #495057;
+      }
+      .select2-container--default
+        .select2-selection--single
+        .select2-selection__arrow {
+        height: 33px;
+      }
+      .select2-container--default
+        .select2-selection--single
+        .select2-selection__rendered {
+        line-height: 34px;
+      }
+      .select2-container .select2-selection--single {
+        height: 36px;
+      }
+      .select2-container--default .select2-selection--single {
+        outline: none;
+      }
     </style>
   </head>
   <body>
@@ -265,7 +316,7 @@
       integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
       crossorigin="anonymous"
     ></script>
-    
+
     <!--For bootstrap select plugin-->
     <!-- Latest compiled and minified CSS -->
     <link
@@ -278,6 +329,9 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
 
     <script>
       if (window.module) module = window.module;

@@ -32,6 +32,9 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+
+    path('validations/', views.Validations, name='validations'),
+
     path('lecturer/',  views.Lecturer.as_view(), name='lecturer'),
     path('lecturer/addlec/',  views.AddLecturer.as_view(), name='lecturer_create'),
     path('lecturer/updatelec/',  views.UpdateLecturer.as_view(),
@@ -46,6 +49,13 @@ urlpatterns = [
          views.UpdateSubject.as_view(), name='subject_update'),
     path('subjects/deletesubject/',
          views.DeleteSubject.as_view(), name='subject_delete'),
+
+    path('sessions/', views.Session.as_view(), name='sessions'),
+    path('sessions/add', views.AddSession.as_view(), name='session_create'),
+    #     path('sessions/delete', views.DeleteSession.as_view(), name='session_delete'),
+
+
+
 
     path('programmes/', views.ProgrammesView.as_view(), name='programmes'),
     path('programmes/add', views.AddProgramme.as_view(), name='add_programmes'),

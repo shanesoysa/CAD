@@ -2,6 +2,8 @@ from django.db.models import fields
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.context_processors import request
+from django.shortcuts import render
+from django.template import RequestContext
 from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
@@ -9,10 +11,11 @@ from django.http import JsonResponse
 from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
 from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
 from django.db.utils import IntegrityError
-#import sys
+# import sys
 from .models import Lecturer as Lecturer1
 from .models import WorkingDays
 from .models import Subjects as Subjects1
+from .models import Session as Session1
 from .models import Session, ParallelSession
 
 from django.views.generic import DetailView
@@ -31,6 +34,15 @@ import datetime
 
 def index(request):
     return render(request, 'home.html')
+
+
+def Validations(request):
+    employee_id1 = request.GET.get('employee_id1', None)
+    data = {
+        'is_taken': Lecturer1.objects.filter(employee_id__iexact=employee_id1).exists()
+    }
+
+    return JsonResponse(data)
 
 
 class Lecturer(ListView):
@@ -333,10 +345,102 @@ class DeleteSubject(View):
         pass
 
 
+class Session(generic.ListView):
+    model = Session1
+    template_name = 'session_allocate.html'
+    context_object_name = 'sessions'
+    queryset = Session1.objects.prefetch_related('lecturers')
+
+    def get_context_data(self, **kwargs):
+        context = super(Session, self).get_context_data(**kwargs)
+        context.update({
+            'lecturers': Lecturer1.objects.all(),
+            'tags': Tags.objects.all(),
+            'subjects': Subjects1.objects.all(),
+            'groups': Group.objects.all(),
+            'subgroups': Subgroup.objects.select_related('group'),
+            'sessions': Session1.objects.prefetch_related('group_id', 'subject', 'tag', 'subgroup_id').all(),
+            # 'more_context': Model.objects.all(),
+        })
+        return context
+
+    # def get_queryset(self):
+    #     return Session1.objects.order_by('id')
+
+
+# class DeleteSession(View):
+#     try:
+#         def get(self, request):
+#             id1 = request.GET.get('id', None)
+#             obj = Session1.objects.get(id=id1).delete()
+
+#             # obj.lecturers.remove(id=id1)
+
+#             data = {
+#                 'deleted': True
+#             }
+#             return JsonResponse(data)
+#     except:
+#         print("session delete failed")
+#         pass
+
+
+class AddSession(View):
+    def get(self, request):
+
+        try:
+            lecturers = request.GET.getlist('lecturers[]')
+            subjects = request.GET.get('subjects', None)
+            tags = request.GET.get('tags', None)
+            students = request.GET.get('students', None)
+            groups = request.GET.get('groups', None)
+            duration = request.GET.get('duration', None)
+
+            obj = Session1.objects.create(
+                subject_id=subjects,
+                tag_id=tags,
+                student_count=students,
+                group_id_id=groups,
+                duration=duration
+            )
+
+            latestid = Session1.objects.latest('id')
+            # for lec in lecturers:
+            #     print(lec)
+            #     obj.lecturers.add(lec)
+
+            for i in range(len(lecturers)):
+                objlec = Lecturer1.objects.get(pk=lecturers[i])
+
+                obj.lecturers.add(objlec)
+                print(lecturers[i])
+                # obj.lecturers.create(session_id=latestid,
+                #                      lecturer_id=lecturers[i])
+
+            result = {
+                'success': lecturers
+            }
+            # print('lectureeeeeeeeeeeees:'+lecturers)
+            return JsonResponse(result)
+
+        except:
+            print("fail adding data")
+            pass
+            # result = {
+            #     'success': 'false'
+            # }
+            # return JsonResponse(result)
+
+
 # Rehani's
 class TagsView(generic.ListView):
     model = Tags
     template_name = 'tags/tags.html'
+
+
+class DDView(generic.ListView):
+    model = Tags
+    template_name = 'students/st.html'
 
 
 class DeleteTags(View):
@@ -428,7 +532,7 @@ class StudentsGenerationView(generic.ListView):
         listOfGroups = Group.objects.filter(generated_group=None)
         for group in listOfGroups:
             print(group.pk)
-            #group_obj = Group.objects.get(pk=group.pk)
+            # group_obj = Group.objects.get(pk=group.pk)
             group_id = group.generate_group_id()
             group.generated_group = group_id
             group.save()
@@ -444,7 +548,7 @@ class StudentsSubGroupGenerationView(generic.ListView):
         """Return the last five published questions."""
         groupy = Group.objects.get(id=self.kwargs['pk'])
         for subgroup in groupy.subgroup_set.all():
-            #group_obj = Group.objects.get(pk=group.pk)
+            # group_obj = Group.objects.get(pk=group.pk)
             subgroup_id = subgroup.generate_subgroup_id()
             subgroup.generated_subgroup = subgroup_id
             subgroup.save()
@@ -725,7 +829,7 @@ class AddSubGroups(View):
             print("successfull")
             return JsonResponse(data)
         except IntegrityError as e:
-            #print("Oops!", sys.exc_info()[0], "occurred.")
+            # print("Oops!", sys.exc_info()[0], "occurred.")
             data = {
                 'success_stat': 0,
                 'error_msg': 'Cannot save duplicate subgroup'
@@ -811,6 +915,7 @@ class ConsecutiveSessionsView(generic.ListView):
 
 
 class BlockTimeSlotsView(generic.ListView):
+    model = Session
 
     context_object_name = 'lecturer_list'
     template_name = 'sessions/blocked-timeslots.html'

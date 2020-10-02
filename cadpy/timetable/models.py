@@ -112,16 +112,16 @@ class Subgroup(models.Model):
     # str not defined
 
 
-# class Subjects(models.Model):
-#     offeredYear = models.CharField(max_length=4, blank=True)
-#     offeredSemester = models.CharField(max_length=100, blank=True)
-#     subjectName = models.CharField(max_length=100, blank=True)
-#     subjectCode = models.CharField(max_length=10, blank=True)
-#     noLecHours = models.IntegerField(blank=True, null=True)
-#     noTutHours = models.IntegerField(blank=True, null=True)
-#     noLabHours = models.IntegerField(blank=True, null=True)
-#     noEveHours = models.IntegerField(blank=True, null=True)
-#     objects = models.Manager()
+class Subjects(models.Model):
+    offeredYear = models.CharField(max_length=4, blank=True)
+    offeredSemester = models.CharField(max_length=100, blank=True)
+    subjectName = models.CharField(max_length=100, blank=True)
+    subjectCode = models.CharField(max_length=10, blank=True)
+    noLecHours = models.IntegerField(blank=True, null=True)
+    noTutHours = models.IntegerField(blank=True, null=True)
+    noLabHours = models.IntegerField(blank=True, null=True)
+    noEveHours = models.IntegerField(blank=True, null=True)
+    objects = models.Manager()
 
 
 class Session(models.Model):
@@ -134,7 +134,11 @@ class Session(models.Model):
     student_count = models.IntegerField(default=1)
     duration = models.IntegerField(default=1)
     consecutive_session = models.ForeignKey(
-        'self', on_delete=models.CASCADE, null=True, blank=True)  # remove this feild
+        'self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def get_lecturers(self):
+        if self.lecturers:
+            return '%s' % " , ".join([lecturer.name for lecturer in self.lecturers.all()])
 
 
 class ConsecutiveSession(models.Model):
