@@ -73,10 +73,6 @@ urlpatterns = [
     path('<int:pk>/subgroups/generate',
          views.StudentsSubGroupGenerationView.as_view(), name='generate_subgroups'),
 
-
-    path('dd/', views.DDView.as_view(), name='dd'),
-
-
     path('students/', views.StudentsView.as_view(), name='students'),
     path('students/generate', views.StudentsGenerationView.as_view(),
          name='generate_students'),
@@ -197,4 +193,44 @@ urlpatterns = [
 
     # ranul
     #################################################################################
+    path('tags/', views.TagsView.as_view(), name='tags'),
+    path('tags/add', views.AddTagsView.as_view(), name='add_tags'),
+    path('tags/delete', views.DeleteTags.as_view(), name='remove_tags'),
+    path('tags/update', views.UpdateTags.as_view(), name='update_tags'),
+
+    path('groups/', views.GroupsView.as_view(), name='groups'),
+    path('groups/add', views.AddStudentsView.as_view(), name='add_groups'),
+    path('groups/delete', views.DeleteStudentsView.as_view(), name='remove_groups'),
+    path('groups/update', views.UpdateGroupsView.as_view(), name='update_groups'),
+
+    path('sessions/assign', views.AssignSessionsView.as_view(),
+         name="assign_sessions"),
+    path('timeslots/blocked', views.BlockTimeSlotsView.as_view(),
+         name="blocked_timeslots"),
+    path('timeslots/blocked/view', views.view_blocked_timeslots,
+         name="view_blocked_timeslots"),
+    path('timeslots/blocked/add', views.create_blocked_session,
+         name="add_blocked_timeslots"),
+    path('timeslots/blocked/group-details',
+         views.get_group_data_2, name="get_group_data_2"),
+
+    path('sessions/<int:pk>/consecutive',
+         views.ConsecutiveSessionsView.as_view(), name="consecutive_sessions"),
+    path('sessions/<int:pk>/consecutive/group-details',
+         views.get_group_data, name="get_group_data"),
+    #     path('sessions/<int:pk>/consecutive/add',
+    #          views.create_consecutive_session, name="add_consecutive_sessions"),
+    path('sessions/<int:pk>/consecutive/search',
+         views.get_consecutive_session, name="search_consecutive_sessions"),
+
+    path('sessions/assign/search',
+         views.get_searched_session, name="search_sessions"),
+    path('sessions/assign/parallel', views.createParallelSession,
+         name="add_parallel_sessions"),
+
+    path('sessions/parallel', views.ParallelSessionsView.as_view(),
+         name="parallel_sessions"),
+    path('sessions/non-parallel', views.NonParallelSessionsView.as_view(),
+         name="non_parallel_sessions"),
+
 ]

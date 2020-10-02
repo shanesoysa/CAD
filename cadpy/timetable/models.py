@@ -28,12 +28,14 @@ class Subjects(models.Model):
     noEveHours = models.IntegerField(blank=True, null=True)
     objects = models.Manager()
 
+
 class WorkingDays(models.Model):
-        nubdays = models.IntegerField(blank=True, null=True)
-        days= models.CharField( max_length = 255,null = True,blank = True )
-        starttime=models.CharField(max_length = 255,null = True,blank = True)
-        endtime=models.CharField(max_length = 255,null = True,blank = True)
-        slot= models.CharField( max_length = 255,null = True,blank = True )
+    nubdays = models.IntegerField(blank=True, null=True)
+    days = models.CharField(max_length=255, null=True, blank=True)
+    starttime = models.CharField(max_length=255, null=True, blank=True)
+    endtime = models.CharField(max_length=255, null=True, blank=True)
+    slot = models.CharField(max_length=255, null=True, blank=True)
+
 
 class Tags(models.Model):
     label = models.CharField(max_length=25, unique=True)
@@ -132,15 +134,46 @@ class Session(models.Model):
     student_count = models.IntegerField(default=1)
     duration = models.IntegerField(default=1)
     consecutive_session = models.ForeignKey(
-        'self', on_delete=models.CASCADE, null=True, blank=True)
+        'self', on_delete=models.CASCADE, null=True, blank=True)  # remove this feild
 
 
-class Timeslots(models.Model):
-    day = models.DateField()
+class ConsecutiveSession(models.Model):
+    session1 = models.ForeignKey(
+        Session, related_name='consecutivesession_session1', on_delete=models.CASCADE,)
+    session2 = models.ForeignKey(
+        Session, related_name='consecutivesession_session2', on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['session1', 'session2'], name='consecutive_details')
+        ]
+
+
+class GroupBlockedTimeslots(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    subgroup = models.ForeignKey(
+        Subgroup, on_delete=models.CASCADE, null=True, blank=True)
+    day = models.CharField(max_length=20)
+    starttime = models.CharField(max_length=50)
+    endtime = models.CharField(max_length=50)
+
+
+class LecturerBlockedTimeslots(models.Model):
+    lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    day = models.CharField(max_length=20)
+    starttime = models.CharField(max_length=50)
+    endtime = models.CharField(max_length=50)
+
+
+class SessionBlockedTimeslots(models.Model):
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    day = models.CharField(max_length=20)
+    starttime = models.CharField(max_length=50)
+    endtime = models.CharField(max_length=50)
 
 
 class ParallelSession(models.Model):
-    id = models.AutoField(primary_key=True)
     sessions = models.ManyToManyField(Session)
 
 
@@ -227,3 +260,14 @@ class SessionRoom(models.Model):
     objects = models.Manager()
 
 #########################################################################
+
+
+class MockWorkingDays(models.Model):
+    nubdays = models.IntegerField(blank=True, null=True)
+    days = models.CharField(max_length=255, null=True, blank=True)
+    starttime = models.CharField(max_length=255, null=True, blank=True)
+    endtime = models.CharField(max_length=255, null=True, blank=True)
+    slot = models.CharField(max_length=255, null=True, blank=True)
+
+    def get_all_days(self):
+        return self.days.split(',')
