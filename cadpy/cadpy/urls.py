@@ -40,6 +40,9 @@ urlpatterns = [
 
     path('sessions/', views.Session.as_view(), name='sessions'),
     path('sessions/add', views.AddSession.as_view(), name='session_create'),
+    #     path('sessions/delete', views.DeleteSession.as_view(), name='session_delete'),
+
+
 
 
     path('programmes/', views.ProgrammesView.as_view(), name='programmes'),

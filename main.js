@@ -16,6 +16,7 @@ function createWindow() {
     },
   });
 
+  win.maximize();
   win.setMenu(null);
   // and load the index.html of the app.
   win.loadURL("http://127.0.0.1:8000/");

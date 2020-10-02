@@ -172,8 +172,8 @@
 
         class="form-control OnlyNumber"
         type="number"
-        name="employee_id1"
-        id="employee_id1"
+        name="duration"
+        id="duration"
       
       />
         </div>
@@ -184,34 +184,12 @@
 
       </div>
       <div class="col-5">
-        <!-- <h5>Department</h5>
-        <select
-        class="form-control"
-        id="department1"
-        name="department1"
-      >
-      <option class="d-none" disabled selected></option>
-      <option  value="Information technology">Information technology</option>
-      <option  value="Software Engineering">Software Engineering</option>
-      <option  value="Cyber Security">Cyber Security</option>
-      <option value="Interactive Media">Interactive Media </option>
-         
-    </select> -->
+        
       </div>
       <div class="col-1">
  
       </div>
-      <!-- <div class="col-5">
-          <h5>Rank</h5>
-          <input
-            value=""
-            class="form-control"
-            type="text"
-            name="rank1"
-            readonly
-           
-          />
-        </div> -->
+      
   
     </div>
     
@@ -230,6 +208,8 @@
    
  
       </div>
+
+
     </div>
 
     
@@ -237,13 +217,13 @@
   </form>
 </div>
 
-</div>
 
-<div class="container d-none" id="tablediv">
+
+<div class="container" id="tablediv">
 
   <div class="row">
   <div class="col-4">
-  <h3>Lecturers</h3>
+  <h3>Sessions</h3>
 </div>
 <div class="col-4">
   
@@ -261,46 +241,30 @@
 
 </div>
 <div class="row">
-<div class="col-12">
+{% for session in sessions %}
+
+<div class="col-3">
+
+  <div class="card p-2" style="width: 18rem;">
+    <div class="card-body" style="line-height: 100%;">
+      <!-- <h5 class="card-title">Card title</h5> -->
+      <h6 class="card-subtitle mb-2 text">{{session.get_lecturers}}</h6>
+      <!-- <p class="card-text">{{session.get_lecturers}}</p> -->
+      <!-- <p class="card-text">{{session.id}}</p> -->
+      <p class="card-text">{{session.subject.subjectName}} ({{session.subject.subjectCode}})</p>
+      <p class="card-text">{{session.tag.label}}</p>
+      <p class="card-text">{{session.group_id.generated_group}}</p>
+      <p class="card-text">{{session.student_count}}({{session.duration}})</p>
+      
+    </div>
+  </div>
+
   
 
-  <table id="userTable" class="table table-striped">
-    <tr>
-      <th>Name</th>
-      <th>center</th>
-      <th>employee_id</th>
-      <th>building</th>
-      <th>faculty</th>
-      <th>level</th>
-      <th>department</th>
-      <th>rank</th>
-      <th colspan="3">Actions</th>
-    </tr>
-    {% if lecturers %}
-    {% for lecturer in lecturers %}
-    <tr id="user-{{lecturer.id}}">
-        <td class="lecName userData" name="name">{{lecturer.name}}</td>
-        <td class="lecCenter userData" name="center">{{lecturer.center}}</td>
-        <td class="lecEmployee_id userData" name="employee_id">{{lecturer.employee_id}}</td>
-        <td class="lecBuilding userData" name="building">{{lecturer.building}}</td>
-        <td class="lecFaculty userData" name="faculty">{{lecturer.faculty}}</td>
-        <td class="lecLevel userData" name="level">{{lecturer.level}}</td>
-        <td class="lecDepartment userData" name="department">{{lecturer.department}}</td>
-        <td class="lecRank userData" name="rank">{{lecturer.rank}}</td>
-
-        <td align="center">
-            <button class="btn btn-success form-control" onClick="editUser({{lecturer.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
-        </td>
-        <td align="center">
-            <button class="btn btn-danger form-control" onClick="deleteUser({{lecturer.id}})">X</button>
-        </td>
-    </tr>
-    {% endfor %}
-    {% else %}
-      No Users
-    {% endif %}
-  </table>
+  
 </div>
+
+{% endfor %}
 </div>
 </div> 
 </div>
@@ -316,6 +280,19 @@
 
 <script>
 
+  $("#viewsection").click(function(){
+    $("#addingform").hide(1000);
+    $("#tablediv").show();
+  });
+  
+  $("#addsection").click(function(){
+    $("#tablediv").hide(1000);
+    $("#addingform").show();
+
+  });
+
+
+
   
   $(document).ready(function() {
     $('.sel2').select2({
@@ -326,6 +303,7 @@
     });
     $("#divsubgroup").addClass('d-none');
     $("#divgroup").removeClass('d-none');
+    $("#tablediv").hide();
 
     
 
@@ -339,10 +317,11 @@
     var students = $('#nostudents').val();
     var groups = $('#loadgroups').val();
     var subgroups= $('#loadsubgroups').val();
+    var duration = $('#duration').val();
     var radiovalue = $('input[name="groups"]:checked').val();
 
-    console.log("lec :"+lecturers+"subject :"+subjects+"tags :"+tags+"student :"+students+"groups :"+groups+"subgroups :"+subgroups);
-    if (lecturers && subjects && tags && students && (groups || subgroups)) {
+    console.log("lec :"+lecturers+"subject :"+subjects+"tags :"+tags+"student :"+students+"groups :"+groups+"subgroups :"+subgroups+"duration :"+duration);
+    if (lecturers && subjects && tags && students && duration && (groups || subgroups)) {
       if(radiovalue == 1)
         // Create Ajax Call
         {
@@ -353,21 +332,24 @@
               'subjects':subjects,
               'tags':tags,
               'students':students,
-              'groups':groups
+              'groups':groups,
+              'duration':duration
               
             },
             dataType: 'json',
             beforeSend: function() {
               $.LoadingOverlay("show");
 
-            },
-            success: function (data) {
-             
-              console.log(data.subject);
 
+            },
+            success: function (r) {
+             
               $.LoadingOverlay("hide");
 
-              swal("success","request sent sessions 2", "success");
+              
+              console.log(r.success);
+
+              swal("success","request sent sessions 1", "success");
                 
             }
         });
@@ -385,11 +367,13 @@
           beforeSend: function() {
             $.LoadingOverlay("show");
 
+
           },
           success: function (r) {
             $.LoadingOverlay("hide");
 
-            swal("success","request sent sessions 1", "success");
+            console.log(r.success);
+            swal("success","request sent sessions 2", "success");
 
               
           }
@@ -428,6 +412,9 @@
     }
     
   });
+
+
+  
   
 
   </script>
