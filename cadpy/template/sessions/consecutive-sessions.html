@@ -32,7 +32,7 @@
 {% block content %}
 <div class="container-fluid main bg-light">
     <div class="bg-light" style="padding: 10px 0px; font-weight: 900;">
-        <h3 style="color: #33344a;" >Consecutive Sessions </h3>
+        <h3 style="color: #33344a;" ><a href="{% url 'assign_sessions' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Consecutive Sessions </h3>
     </div>
     <div class="card shadow p-3 mb-5 bg-white rounded">
         <div class="card-title" style="color: purple;">Search Session 2</div>
@@ -80,8 +80,8 @@
                     </div>
                 </div>
                 <div class="row justify-content-md-center">
-                    <button class="btn btn-secondary col-2" id="reset_btn">Reset</button> &nbsp;
-                    <button class="btn btn-primary col-2" id="search_btn">Search</button>
+                    <button class="btn btn-secondary col-2" id="reset_btn" disabled="true">Reset</button> &nbsp;
+                    <button class="btn btn-primary col-2" id="search_btn" disabled="true">Search</button>
                 </div>
             </form>
         </div>
@@ -102,11 +102,13 @@
                     </div>
                 </div> 
             </div>
-            <div class="right" id="session_2">
+            <div class="right" >
                 <h5 class="card-title">Session 2</h5>
-                
+                <div id="session_2">
+
+                </div>
             </div>
-            <button class="btn btn-primary bottom col-1" id="save_btn"> Set </button>
+            <button class="btn btn-primary bottom col-1" id="save_btn" disabled="true"> Set </button>
         </div>
     </div>
 </div>
@@ -119,6 +121,16 @@
 </script>
 <script>
 $(document).ready(function(){
+
+    $('select').change(function(){
+            if($(this).val() !== 'default'){
+                $('#search_btn').prop('disabled', false);
+                $('#reset_btn').prop('disabled', false);
+            }else{
+                $('#search_btn').prop('disabled', true);
+                $('#reset_btn').prop('disabled', true);
+            }
+    });
 
     $('input[type="radio"][name="batch"]').click(function(){
         var value = $('input[name="batch"]:checked').val();
@@ -190,8 +202,10 @@ $(document).ready(function(){
                         alert('cannot add a consecutive session to itself')
                     else if(session2_list.includes(data.id))
                         alert('Session already exists in the list') 
-                    else    
+                    else{
                         displaySession2(data)
+                        $('#save_btn').prop('disabled', false);
+                    }    
                 }else{
                     alert(data.error_msg)
                 }

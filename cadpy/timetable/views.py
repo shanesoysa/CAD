@@ -8,7 +8,7 @@ from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
-from .models import Session, ParallelSession, NonParallelSession
+from .models import Session, ParallelSession, NonParallelSession, ConsecutiveSession
 from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
 from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -654,6 +654,7 @@ class AssignSessionsView(generic.ListView):
         context['tags_list'] = Tags.objects.all()
         context['subject_list'] = Subjects1.objects.all()
         context['lecturer_list'] = Lecturer1.objects.all()
+        context['work_days'] = MockWorkingDays.objects.all()
         context['group_list'] = Group.objects.exclude(generated_group = None)
         return context
 
@@ -694,26 +695,28 @@ class NonParallelSessionsView(generic.ListView):
 @csrf_exempt
 def create_consecutive_session(request, pk):
     try:
-       
-        session2_list = request.POST.get('session2_id_list', None)
-        list_json =json.loads(session2_list)
+        list_json = request.POST.get('session2_id_list', None)
+        session2_list =json.loads(session2_list)
         session1_obj = Session.objects.get(pk=pk)
 
-        for session2 in list_json:
+        for session2 in session2_list:
             session2_obj = Session.objects.get(pk=session2)
-            session2_obj.consecutive_session = session1_obj
-            session2_obj.save()
+            ConsecutiveSession.objects.create(
+                session1=session1_obj,
+                session2=session2_obj
+            )
+            
         data = {
             'success_stat': 1
         }  
-        # if(session_obj.consecutive_session == None):
-        #     session1_obj.consecutive_session = session2_obj
-        #     session1_obj.save()
-        # else:
-        #     data['error_msg'] = 'Consecutive Session already exists for this session'
-        
-        return JsonResponse(data)       
-    except:    
+        return JsonResponse(data) 
+    except IntegrityError as e:
+        data = {
+            'error_msg': 'Consecutive Session already exists',
+            'success_stat': 0
+        }  
+        return JsonResponse(data)      
+    except Exception as ex:    
         data = {
             'error_msg': 'unexpected error',
             'success_stat': 0
@@ -753,7 +756,7 @@ def get_group_data_2(request):
          'group_type': group_type
     } 
     return JsonResponse(data)   
-
+#problementho
 def get_consecutive_session(request, pk):
     try:
         batch = request.GET.get('batch', None)       
@@ -791,7 +794,7 @@ def get_consecutive_session(request, pk):
     except MultipleObjectsReturned as ex:
         data = {
             'success_stat': 0,
-            'error_msg': 'Unexpected Error'
+            'error_msg': 'Multiple Sessions exists for search criteria'
         }
         return JsonResponse(data)
 
@@ -804,7 +807,7 @@ def get_searched_session(request):
         tag = request.POST.get('tag', None)  
         conditions_list = {}
         
-        #use conditions to check if null
+        #conditions to check if null
         if (group):
             conditions_list['group_id_id'] = group
 
@@ -913,8 +916,7 @@ def create_blocked_session(request):
                     endtime=end_time
                 )
         else:
-            obj = Session.objects.get(pk=id)    
-            print(obj.id)
+            obj = Session.objects.get(pk=block_id)    
             for d in days_py:
                 SessionBlockedTimeslots.objects.create(
                     session=obj,
@@ -931,7 +933,6 @@ def create_blocked_session(request):
         data = {
             'success_stat': 0
         }
-        print(e)
         return JsonResponse(data)
 
 

@@ -107,9 +107,10 @@
                 <div class="bg-white col-5 shadow text-black my-4 mr-4 some" id="{{session.id}}">
                     <div>
                         <i class="fas fa-plus topcornerleft add_icon"  data-toggle="tool-tip" title="Assign Session"></i>
+                        <i class="icon-remove-circle topcornerright remove_icon" hidden="true" data-toggle="tool-tip" title="Remove Session"></i>
                         <i class="fas fa-ellipsis-v topcornerright hamburger_icon dropdown">
                             <div  class="dropdown-menu dropdown-menu-right code shadow">
-                                <a class="dropdown-item " href="{% url 'blocked_timeslots' %}">Block Session</a>
+                                <span data-toggle="modal" data-target="#block_sessions_modal11" class="blocking"><a class="dropdown-item ">Block Session</a></span>
                                 <a class="dropdown-item " href="{% url 'consecutive_sessions' session.id %}">Set Consecutive</a>
                             </div>
                         </i>
@@ -141,12 +142,58 @@
                 </div>
             </form>
             <div class="boxed m-1 p-3">
-                <button class="btn btn-primary" style="float: right;"> Save </button>
+                <button class="btn btn-primary" id="parallel_btn" style="float: right;" disabled="true"> Save </button>
                 <br>
                 <div id="boxes">
 
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<!--Model in bootstrap-->
+<div class="modal" id="block_sessions_modal11" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Block Timeslot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+            <form id="timeslotForm" action="">
+                <div class="modal-body">
+                    <input id="bIdId" name="bIdname" type="hidden" />
+                    <div class="row">
+                        {% for days in work_days %}
+                        <div class="col-4" id="col_day">
+                            <p>Day(s)</p>
+                            {% for day in days.get_all_days %}
+                            <div class="form-check">
+                                <input class="form-check-input check_count" type="checkbox" value="{{day}}" id="d-{{day}}">
+                                <label class="form-check-label" for="d-{{day}}">{{day}}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                        <div class="form-group col-4">
+                            <div class="md-form md-outline">
+                                <label for="startTimeId">Start Time: </label>
+                                <input type="time" id="startTimeId" class="form-control" name="startTime" placeholder="Select time" min="{{work_days.0.starttime}}" max="{{work_days.0.endtime}}" step="3600">
+                            </div>
+                        </div>
+                        <div class="form-group col-4">
+                            <div class="md-form md-outline">
+                                <label for="endTimeId">End Time</label>
+                                <input type="time" id="endTimeId" class="form-control" name="endTime" placeholder="Select time" min="{{work_days.0.starttime}}" max="{{work_days.0.endtime}}" step="3600">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" id="save_btn" class="btn btn-primary" disabled="true">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
     </div>
 </div>
@@ -167,9 +214,7 @@
         }
 
         $('[data-toggle="tool-tip"]').tooltip();
-        // $('.hamburger_icon').mouseover(function(){
-            
-        // });
+       
         $('.hamburger_icon').mouseleave(function(){
             function hideDrop(){
                 $('.dropdown-menu').hide();
@@ -179,9 +224,18 @@
         });
 
         $('.add_icon').click(function(){
-            var id = $(this).parent().parent().attr('id')
-            console.log('id' + id)
-            $('.boxed #boxes').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'))
+            var id = $(this).parent().parent().attr('id');
+            $(this).hide();
+            var idList = JSON.stringify(getSession2IdList());
+            if(idList.includes(id)){
+                alert('Session already added to list')
+            }else{
+                $('.boxed #boxes').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'));
+               // $('#boxes > #' + id + ' > .hamburger_icon').html('<p>hey</p>');
+              //  $('#boxes #' + id + '.add_icon').remove();
+               // $('#boxes #' + id + '.remove_icon').show();
+                $('#parallel_btn').prop('disabled', false);
+            }
         });
 
         $('.boxed > button').click(function(){
@@ -315,6 +369,62 @@
             });
 
         }
+
+        $(':input').change(function(){
+        if($('input[name="startTime"]').val() && $('input[name="endTime"]').val() && $("input[type=checkbox]:checked").val())
+            $('#save_btn').prop('disabled', false)
+        })
+
+        $('.blocking').click(function(){
+            var id = $(this).parents().eq(3).attr('id')
+            $('#bIdId').val(id)
+        })
+
+        
+
+        $("#save_btn").click(function() {
+            var blockInput = 'SS';
+            var blockIdInput = $('input[name="bIdname"]').val();
+            var blockId = parseInt(blockIdInput)
+            var days = [];
+            $('#col_day > .form-check > input:checked').each(function(index, val){
+                var id = $(this).val()
+                days.push(id)
+                });
+
+            var days_json = JSON.stringify(days)
+
+            var startTimeInput = $('input[name="startTime"]').val();
+            var endTimeInput = $('input[name="endTime"]').val();
+            if (startTimeInput && endTimeInput) {
+                $.ajax({
+                    url: '{% url "add_blocked_timeslots" %}',
+                    type: 'POST',
+                    data: {
+                    'days_list':days_json,
+                    'block':blockInput,
+                    'block_id':blockId,
+                    'start_time':startTimeInput,
+                    'end_time':endTimeInput,
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success_stat == 1) { 
+                            alert('Blocked Session')
+                        }else{
+                            alert(data.error_msg)
+                        }
+                    }
+                });
+            } else {
+                alert("All fields must have a valid value.");
+            }
+
+            $('form#timeslotForm').trigger("reset");
+            $('#block_sessions_modal11').modal('hide');
+            return false;
+        });
+        
     });
 </script>
 {% endblock javascript %}
