@@ -2,7 +2,29 @@
 
 {% block title %}Blocking Sessions{% endblock title %}
 
-{% block stylesheet %}{% endblock stylesheet %}
+{% block stylesheet %}
+<style>
+
+.left{
+    float: left;
+    width: 85%;
+}
+.right{
+    float: left;
+    width: 10%;
+}
+
+#nonblocked{
+    border: 1px solid grey;
+}
+
+.keyblock{
+    height: 40px;
+    width: 40px;
+}
+
+</style>
+{% endblock stylesheet %}
 
 {% block content %}
 <div class="container-fluid main bg-white">
@@ -36,8 +58,23 @@
             </form>
         </div>
     </div>
-    <div class="m-2" id="timetable">
+    <div>
+        <div class="m-2 left" id="timetable">
         
+        </div>
+        <div class="right" >
+            <div class="card bg-white shadow rounded" style="display: none;" id="keytimetable">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Key</h5>
+                    <div>
+                        <div id="nonblocked" class="keyblock"></div> : Available
+                    </div>
+                    <div>
+                        <div  class="keyblock bg-primary"></div> : Unavailable
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <!--Model in bootstrap-->
@@ -156,8 +193,8 @@ $(document).ready(function(){
                 success: function (data) {
                     if (data.success_stat == 1) { 
                         $('#set_btn').prop('disabled', false)
-                        console.log(data.blocks)
                         appendToTimeTable(data.blocks, data.time_list, data.day_list)
+                        $('#keytimetable').css('display', 'block')
                     }else{
                         alert(data.error_msg)
                     }
@@ -173,7 +210,6 @@ $(document).ready(function(){
 
 
     $("#save_btn").click(function() {
-        alert('Submit triggered')
         var blockInput = $('input[name="bname"]').val();
         var blockIdInput = $('input[name="bIdname"]').val();
 
@@ -187,11 +223,6 @@ $(document).ready(function(){
 
         var startTimeInput = $('input[name="startTime"]').val();
         var endTimeInput = $('input[name="endTime"]').val();
-        console.log('Here ' + blockInput)
-        console.log('Here ' + blockIdInput)
-        console.log('Here ' + startTimeInput)
-        console.log('Here ' + endTimeInput)
-        console.log('days ' + days)
 
         if (startTimeInput && endTimeInput) {
             $.ajax({
@@ -207,7 +238,8 @@ $(document).ready(function(){
                 dataType: 'json',
                 success: function (data) {
                     if (data.success_stat == 1) { 
-                        appendToTimeTable(data.blocks, data.time_list, data.day_list)
+                        var hash = getListOfDays(data.day_list)
+                        addTimeblocks(hash, data.blocks)
                     }else{
                         alert(data.error_msg)
                     }
@@ -234,13 +266,7 @@ $(document).ready(function(){
                 </tbody>
             </table>`
         );
-        var hash = {}
-        for (i=0; i < daylist.length; i++){
-            $('#dayView').append(
-                `<th id="${daylist[i]}" scope="col">${daylist[i]}</th>`
-            )
-            hash[i+1] = daylist[i]
-        }
+        var hash = listOfDays(daylist);
         var addon = getCells(daylist.length)
         var mintime
         var maxindex = timelist.length - 1
@@ -250,21 +276,29 @@ $(document).ready(function(){
             $('tbody').append(`<tr id="${value}"><th scope="row">${value}</th>${addon}<tr>`)
         })
 
-        for (block of blocks){
-            var day = block.day
-            var starttime = block.start_time
-            console.log(starttime)
-            var endtime = block.end_time
-            console.log(endtime)
-            var mykey = Object.keys(hash).find(key => hash[key] === day)
-            var time = starttime.split(':')
-            var timeid = time[0] + '\\:' + time[1]
-            $('#'+ timeid + ' > .' + mykey).addClass('bg-primary')
-        }
-
+        addTimeblocks(hash, blocks);
        // $('#startTimeId').attr({'min': mintime, 'max': timelist[maxindex]});
        // $('#endTimeId').attr({'min': mintime, 'max': timelist[maxindex]});
         
+    }
+
+    function listOfDays(daylist){
+        var hash = {}
+        for (i=0; i < daylist.length; i++){
+            $('#dayView').append(
+                `<th id="${daylist[i]}" scope="col">${daylist[i]}</th>`
+            )
+            hash[i+1] = daylist[i]
+        }
+        return hash
+    }
+
+    function getListOfDays(daylist){
+        var hash = {}
+        for (i=0; i < daylist.length; i++){
+            hash[i+1] = daylist[i]
+        }  
+        return hash 
     }
 
     function getCells(count){
@@ -275,7 +309,22 @@ $(document).ready(function(){
         return cells
     }
 
-    
+    function addTimeblocks(hash, blocks){
+        for (block of blocks){
+            var day = block.day
+            var starttime = block.start_time
+            var endtime = block.end_time
+            var mykey = Object.keys(hash).find(key => hash[key] === day)
+            var time = starttime.split(':')
+            var timeid = time[0] + '\\:' + time[1]
+            $('#'+ timeid + ' > .' + mykey).addClass('bg-primary')
+        }
+    }
+
+    $('input[type="time"][name="startTime"]').change(function(){
+        var minimum = $('input[type="time"][name="startTime"]').val()
+        $('input[type="time"][name="endTime"]').prop('min', minimum)
+    })
     
 });
 
@@ -284,7 +333,14 @@ function displayFormInfo(){
     var block_id  = $('#blockId').val();
     $('#bId').val(block);
     $('#bIdId').val(block_id);
+    var slot = '{{work_days.0.slot}}'
+    var step = 3600
 
+    if(slot == '30 min slots'){
+        step = 1800
+    }
+    console.log('mins: ' + step + ' ' + slot)
+    $('input[type="time"]').prop('step', step)
 }
 </script>
 {% endblock javascript %}
