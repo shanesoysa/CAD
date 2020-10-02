@@ -6,7 +6,7 @@ from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
-from .models import GroupRoom, LecturerRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
+from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
 from django.db.utils import IntegrityError
 #import sys
 from .models import Lecturer as Lecturer1
@@ -966,6 +966,8 @@ def sessionRooms(request):
 def consecutiveSessionRooms(request):
     return render(request, 'rooms/consecutive_sessions.html')
 
+# def some():
+
 # rooms for subjects and relevant tags
 
 
@@ -1267,6 +1269,91 @@ def deleteSubjectTagRoom(request):
         return JsonResponse(data)
     except:
         pass
+
+
+def deleteAllSubjectTagRooms(request):
+    try:
+        SubjectTagRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+# load all sessions
+
+
+def loadGroupSessions(request):
+    locations = Session.objects.select_related(
+        'group_id').select_related('tag').select_related('subject')
+    list = []
+    for row in locations:
+        list.append(
+            {'group_name': row.group_id.generated_group, 'id': row.id, 'tag': row.tag.label, 'subject': row.subject.subjectName})
+    return JsonResponse(list, safe=False)
+
+
+# load all subgroup sessions
+
+def loadSubGroupSessions(request):
+    locations = Session.objects.filter(subgroup_id__isnull=False).select_related(
+        'subgroup_id').select_related('tag').select_related('subject')
+    list = []
+    for row in locations:
+        list.append(
+            {'group_name': row.subgroup_id.generated_subgroup, 'id': row.id, 'tag': row.tag.label, 'subject': row.subject.subjectName})
+    return JsonResponse(list, safe=False)
+
+# add rooms for sessions
+
+
+def addSessionRooms(request):
+    try:
+        session = request.GET.get('session', None)
+        building = request.GET.get('building', None)
+        room = request.GET.get('room', None)
+
+        obj = SessionRoom.objects.create(
+            session_id=session, building_id=building, room_id=room
+        )
+
+        data = {
+            'id': obj.id
+        }
+
+        return JsonResponse(data)
+    except:
+        pass
+
+
+# delete session rooms
+def deleteSessionRooms(request):
+    try:
+        id = request.GET.get('id', None)
+        SessionRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+
+def deleteAllSessionRooms(request):
+    try:
+        SessionRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+
+# load saved session rooms
+def loadSavedSessionRooms(request):
+    locations = SessionRoom.objects.select_related(
+        'building').select_related('room').select_related('subject')
+    list = []
+    for row in locations:
+        list.append(
+            {'group_name': row.subgroup_id.generated_subgroup, 'id': row.id, 'tag': row.tag.label, 'subject': row.subject.subjectName})
+    return JsonResponse(list, safe=False)
 
 
 # ranul

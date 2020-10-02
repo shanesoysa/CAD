@@ -419,6 +419,7 @@
 
         $.ajax({
           url: "{% url 'deleteAllUnavailableRooms' %}",
+          async: false,
         });
       });
 
@@ -442,6 +443,7 @@
             var request = $.ajax({
               url: "{% url 'adddUnavailableRooms' %}",
               dataType: "json",
+              async: false,
               data: {
                 day: days,
                 start: start,
@@ -506,6 +508,7 @@
           var request = $.ajax({
             url: "{% url 'deleteUnavailableRoom' %}",
             dataType: "json",
+            async: false,
             data: {
               id: e[0],
             },

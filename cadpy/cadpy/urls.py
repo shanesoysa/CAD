@@ -172,6 +172,17 @@ urlpatterns = [
          views.addSubjectTagRoom, name='addSubjectTagRoom'),
     path('rooms/deleteSubjectTagRoom',
          views.deleteSubjectTagRoom, name='deleteSubjectTagRoom'),
+    path('rooms/loadGroupSessions',
+         views.loadGroupSessions, name='loadGroupSessions'),
+    path('rooms/loadSubGroupSessions',
+         views.loadSubGroupSessions, name='loadSubGroupSessions'),
+    path('rooms/addSessionRooms', views.addSessionRooms, name='addSessionRooms'),
+    path('rooms/deleteSessionRooms',
+         views.deleteSessionRooms, name='deleteSessionRooms'),
+    path('rooms/deleteAllSubjectTagRooms',
+         views.deleteAllSubjectTagRooms, name='deleteAllSubjectTagRooms'),
+    path('rooms/deleteAllSessionRooms',
+         views.deleteAllSessionRooms, name='deleteAllSessionRooms'),
 
     # ranul
     #################################################################################

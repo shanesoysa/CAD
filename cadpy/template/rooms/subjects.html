@@ -389,6 +389,7 @@
         $.ajax({
           url: '{% url "loadRooms" %}',
           dataType: "json",
+          // async: false,
           success: function (data) {
             var locations = data;
             var length = locations.length;
@@ -409,6 +410,11 @@
             console.log(1);
           },
         });
+
+        $.ajax({
+          url: '{% url "deleteAllSubjectTagRooms" %}',
+          async: false,
+        });
       });
 
       // retrieve from select
@@ -426,11 +432,16 @@
             var request = $.ajax({
               url: "{% url 'addSubjectTagRoom' %}",
               dataType: "json",
+              async: false,
               data: {
                 subject: JSON.parse(subject[0].id),
                 tag: JSON.parse(tag[0].id),
                 building: JSON.parse(element.id).bid,
                 room: JSON.parse(element.id).rid,
+              },
+              beforeSend: function () {
+                $("#add").prop("disabled", true);
+                $("#add span").addClass("spinner-border");
               },
               success: function (data) {
                 $("#add span").removeClass("spinner-border");
@@ -470,14 +481,14 @@
               "' /></td></tr>"
           );
           $("#hid" + key).val(JSON.stringify(arr));
-          console.log(JSON.parse($("#hid" + key).val()));
+          // console.log(JSON.parse($("#hid" + key).val()));
         });
         key++;
       }
 
       // remove table row
       function del(key) {
-        console.log(JSON.parse($("#hid" + key).val()));
+        // console.log(JSON.parse($("#hid" + key).val()));
 
         $("#row" + key).fadeTo("slow", 0.5);
         $("#row" + key + " i").css("pointer-events", "none");
@@ -488,8 +499,13 @@
           var request = $.ajax({
             url: "{% url 'deleteSubjectTagRoom' %}",
             dataType: "json",
+            async: false,
             data: {
               id: e[0],
+            },
+            beforeSend: function () {
+              $("#row" + key).fadeTo("slow", 0.5);
+              $("#row" + key + " i").css("pointer-events", "none");
             },
           });
           promises.push(request);

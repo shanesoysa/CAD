@@ -250,12 +250,37 @@
       </div>
       <hr />
       <div class="row">
-        <div class="col-9 m-auto">
+        <div class="col m-auto">
           <h3>Select preferred rooms for sessions</h3>
         </div>
       </div>
       <div class="row mt-3">
-        <div class="col-9 m-auto d-flex justify-content-between">
+        <div class="col m-auto">
+          <div class="custom-control custom-radio custom-control-inline">
+            <input
+              type="radio"
+              id="groups"
+              name="customRadioInline1"
+              class="custom-control-input"
+              checked="checked"
+            />
+            <label class="custom-control-label" for="groups">Groups</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input
+              type="radio"
+              id="subgroups"
+              name="customRadioInline1"
+              class="custom-control-input"
+            />
+            <label class="custom-control-label" for="subgroups"
+              >Sub-groups</label
+            >
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col m-auto d-flex justify-content-between">
           <div class="form-group">
             <label>Session</label>
             <select
@@ -280,12 +305,15 @@
             ></select>
           </div>
           <div class="form-group d-flex align-items-end">
-            <button class="btn btn-outline-primary" onclick="add()">Add</button>
+            <button id="add" class="btn btn-outline-primary" onclick="add()">
+              <span class="spinner-border-sm"></span>
+              Add
+            </button>
           </div>
         </div>
       </div>
       <div class="row mt-3">
-        <div class="col-9 m-auto">
+        <div class="col m-auto">
           <div class="tableFixHead">
             <table id="table" class="table">
               <thead>
@@ -294,13 +322,35 @@
                 <th></th>
                 <th></th>
               </thead>
-              <tbody style="height: 100px; overflow: auto"></tbody>
+              <tbody style="height: 100px; overflow: auto">
+                <!-- <tr id="1">
+                  <td>Y2.S2.CSE.02 - CS - Evaluation</td>
+                  <td>New building - A501</td>
+                  <td>
+                    <i class="fas fa-times text-danger" onclick="add2(1)"></i>
+                  </td>
+                </tr>
+                <tr id="2">
+                  <td>Y2.S2.CSE.02 - IP - Practical</td>
+                  <td>Engineering 2 - B402</td>
+                  <td>
+                    <i class="fas fa-times text-danger" onclick="add2(2)"></i>
+                  </td>
+                </tr>
+                <tr id="3">
+                  <td>Y2.S2.CSE.01 - IP - Practical</td>
+                  <td>Engineering 2 - B502</td>
+                  <td>
+                    <i class="fas fa-times text-danger" onclick="add2(3)"></i>
+                  </td>
+                </tr> -->
+              </tbody>
             </table>
           </div>
         </div>
       </div>
-      <div class="row mt-5">
-        <div class="col-9 m-auto d-flex flex-row-reverse">
+      <div class="row mt-4">
+        <div class="col m-auto d-flex flex-row-reverse">
           <a
             href="{% url 'consecutiveSessionRooms' %}"
             class="btn btn-outline-primary"
@@ -333,26 +383,50 @@
     </script>
     <script>
       var key = 0;
+      var locations, groups, subgroups;
       $(document).ready(function () {
         $(".js-example-basic-single").select2({
-          placeholder: "Select a session",
-          minimumResultsForSearch: -1,
+          placeholder: "Select a group/sub-group",
+          // minimumResultsForSearch: -1,
         });
         $(".js-example-basic-multiple").select2({
           placeholder: "Select room(s)",
           allowClear: true,
         });
+
         $.ajax({
-          url: '{% url "loadLecturers" %}',
+          url: '{% url "loadGroupSessions" %}',
           dataType: "json",
           success: function (data) {
-            var lecturers = JSON.parse(data);
-            var length = lecturers.length;
+            // console.log(data);
+            groups = data;
+            var length = groups.length;
             for (var i = 0; i < length; i++) {
-              var o = new Option(lecturers[i].fields.name, lecturers[i].pk);
-              $(o).html(lecturers[i].fields.name);
+              var o = new Option(
+                groups[i].group_name +
+                  " - " +
+                  groups[i].subject +
+                  " - " +
+                  groups[i].tag,
+                groups[i].id
+              );
+              $(o).html(
+                groups[i].group_name +
+                  " - " +
+                  groups[i].subject +
+                  " - " +
+                  groups[i].tag
+              );
               $("#lecturers").append(o);
             }
+          },
+        });
+
+        $.ajax({
+          url: '{% url "loadSubGroupSessions" %}',
+          dataType: "json",
+          success: function (data) {
+            subgroups = data;
           },
         });
 
@@ -360,7 +434,8 @@
           url: '{% url "loadRooms" %}',
           dataType: "json",
           success: function (data) {
-            var locations = data;
+            // console.log(data);
+            locations = data;
             var length = locations.length;
             for (var i = 0; i < length; i++) {
               var obj = {
@@ -379,23 +454,106 @@
             console.log(1);
           },
         });
+
+        $("#groups").bind("click", function () {
+          $("#lecturers").empty();
+          var length = groups.length;
+          for (var i = 0; i < length; i++) {
+            var o = new Option(
+              groups[i].group_name +
+                " - " +
+                groups[i].subject +
+                " - " +
+                groups[i].tag,
+              groups[i].id
+            );
+            $(o).html(
+              groups[i].group_name +
+                " - " +
+                groups[i].subject +
+                " - " +
+                groups[i].tag
+            );
+            $("#lecturers").append(o);
+          }
+          // $("#add").attr("onclick", "add()");
+        });
+
+        $("#subgroups").bind("click", function () {
+          $("#lecturers").empty();
+          var length = subgroups.length;
+          for (var i = 0; i < length; i++) {
+            var o = new Option(
+              subgroups[i].group_name +
+                " - " +
+                subgroups[i].subject +
+                " - " +
+                subgroups[i].tag,
+              subgroups[i].id
+            );
+            $(o).html(
+              subgroups[i].group_name +
+                " - " +
+                subgroups[i].subject +
+                " - " +
+                subgroups[i].tag
+            );
+            $("#lecturers").append(o);
+          }
+        });
+
+        $.ajax({
+          url: "{% url 'deleteAllSessionRooms' %}",
+          async: false,
+        });
       });
 
       // retrieve from select
       function add() {
+        // console.log("in");
+        $("#add").prop("disabled", true);
+        // console.log("in");
+        // console.log("in");
+        $("#add span").addClass("spinner-border");
         var rooms = "";
         var lecturer = $("#lecturers").select2("data");
         var room = $("#rooms").select2("data");
         var arr = [];
-        room.forEach((element) => {
-          arr.push([
-            JSON.parse(lecturer[0].id),
-            JSON.parse(element.id).bid,
-            JSON.parse(element.id).rid,
-          ]);
-          rooms += element.text + ", ";
-        });
+        var promises = [];
         if (lecturer != "" && room != "") {
+          room.forEach((element) => {
+            // setTimeout(function () {
+            var request = $.ajax({
+              url: "{% url 'addSessionRooms' %}",
+              dataType: "json",
+              async: false,
+              data: {
+                session: JSON.parse(lecturer[0].id),
+                building: JSON.parse(element.id).bid,
+                room: JSON.parse(element.id).rid,
+              },
+              success: function (data) {
+                $("#add span").removeClass("spinner-border");
+                $("#add").prop("disabled", false);
+                arr.push([
+                  data.id,
+                  JSON.parse(lecturer[0].id),
+                  JSON.parse(element.id).bid,
+                  JSON.parse(element.id).rid,
+                ]);
+              },
+              error: function () {
+                $("#add span").removeClass("spinner-border");
+                $("#add").prop("disabled", false);
+                return;
+              },
+            });
+            promises.push(request);
+            // }, 1);
+            rooms += element.text + ", ";
+          });
+        }
+        $.when.apply(null, promises).done(function () {
           $("#table > tbody").append(
             "<tr id='row" +
               key +
@@ -409,16 +567,40 @@
               key +
               "' /></td></tr>"
           );
-        }
-        $("#hid" + key).val(JSON.stringify(arr));
-        // console.log(JSON.parse($("#hid" + key).val()));
+          $("#hid" + key).val(JSON.stringify(arr));
+          // console.log(JSON.parse($("#hid" + key).val()));
+        });
         key++;
       }
+
+      // function add2(key) {
+      //   $("#" + key).remove();
+      // }
 
       // remove table row
       function del(key) {
         // console.log(JSON.parse($("#hid" + key).val()));
-        $("#row" + key).remove();
+
+        $("#row" + key).fadeTo("slow", 0.5);
+        $("#row" + key + " i").css("pointer-events", "none");
+        var arr = JSON.parse($("#hid" + key).val());
+        var promises = [];
+        arr.forEach((e) => {
+          // console.log(e[0]);
+          var request = $.ajax({
+            url: "{% url 'deleteSessionRooms' %}",
+            dataType: "json",
+            async: false,
+            data: {
+              id: e[0],
+            },
+          });
+          promises.push(request);
+        });
+        $.when.apply(null, promises).done(function () {
+          // console.log("in");
+          $("#row" + key).remove();
+        });
       }
     </script>
   </body>

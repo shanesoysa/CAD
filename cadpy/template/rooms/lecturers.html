@@ -400,6 +400,7 @@
             var request = $.ajax({
               url: "{% url 'addLecturerRooms' %}",
               dataType: "json",
+              async: false,
               data: {
                 lec: JSON.parse(lecturer[0].id),
                 building: JSON.parse(element.id).bid,
@@ -458,6 +459,7 @@
           var request = $.ajax({
             url: "{% url 'deleteLecturerRooms' %}",
             dataType: "json",
+            async: false,
             data: {
               id: e[0],
             },

@@ -213,4 +213,11 @@ class SubjectTagRoom(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     objects = models.Manager()
 
+
+class SessionRoom(models.Model):
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
+
 #########################################################################
