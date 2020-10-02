@@ -190,6 +190,8 @@ urlpatterns = [
          views.deleteAllSubjectTagRooms, name='deleteAllSubjectTagRooms'),
     path('rooms/deleteAllSessionRooms',
          views.deleteAllSessionRooms, name='deleteAllSessionRooms'),
+    path('rooms/loadConsecutiveSessions',
+         views.loadConsecutiveSessions, name='loadConsecutiveSessions'),
 
     # ranul
     #################################################################################

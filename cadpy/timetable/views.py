@@ -25,7 +25,7 @@ from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime, timedelta
+import datetime
 # Create your views here.
 
 
@@ -1443,10 +1443,39 @@ def consecutiveSessionRooms(request):
 def some():
     try:
         print('lol')
+        print(datetime.timedelta(hours=2))
         va = WorkingDays.objects.all()
+        days = va[0].days
+        v = []
+        v = days.split(',')
+        print(v)
+        # for index, i in enumerate(v):
+        #     if i == 'tuesday':
+        #         v[index] = 2
+        # print(v)
 
-        print(va[0].starttime)
-        print(va)
+        gid = 68
+        st = 8
+        et = 5
+
+        sessions = Session.objects.filter(group_id_id=gid)
+        sessionids = []
+        for i in sessions:
+            sessionids.append(i.id)
+
+        print(sessionids)
+
+        blockedtimes = GroupBlockedTimeslots.objects.filter(
+            group_id=gid)
+
+        for i in sessions:
+            end = st + i.duration
+            for k in v:
+                for j in blockedtimes:
+                    if(j.day != k and st > j.endtime and end < j.starttime):
+                        print('ok'+i.id)
+
+        print(sessionids)
         return HttpResponse(' ')
     except:
         pass
@@ -1829,13 +1858,15 @@ def deleteAllSessionRooms(request):
 
 
 # load saved session rooms
-def loadSavedSessionRooms(request):
-    locations = SessionRoom.objects.select_related(
-        'building').select_related('room').select_related('subject')
+def loadConsecutiveSessions(request):
+    locations = ConsecutiveSession.objects.select_related(
+        'session1').select_related('session2')
     list = []
     for row in locations:
         list.append(
-            {'group_name': row.subgroup_id.generated_subgroup, 'id': row.id, 'tag': row.tag.label, 'subject': row.subject.subjectName})
+            {'session1_subject': row.session1.subject.subjectName, 'session1_tag': row.session1.tag.label, 'session1_group': row.session1.group_id.generated_group, 'session2_subject': row.session2.subject.subjectName, 'session2_tag': row.session2.tag.label, 'session2_group': row.session2.group_id.generated_group})
+
+    # print(list)
     return JsonResponse(list, safe=False)
 
 
