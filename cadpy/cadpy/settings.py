@@ -27,7 +27,8 @@ SECRET_KEY = 'adcc#^i*ig*%y5*72h4&c8d6-^48^n#iu*w1udroy$7c6ahihz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['rehanih.pythonanywhere.com']
+ALLOWED_HOSTS = []
+# 'rehanih.pythonanywhere.com'
 
 
 # Application definition
