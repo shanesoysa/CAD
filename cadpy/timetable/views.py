@@ -1624,12 +1624,19 @@ def some():
         blockedtimes = GroupBlockedTimeslots.objects.filter(
             group_id=gid)
 
-        for i in sessions:
-            end = st + i.duration
-            for k in v:
-                for j in blockedtimes:
-                    if(j.day != k and st > j.endtime and end < j.starttime):
-                        print('ok'+i.id)
+        print('#########')
+        s = '18:00'
+
+        datetime_object = datetime.strptime(
+            'Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
+        print(datetime_object)
+
+        # for i in sessions:
+        #     end = st + i.duration
+        #     for k in v:
+        #         for j in blockedtimes:
+        #             if(j.day != k and st > j.endtime and end < j.starttime):
+        #                 print('ok'+i.id)
 
         print(sessionids)
         return HttpResponse(' ')
