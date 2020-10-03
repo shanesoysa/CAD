@@ -349,7 +349,8 @@
               
               console.log(r.success);
 
-              swal("success","request sent sessions 1", "success");
+              swal("success","session created for group", "success");
+              location.reload();
                 
             }
         });
@@ -373,7 +374,8 @@
             $.LoadingOverlay("hide");
 
             console.log(r.success);
-            swal("success","request sent sessions 2", "success");
+            swal("success","session created for sub-group", "success");
+              location.reload();
 
               
           }
