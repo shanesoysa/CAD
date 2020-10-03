@@ -10,9 +10,9 @@ from django.db.utils import IntegrityError
 from .models import Lecturer as Lecturer1
 from .models import Subjects as Subjects1
 from .models import Session as Session1
-from .models import Session, ParallelSession
+from .models import ParallelSession
 
-from .models import Session, ParallelSession, NonParallelSession, ConsecutiveSession
+from .models import ParallelSession, NonParallelSession, ConsecutiveSession
 from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
 from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -775,14 +775,14 @@ class UpdateSubGroupsView(View):
 
 
 class AssignSessionsView(generic.ListView):
-    model = Session
+    model = Session1
 
     context_object_name = 'session_list'
     template_name = 'sessions/assign-sessions.html'
 
     def get_queryset(self):
         """Return all session objects"""
-        return Session.objects.all()
+        return Session1.objects.all()
 
 
     def get_context_data(self, **kwargs):
@@ -796,12 +796,12 @@ class AssignSessionsView(generic.ListView):
 
 
 class ConsecutiveSessionsView(generic.ListView):
-    model = Session
+    model = Session1
     template_name = 'sessions/consecutive-sessions.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['session1'] = Session.objects.get(pk=self.kwargs['pk'])
+        context['session1'] = Session1.objects.get(pk=self.kwargs['pk'])
         context['subject_list'] = Subjects1.objects.all()
         context['tags_list'] = Tags.objects.all()
         context['group_list'] = Group.objects.exclude(generated_group=None)
@@ -811,7 +811,7 @@ class ConsecutiveSessionsView(generic.ListView):
 
 
 class BlockTimeSlotsView(generic.ListView):
-    model = Session
+    model = Session1
 
     context_object_name = 'lecturer_list'
     template_name = 'sessions/blocked-timeslots.html'
@@ -841,10 +841,10 @@ def create_consecutive_session(request, pk):
     try:
         list_json = request.POST.get('session2_id_list', None)
         session2_list = json.loads(list_json)
-        session1_obj = Session.objects.get(pk=pk)
+        session1_obj = Sessio1n.objects.get(pk=pk)
 
         for session2 in session2_list:
-            session2_obj = Session.objects.get(pk=session2)
+            session2_obj = Session1.objects.get(pk=session2)
             ConsecutiveSession.objects.create(
                 session1=session1_obj,
                 session2=session2_obj
@@ -918,10 +918,10 @@ def get_consecutive_session(request, pk):
         tag = request.GET.get('tag', None)
 
         if(batch == 'group'):
-            session1 = Session.objects.filter(subgroup_id=None).get(
+            session1 = Session1.objects.filter(subgroup_id=None).get(
                 tag=tag, subject=subject, group_id=group)
         else:
-            session1 = Session.objects.get(
+            session1 = Session1.objects.get(
                 tag=tag, subject=subject, subgroup_id=group)
 
         data = {
