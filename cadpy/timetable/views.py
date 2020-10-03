@@ -12,7 +12,7 @@ from .models import Subjects as Subjects1
 from .models import Session as Session1
 from .models import ParallelSession
 
-from .models import ParallelSession, NonParallelSession, ConsecutiveSession
+from .models import NonParallelSession, ConsecutiveSession
 from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
 from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -976,7 +976,7 @@ def get_searched_session(request):
         if (lecturer):
             conditions_list['lecturers'] = lecturer
 
-        sessions = Session.objects.filter(**conditions_list)
+        sessions = Session1.objects.filter(**conditions_list)
         sessions_list = []
 
         for session in sessions:
@@ -1017,7 +1017,7 @@ def createParallelSession(request):
         sobj.save()
 
         for index, session in enumerate(session_list_py):
-            psession = Session.objects.get(pk=session)
+            psession = Session1.objects.get(pk=session)
             sobj.sessions.add(psession)
 
         data = {
@@ -1083,7 +1083,7 @@ def create_blocked_session(request):
                                  'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
                 return_list.append(subgroup_info)
         else:
-            obj = Session.objects.get(pk=block_id)
+            obj = Session1.objects.get(pk=block_id)
             for d in days_py:
                 SessionBlockedTimeslots.objects.create(
                     session=obj,
