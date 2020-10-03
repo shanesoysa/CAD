@@ -841,7 +841,7 @@ def create_consecutive_session(request, pk):
     try:
         list_json = request.POST.get('session2_id_list', None)
         session2_list = json.loads(list_json)
-        session1_obj = Sessio1n.objects.get(pk=pk)
+        session1_obj = Session1.objects.get(pk=pk)
 
         for session2 in session2_list:
             session2_obj = Session1.objects.get(pk=session2)
