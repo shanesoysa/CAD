@@ -9,7 +9,7 @@ from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
 from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
-from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
+from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags
 from django.db.utils import IntegrityError
 # import sys
 from .models import Lecturer as Lecturer1
@@ -901,7 +901,7 @@ class AssignSessionsView(generic.ListView):
         context['tags_list'] = Tags.objects.all()
         context['subject_list'] = Subjects1.objects.all()
         context['lecturer_list'] = Lecturer1.objects.all()
-        context['work_days'] = MockWorkingDays.objects.all()
+        context['work_days'] = WorkingDays.objects.all()
         context['group_list'] = Group.objects.exclude(generated_group=None)
         return context
 
@@ -933,7 +933,7 @@ class BlockTimeSlotsView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['work_days'] = MockWorkingDays.objects.all()
+        context['work_days'] = WorkingDays.objects.all()
         return context
 
 
@@ -1234,7 +1234,7 @@ def create_blocked_session(request):
                     endtime=end_time
                 )
 
-        timeobj = MockWorkingDays.objects.get()
+        timeobj = WorkingDays.objects.get()
         start_time = datetime.strptime(timeobj.starttime, '%H:%M')
         end_time = datetime.strptime(timeobj.endtime, '%H:%M')
         day_list = timeobj.get_all_days()
@@ -1288,7 +1288,7 @@ def view_blocked_timeslots(request):
                                  'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
                 return_list.append(subgroup_info)
 
-        timeobj = MockWorkingDays.objects.get()
+        timeobj = WorkingDays.objects.get()
         start_time = datetime.strptime(timeobj.starttime, '%H:%M')
         end_time = datetime.strptime(timeobj.endtime, '%H:%M')
         day_list = timeobj.get_all_days()
