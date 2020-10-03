@@ -1,30 +1,21 @@
-{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <title>{% block title %}Title{% endblock title %}</title>
-
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
-      crossorigin="anonymous"
-    />
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
       integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
       crossorigin="anonymous"
     />
-
     <link
-      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css"
       rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
     />
-
-    {% block stylesheet %}{% endblock stylesheet %}
     <style>
       html,
       body {
@@ -130,112 +121,10 @@
       .card {
         background: #f3f2f1;
       }
-
-      /* Shanes*/
-
-      .cycle-tab-container {
-        margin: 30px auto;
-        width: 800px;
-
-        box-shadow: 0 0 10px 2px #ddd;
-      }
-
-      .cycle-tab-container a {
-        color: #173649;
-        font-size: 16px;
-        font-family: roboto;
-        text-align: center;
-      }
-
-      .tab-pane {
-        text-align: center;
-        height: 100px !important;
-        margin: 30px auto;
-        width: 500px;
-        max-width: 100%;
-      }
-
-      .fade {
-        opacity: 0;
-        transition: opacity 4s ease-in-out;
-      }
-
-      .fade.active {
-        opacity: 1;
-      }
-
-      .cycle-tab-item {
-        width: 180px;
-      }
-
-      .cycle-tab-item:after {
-        display: block;
-        content: "";
-        border-bottom: solid 3px orange;
-        transform: scaleX(0);
-        transition: transform 0ms ease-out;
-      }
-      .cycle-tab-item.active:after {
-        transform: scaleX(1);
-        transform-origin: 0% 50%;
-        transition: transform 5000ms ease-in;
-      }
-
-      .nav-link:focus,
-      .nav-link:hover,
-      .cycle-tab-item.active a {
-        border-color: transparent !important;
-        color: orange;
-      }
-
-      /*----------------------------scroll bar styling-----------------------------*/
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-
-      ::-webkit-scrollbar-track {
-        background-color: #ebebeb;
-        -webkit-border-radius: 10px;
-        border-radius: 10px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        -webkit-border-radius: 10px;
-        border-radius: 10px;
-        background: #c6c6d1;
-      }
-      /* select2 styling */
-      .select2-container--default
-        .select2-selection--multiple
-        .select2-selection__choice {
-        color: #495057;
-      }
-      .select2-container--default
-        .select2-results__option--highlighted.select2-results__option--selectable {
-        color: #495057;
-      }
-      .select2-results__option--selectable {
-        color: #495057;
-      }
-      .select2-container--default
-        .select2-selection--single
-        .select2-selection__arrow {
-        height: 33px;
-      }
-      .select2-container--default
-        .select2-selection--single
-        .select2-selection__rendered {
-        line-height: 34px;
-      }
-      .select2-container .select2-selection--single {
-        height: 36px;
-      }
-      .select2-container--default .select2-selection--single {
-        outline: none;
-      }
     </style>
   </head>
   <body>
+    <!-- sidebar -->
     <div class="sidebar text-center">
       <ul>
         <li>
@@ -250,92 +139,108 @@
             <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
             <span class="sidebar-text"> Working</span>
             <span class="sidebar-text"> Days</span>
-            <a href="{% url 'Workingdays'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-users sidebar-icon"></i>
             <span class="sidebar-text"> Lecturers</span>
-            <a href="{% url 'lecturer'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-book sidebar-icon"></i>
             <span class="sidebar-text"> Subjects </span>
-            <a href="{% url 'subject'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
             <span class="sidebar-text"> Students </span>
-            <a href="{% url 'students'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-tags sidebar-icon"></i>
             <span class="sidebar-text"> Tags </span>
-            <a href="{% url 'tags'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
-          <button class="sidebar-button">
+          <button class="sidebar-button" autofocus>
             <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
             <span class="sidebar-text"> Locations </span>
-            <a href="#" class="stretched-link"></a>
+            <a href="{% url 'all_buildings'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
             <span class="sidebar-text"> Statistics </span>
-            <a href="#" class="stretched-link"></a>
+            <a href="{% url 'statistics'%}" class="stretched-link"></a>
           </button>
         </li>
       </ul>
     </div>
-    <main>{% block content %} {% endblock content %}</main>
-    <script>
-      if (typeof module === "object") {
-        window.module = module;
-        module = undefined;
-      }
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- sidebar end -->
+    <!-- main content -->
+    <div class="container-fluid main pb-3">
+      <div class="row d-flex justify-content-between">
+        <div class="col-4 mt-4 ml-4">
+          <h2>Buildings</h2>
+        </div>
+        <div class="col-3 align-self-end text-center">
+          <a href="{% url 'building' %}" class="btn btn-primary"
+            >Add Building</a
+          >
+        </div>
+      </div>
+      <hr />
+      <div class="row">
+        {% if buildings %} {% for building in buildings %}
+        <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body">
+              <i class="far fa-building fa-3x icon"></i>
+              <p class="m-0">{{building.name}}</p>
+              <span>{{building.room_set.all|length}} Rooms</span>
+              <a
+                href="{% url 'building_detail' building.id %}"
+                class="stretched-link"
+              ></a>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="col-3 text-center mt-5">
+          <div class="card border-0">
+            <div class="card-body">
+              <i class="fas fa-city fa-3x icon"></i>
+              <p class="m-0">{{building.name}}</p>
+              <span>3 Rooms</span>
+            </div>
+          </div>
+        </div> -->
+        {% endfor %} {% else %} {% endif %}
+      </div>
+    </div>
+    <!-- main content end -->
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
     <script
       src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
       integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
       crossorigin="anonymous"
     ></script>
-
     <script
       src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
       integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
       crossorigin="anonymous"
     ></script>
-
-    <!--For bootstrap select plugin-->
-    <!-- Latest compiled and minified CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css"
-    />
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
-
-    <script>
-      if (window.module) module = window.module;
-    </script>
-    {% block javascript %} {% endblock javascript%}
+    <!-- <script>
+      // var a = "{{buildings|length}}";
+      // console.log(a);
+    </script> -->
   </body>
 </html>

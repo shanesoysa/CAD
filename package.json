@@ -11,5 +11,9 @@
   "license": "ISC",
   "devDependencies": {
     "electron": "^9.2.0"
+  },
+  "dependencies": {
+    "jquery.steps": "^1.0.2",
+    "mdbootstrap": "^4.19.1"
   }
 }

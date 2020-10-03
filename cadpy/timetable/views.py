@@ -1,24 +1,35 @@
+from django.db.models import fields
+from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.template.context_processors import request
 from django.shortcuts import render
 from django.template import RequestContext
 from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
+from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
 from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
 from django.db.utils import IntegrityError
 # import sys
 from .models import Lecturer as Lecturer1
+from .models import WorkingDays
 from .models import Subjects as Subjects1
 from .models import Session as Session1
 from .models import ParallelSession
 
+from django.views.generic import DetailView
+from .models import Building as BuildingModel, Room as RoomModel
+from django.core import serializers
+
+from .models import Session, ParallelSession, NonParallelSession, ConsecutiveSession
 from .models import NonParallelSession, ConsecutiveSession
 from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
 from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 import json
-from datetime import datetime, timedelta
+import datetime
 # Create your views here.
 
 
@@ -133,6 +144,107 @@ class DeleteLecturer(View):
 
         print("lecturer delete failed")
         pass
+
+
+def side(request):
+    return render(request, 'side.html')
+
+
+class Workingdays(ListView):
+    model = WorkingDays
+    template_name = 'addDays.html'
+    context_object_name = 'days'
+    # print(model)
+
+
+class Adddays(View):
+    def get(self, request):
+
+        try:
+            ndays = request.GET.get('numdays', None)
+            workingdays = request.GET.get('workingdays', None)
+            stime = request.GET.get('stime', None)
+            etime = request.GET.get('etime', None)
+            slots = request.GET.get('slots', None)
+
+          #  x = workingdays.split(',')
+           # print(x)
+
+          #  for y in x:
+            # print(y)
+            # print("successfull")
+            obj = WorkingDays.objects.create(
+                nubdays=ndays,
+                days=workingdays,
+                starttime=stime,
+                endtime=etime,
+                slot=slots,
+            )
+
+            day = {'id': obj.id, 'nubdays': obj.nubdays, 'days': obj.days,
+                   'starttime': obj.starttime, 'endtime': obj.endtime, 'slot': obj.slot}
+            data = {
+                'day': day
+            }
+            # print("successfull")
+            # print(data)
+            return JsonResponse(data)
+
+        except:
+
+            print("fail adding data")
+            pass
+
+
+class Updatedays(View):
+    def get(self, request):
+
+        try:
+            id1 = request.GET.get('id', None)
+            ndays = request.GET.get('numdays', None)
+            workingdays = request.GET.get('workingdays', None)
+            stime = request.GET.get('stime', None)
+            etime = request.GET.get('etime', None)
+            slots = request.GET.get('slots', None)
+
+            obj = WorkingDays.objects.get(id=id1)
+            obj.nubdays = ndays
+            obj.days = workingdays
+            obj.starttime = stime
+            obj.endtime = etime
+            obj.slot = slots
+            obj.save()
+
+            day = {'id': obj.id, 'nubdays': obj.nubdays, 'days': obj.days,
+                   'starttime': obj.starttime, 'endtime': obj.endtime, 'slot': obj.slot}
+
+            data = {
+                'day': day
+            }
+            return JsonResponse(data)
+
+        except:
+
+            print("days update failed")
+            pass
+
+
+def home(request):
+    return render(request, 'home.html')
+
+
+class Deletedays(View):
+    def get(self, request):
+        id1 = request.GET.get('id', None)
+        WorkingDays.objects.get(id=id1).delete()
+        data = {
+            'deleted': True
+        }
+        return JsonResponse(data)
+
+
+def timetables(request):
+    return render(request, 'timetables.html')
 
 
 class Subjects(ListView):
@@ -784,7 +896,6 @@ class AssignSessionsView(generic.ListView):
         """Return all session objects"""
         return Session1.objects.all()
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tags_list'] = Tags.objects.all()
@@ -835,6 +946,37 @@ class NonParallelSessionsView(generic.ListView):
     model = NonParallelSession
     template_name = 'sessions/non-parallel-sessions.html'
 
+
+# @csrf_exempt
+# def create_consecutive_session(request, pk):
+#     try:
+#         list_json = request.POST.get('session2_id_list', None)
+#         session2_list = json.loads(session2_list)
+#         session1_obj = Session.objects.get(pk=pk)
+
+#         for session2 in session2_list:
+#             session2_obj = Session.objects.get(pk=session2)
+#             ConsecutiveSession.objects.create(
+#                 session1=session1_obj,
+#                 session2=session2_obj
+#             )
+
+#         data = {
+#             'success_stat': 1
+#         }
+#         return JsonResponse(data)
+#     except IntegrityError as e:
+#         data = {
+#             'error_msg': 'Consecutive Session already exists',
+#             'success_stat': 0
+#         }
+#         return JsonResponse(data)
+#     except Exception as ex:
+#         data = {
+#             'error_msg': 'unexpected error',
+#             'success_stat': 0
+#         }
+#         return JsonResponse(data)
 
 @csrf_exempt
 def create_consecutive_session(request, pk):
@@ -1178,7 +1320,725 @@ def get_time_range(start_time, end_time, time_interval):
     while (current_time < end_time):
         stime = current_time.strftime('%H:%M')
         time_arr.append(stime)
-        current_time += timedelta(minutes=time_interval)
+        current_time += datetime.timedelta(minutes=time_interval)
 
     time_arr.append(end_time.strftime('%H:%M'))
     return time_arr
+
+
+#########################################################################################
+# ranul
+
+
+def addBuilding(request):
+    return render(request, 'locations/add_building.html')
+
+
+class CreateBuilding(View):
+    def get(self, request):
+        try:
+            name = request.GET.get('name', None)
+
+            obj = BuildingModel.objects.create(
+                name=name,
+            )
+
+            building = {'id': obj.id, 'name': obj.name}
+
+            data = {
+                'building': building
+            }
+
+            return JsonResponse(data)
+
+        except:
+            pass
+
+
+class CreateRoom(View):
+    def get(self, request):
+        try:
+            name = request.GET.get('room_name', None)
+            capacity = request.GET.get('capacity', None)
+            room_type = request.GET.get('type', None)
+            bid = request.GET.get('id', None)
+
+            building = BuildingModel.objects.get(id=bid)
+
+            obj = RoomModel.objects.create(
+                name=name,
+                capacity=capacity,
+                room_type=room_type,
+                building=building,
+            )
+
+            room = {'id': obj.id, 'name': obj.name}
+
+            data = {
+                'room': room
+            }
+
+            return JsonResponse(data)
+
+        except:
+            print("fail adding data")
+            pass
+
+
+class DeleteBuilding(View):
+    try:
+        def get(self, request):
+            id = request.GET.get('id', None)
+            BuildingModel.objects.get(id=id).delete()
+            data = {
+                'deleted': True
+            }
+            return JsonResponse(data)
+    except:
+
+        print("lecturer delete failed")
+        pass
+
+
+class DeleteRoom(View):
+    try:
+        def get(self, request):
+            id = request.GET.get('id', None)
+            RoomModel.objects.get(id=id).delete()
+            data = {
+                'deleted': True
+            }
+            return JsonResponse(data)
+    except:
+        pass
+
+
+class UpdateBuilding(View):
+    try:
+        def get(self, request):
+            id = request.GET.get('id', None)
+            name = request.GET.get('name', None)
+
+            obj = BuildingModel.objects.get(id=id)
+            obj.name = name
+            obj.save()
+
+            lecturer = {'id': obj.id, 'name': obj.name}
+
+            data = {
+                'lecturer': lecturer
+            }
+            return JsonResponse(data)
+
+    except:
+
+        print("lecturer update failed")
+        pass
+
+
+class UpdateRoom(View):
+    try:
+        def get(self, request):
+            id = request.GET.get('id', None)
+            name = request.GET.get('room_name', None)
+            capacity = request.GET.get('capacity', None)
+            room_type = request.GET.get('type', None)
+
+            obj = RoomModel.objects.get(id=id)
+            obj.name = name
+            obj.capacity = capacity
+            obj.room_type = room_type
+            obj.save()
+
+            room = {'id': obj.id, 'name': obj.name}
+
+            data = {
+                'room': room
+            }
+            return JsonResponse(data)
+
+    except:
+
+        print("lecturer update failed")
+        pass
+
+
+class Buildings(ListView):
+    model = BuildingModel
+    template_name = 'locations/all_buildings.html'
+    context_object_name = 'buildings'
+
+
+class BuildingDetail(DetailView):
+    model = BuildingModel
+    template_name = 'locations/building_detail.html'
+
+
+def lecturerStatistics(request):
+    return render(request, 'statistics/lecturer_statistics.html')
+
+
+def lecturerCount(reuqest):
+    count = Lecturer1.objects.count()
+    data = {
+        'count': count
+    }
+    return JsonResponse(data)
+
+
+def lecturerCenterStats(request):
+    metro = Lecturer1.objects.filter(center='Metro').count()
+    malabe = Lecturer1.objects.filter(center='Malabe').count()
+    matara = Lecturer1.objects.filter(center='Matara').count()
+    kurunegala = Lecturer1.objects.filter(center='Kurunagala').count()
+    kandy = Lecturer1.objects.filter(center='Kandy').count()
+    jaffna = Lecturer1.objects.filter(center='Jaffna').count()
+    centers = [metro, malabe, matara, kurunegala, kandy, jaffna]
+    data = {
+        'centers': centers,
+    }
+    return JsonResponse(data)
+
+
+def lecurerLevelStat(request):
+    p = Lecturer1.objects.filter(level=1).count()
+    ap = Lecturer1.objects.filter(level=2).count()
+    slhg = Lecturer1.objects.filter(level=3).count()
+    sl = Lecturer1.objects.filter(level=4).count()
+    l = Lecturer1.objects.filter(level=5).count()
+    al = Lecturer1.objects.filter(level=6).count()
+    i = Lecturer1.objects.filter(level=7).count()
+    levels = [p, ap, slhg, sl, l, al, i]
+    data = {
+        'levels': levels
+    }
+    return JsonResponse(data)
+
+
+def subjectCount(request):
+    count = Subjects1.objects.count()
+    data = {
+        'count': count
+    }
+    return JsonResponse(data)
+
+
+def subjectStatistics(request):
+    return render(request, 'statistics/subject_statistics.html')
+
+
+def allSubjectStatistics(request):
+    subjects = Subjects1.objects.all()
+    return JsonResponse(serializers.serialize('json', subjects), safe=False)
+
+
+def studentStatistics(request):
+    return render(request, 'statistics/student_statistics.html')
+
+
+def allProgrammeStatistics(request):
+    programmes = Programme.objects.all()
+    return JsonResponse(serializers.serialize('json', programmes), safe=False)
+
+
+def allYearSemesterStatistics(request):
+    yearSemester = AcademicYearSemester.objects.all()
+    return JsonResponse(serializers.serialize('json', yearSemester), safe=False)
+
+
+def allGroupStatistics(request):
+    groups = Group.objects.all()
+    return JsonResponse(serializers.serialize('json', groups), safe=False)
+
+
+def allSubGroupStatistics(request):
+    subGroups = Subgroup.objects.all()
+    return JsonResponse(serializers.serialize('json', subGroups), safe=False)
+
+
+def statistics(request):
+    return render(request, 'statistics/statistics.html')
+
+# rooms for lecturers view
+
+
+def lecturerRooms(request):
+    return render(request, 'rooms/lecturers.html')
+
+# load lecturers
+
+
+def loadLecturers(request):
+    return JsonResponse(serializers.serialize('json', Lecturer1.objects.all(), fields=('name')), safe=False)
+
+# load all rooms with building names
+
+
+def loadRooms(request):
+    locations = RoomModel.objects.select_related(
+        'building').order_by('building')
+    list = []
+    for row in locations:
+        list.append(
+            {'building_name': row.building.name, 'building_id': row.building.id, 'room_name': row.name, 'room_id': row.id})
+    return JsonResponse(list, safe=False)
+
+# rooms for groups
+
+
+def groupRooms(request):
+    return render(request, 'rooms/groups.html')
+
+# rooms for sessions
+
+
+def sessionRooms(request):
+    return render(request, 'rooms/sessions.html')
+
+# rooms for consecutive sessions
+
+
+def consecutiveSessionRooms(request):
+    some()
+    return render(request, 'rooms/consecutive_sessions.html')
+
+
+def some():
+    try:
+        print('lol')
+        print(datetime.timedelta(hours=2))
+        va = WorkingDays.objects.all()
+        days = va[0].days
+        v = []
+        v = days.split(',')
+        print(v)
+        # for index, i in enumerate(v):
+        #     if i == 'tuesday':
+        #         v[index] = 2
+        # print(v)
+
+        gid = 68
+        st = 8
+        et = 5
+
+        sessions = Session.objects.filter(group_id_id=gid)
+        sessionids = []
+        for i in sessions:
+            sessionids.append(i.id)
+
+        print(sessionids)
+
+        blockedtimes = GroupBlockedTimeslots.objects.filter(
+            group_id=gid)
+
+        print('#########')
+        s = '18:00'
+
+        datetime_object = datetime.strptime(
+            'Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
+        print(datetime_object)
+
+        # for i in sessions:
+        #     end = st + i.duration
+        #     for k in v:
+        #         for j in blockedtimes:
+        #             if(j.day != k and st > j.endtime and end < j.starttime):
+        #                 print('ok'+i.id)
+
+        print(sessionids)
+        return HttpResponse(' ')
+    except:
+        pass
+
+# rooms for subjects and relevant tags
+
+
+def subjectRooms(request):
+    return render(request, 'rooms/subjects.html')
+
+# unavailable times of rooms
+
+
+def timeRooms(request):
+    return render(request, 'rooms/time.html')
+
+
+# rooms for tags
+
+
+def tagRooms(request):
+    return render(request, 'rooms/tags.html')
+
+# add unavailable times of rooms
+
+
+class addUnavailableRooms(View):
+    def get(self, request):
+        try:
+            day = request.GET.get('day', None)
+            start = request.GET.get('start', None)
+            end = request.GET.get('end', None)
+            building = request.GET.get('building', None)
+            room = request.GET.get('room', None)
+
+            obj = UnavailableRoom.objects.create(
+                day=day,
+                start_time=start,
+                end_time=end,
+                building_id=building,
+                room_id=room,
+            )
+
+            saved = {
+                'id': obj.id
+            }
+
+            data = {
+                'created': saved
+            }
+
+            return JsonResponse(data)
+
+        except:
+            pass
+
+# delete all unavailable rooms
+
+
+def deleteAllUnavailableRooms(request):
+    try:
+        UnavailableRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+# delete unavailable room
+
+
+def deleteUnavailableRoom(request):
+    try:
+        id = request.GET.get('id', None)
+        UnavailableRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+# add rooms for lecturers
+
+
+class addLecturerRooms(View):
+    def get(self, request):
+        try:
+            lec = request.GET.get('lec', None)
+            building = request.GET.get('building', None)
+            room = request.GET.get('room', None)
+
+            obj = LecturerRoom.objects.create(
+                lecturer_id=lec,
+                building_id=building,
+                room_id=room
+            )
+
+            data = {
+                'id': obj.id
+            }
+            return JsonResponse(data)
+        except:
+            pass
+
+# delete rooms for lecturers
+
+
+def deleteLecturerRooms(request):
+    try:
+        id = request.GET.get('id', None)
+        LecturerRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+# delete all rooms for lecturers
+
+
+def deleteAllLecturerRooms(request):
+    try:
+        LecturerRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+# load groups
+
+
+def loadGroups(request):
+    return JsonResponse(serializers.serialize('json', Group.objects.all(), fields=('generated_group')), safe=False)
+
+
+def loadSubGroups(request):
+    return JsonResponse(serializers.serialize('json', Subgroup.objects.all(), fields=('generated_subgroup')), safe=False)
+
+
+# add rooms for groups
+
+def addGroupRoom(request):
+    try:
+        group = request.GET.get('group', None)
+        building = request.GET.get('building', None)
+        room = request.GET.get('room', None)
+
+        obj = GroupRoom.objects.create(
+            group_id=group, building_id=building, room_id=room
+        )
+
+        data = {
+            'id': obj.id
+        }
+
+        return JsonResponse(data)
+
+    except:
+        pass
+
+# add rooms for sub groups
+
+
+def addSubGroupRoom(request):
+    try:
+        subgroup = request.GET.get('subgroup', None)
+        building = request.GET.get('building', None)
+        room = request.GET.get('room', None)
+
+        obj = SubGroupRoom.objects.create(
+            subgroup_id=subgroup, building_id=building, room_id=room
+        )
+
+        data = {
+            'id': obj.id
+        }
+
+        return JsonResponse(data)
+
+    except:
+        pass
+
+
+# delete group room
+def deleteGroupRooms(request):
+    try:
+        id = request.GET.get('id', None)
+        GroupRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+
+# delete subgroup room
+def deleteSubGroupRooms(request):
+    try:
+        id = request.GET.get('id', None)
+        SubGroupRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+# delete all groups and subgroup rooms
+
+
+def deleteAllGroupRooms(request):
+    try:
+        GroupRoom.objects.all().delete()
+        SubGroupRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+# load tags
+
+
+def loadTags(request):
+    return JsonResponse(serializers.serialize('json', Tags.objects.all(), fields=('label')), safe=False)
+
+
+def addTagRoom(request):
+    try:
+        tag = request.GET.get('tag', None)
+        building = request.GET.get('building', None)
+        room = request.GET.get('room', None)
+
+        obj = TagRoom.objects.create(
+            tag_id=tag, building_id=building, room_id=room
+        )
+
+        data = {
+            'id': obj.id
+        }
+
+        return JsonResponse(data)
+    except:
+        pass
+
+# delete tag room
+
+
+def deleteTagRoom(request):
+    try:
+        id = request.GET.get('id', None)
+        TagRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+
+# delete all tag rooms
+
+
+def deleteAllTagRooms(request):
+    try:
+        TagRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+
+# load subjects
+def loadSubjects(request):
+    return JsonResponse(serializers.serialize('json', Subjects1.objects.all(), fields=('subjectName')), safe=False)
+
+
+# add rooms for subject and tag
+def addSubjectTagRoom(request):
+    try:
+        subject = request.GET.get('subject', None)
+        tag = request.GET.get('tag', None)
+        building = request.GET.get('building', None)
+        room = request.GET.get('room', None)
+
+        obj = SubjectTagRoom.objects.create(
+            subject_id=subject, tag_id=tag, building_id=building, room_id=room
+        )
+
+        data = {
+            'id': obj.id
+        }
+
+        return JsonResponse(data)
+    except:
+        pass
+
+
+def deleteSubjectTagRoom(request):
+    try:
+        id = request.GET.get('id', None)
+        SubjectTagRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+
+def deleteAllSubjectTagRooms(request):
+    try:
+        SubjectTagRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+# load all sessions
+
+
+def loadGroupSessions(request):
+    locations = Session.objects.select_related(
+        'group_id').select_related('tag').select_related('subject')
+    list = []
+    for row in locations:
+        list.append(
+            {'group_name': row.group_id.generated_group, 'id': row.id, 'tag': row.tag.label, 'subject': row.subject.subjectName})
+    return JsonResponse(list, safe=False)
+
+
+# load all subgroup sessions
+
+def loadSubGroupSessions(request):
+    locations = Session.objects.filter(subgroup_id__isnull=False).select_related(
+        'subgroup_id').select_related('tag').select_related('subject')
+    list = []
+    for row in locations:
+        list.append(
+            {'group_name': row.subgroup_id.generated_subgroup, 'id': row.id, 'tag': row.tag.label, 'subject': row.subject.subjectName})
+    return JsonResponse(list, safe=False)
+
+# add rooms for sessions
+
+
+def addSessionRooms(request):
+    try:
+        session = request.GET.get('session', None)
+        building = request.GET.get('building', None)
+        room = request.GET.get('room', None)
+
+        obj = SessionRoom.objects.create(
+            session_id=session, building_id=building, room_id=room
+        )
+
+        data = {
+            'id': obj.id
+        }
+
+        return JsonResponse(data)
+    except:
+        pass
+
+
+# delete session rooms
+def deleteSessionRooms(request):
+    try:
+        id = request.GET.get('id', None)
+        SessionRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+
+def deleteAllSessionRooms(request):
+    try:
+        SessionRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
+
+
+# load saved session rooms
+def loadConsecutiveSessions(request):
+    locations = ConsecutiveSession.objects.select_related(
+        'session1').select_related('session2')
+    list = []
+    for row in locations:
+        list.append(
+            {'session1_subject': row.session1.subject.subjectName, 'session1_tag': row.session1.tag.label, 'session1_group': row.session1.group_id.generated_group, 'session2_subject': row.session2.subject.subjectName, 'session2_tag': row.session2.tag.label, 'session2_group': row.session2.group_id.generated_group})
+
+    # print(list)
+    return JsonResponse(list, safe=False)
+
+
+# ranul
+#########################################################################################
