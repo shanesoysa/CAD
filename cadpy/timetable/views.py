@@ -776,7 +776,14 @@ class UpdateSubGroupsView(View):
 
 class AssignSessionsView(generic.ListView):
     model = Session
+
+    context_object_name = 'session_list'
     template_name = 'sessions/assign-sessions.html'
+
+    def get_queryset(self):
+        """Return all session objects"""
+        return Session.objects.all()
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
