@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
@@ -27,11 +28,13 @@ SECRET_KEY = 'adcc#^i*ig*%y5*72h4&c8d6-^48^n#iu*w1udroy$7c6ahihz'
 DEBUG = True
 
 ALLOWED_HOSTS = ['rehanih.pythonanywhere.com']
+# 'rehanih.pythonanywhere.com'
 
 
 # Application definition
 
 INSTALLED_APPS = [
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -120,3 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'assets')

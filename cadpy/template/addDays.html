@@ -1,0 +1,597 @@
+
+{% extends 'base.html' %}
+{% load timetable_extras %}
+{% block stylesheet %}
+
+{% endblock stylesheet %}
+
+{% block content %}
+
+<div class="sidebar text-center">
+  <ul>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-2x fa-home sidebar-icon"></i>
+        <span class="sidebar-text"> Home </span>
+        <a href="{% url 'home'%}" class="stretched-link"></a>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="far fa-calendar-alt fa-2x sidebar-icon"></i>
+        <span class="sidebar-text"> Working</span>
+        <span class="sidebar-text"> Days</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-2x fa-users sidebar-icon"></i>
+        <span class="sidebar-text"> Lecturers</span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-2x fa-book sidebar-icon"></i>
+        <span class="sidebar-text"> Subjects </span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-2x fa-user-friends sidebar-icon"></i>
+        <span class="sidebar-text"> Students </span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-2x fa-tags sidebar-icon"></i>
+        <span class="sidebar-text"> Tags </span>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button">
+        <i class="fas fa-2x fa-map-marker-alt sidebar-icon"></i>
+        <span class="sidebar-text"> Locations </span>
+        <a href="" class="stretched-link"></a>
+      </button>
+    </li>
+    <li>
+      <button class="sidebar-button" autofocus>
+        <i class="fas fa-2x fa-chart-pie sidebar-icon"></i>
+        <span class="sidebar-text"> Statistics </span>
+        <a href="" class="stretched-link"></a>
+      </button>
+    </li>
+  </ul>
+</div>
+
+
+
+    <div class="container main px-0">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1" >
+            <form id="addworkingdays" action=""  >
+                <br><br>
+                
+                <div align="center">
+                   <h3> <b>select working days</b></h3>
+                    <div class="checkbox">
+                      <label><input type="checkbox" class="chkbx"   value="monday">monday</label> &nbsp;&nbsp;&nbsp;&nbsp;
+                      <label><input type="checkbox" class="chkbx"value="tuesday">tuesday</label><br>
+                      <label><input type="checkbox"class="chkbx" value="wendsday">wendsday</label>&nbsp;&nbsp;&nbsp;&nbsp;
+                      <label><input type="checkbox" class="chkbx"value="thursday">thursday</label><br>
+                      <label><input type="checkbox"class="chkbx" value="friday">friday</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                      <label><input type="checkbox"class="chkbx" value="saturday">saturday</label><br>
+                      <label><input type="checkbox"class="chkbx" value="sunday">sunday</label><br>
+
+                    </div>
+                    <div class="col-sm-6">
+                      <input class="form-control" type="text"  id="count" readonly="readonly" placeholder="number of days" >
+                    </div>
+                    <div class="col-sm-6">
+                      <input class="form-control" type="text"  id="selectedtext" readonly="readonly" placeholder="days selected" >
+                       </div>
+                      </div> <br>
+
+                      <div align="center">
+                   <h3><b> select working time</b></h3>
+                    <div class="col-sm-6">
+                      <br>  <input type="time" name ="stime" id="default-picker" class="form-control" placeholder="Select time">
+                        <label for="default-picker">start time</label>
+                      </div>
+                      <div class="col-sm-6">
+                        <input type="time" name="etime" id="default-picker" class="form-control" placeholder="Select time">
+                        <label for="default-picker">end time</label>
+                      </div>
+                    </div>
+
+               <br>
+<div align="center">
+               <h3><b>arrange time slots</b></h3><br>
+               <div class="form-group">
+                <label for="exampleFormControlSelect1"></label>
+                <select class="form-control"  id="slots">
+                  <option >1 hour slots</option>
+                  <option >30 min slots</option>
+                </select>
+
+              </div>
+              <div class="form-group">
+                <input class="form-control" type="text"  id="slt" readonly="readonly" placeholder="selected time slot" >
+              </div>
+              <br>
+              </div>
+
+              <!-- {% for day in days %}
+              {% with var=day.days|split %} -->
+              <!-- {{day.days|split}} -->
+              <!-- {% for i in var %}
+            
+              <th class="userdays userData" name="days">  {{i}}</th>
+              {% endfor %}
+              {% endwith %} -->
+<!--    
+             <th class="userdays userData" name="days">{{a}}</th> -->
+              <!-- {% endfor %} -->
+               
+                <button  type="submit" class="btn btn-primary px-4 btn_save float-right">Save</button>
+                <br>
+              </form>
+              <button type="button" class="btn btn_amda btn-success invisible  px-4 float-left" onClick="editUser()" data-toggle="modal" data-target="#myModal")">EDIT</button>
+              <button type="button" class="btn btn_amda btn-danger invisible px-4 float-left" onClick="deletedays()">DELETE DAYS</button>
+            <br><br><br>
+            {% if days %}
+            {% for day in days %}
+            <!-- <button class="btn btn-success px-4 float-left" onClick="editUser({{day.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
+            <button class="btn btn-danger px-4 float-left" onClick="deletedays({{day.id}})")">DELETE DAYS</button> -->
+            {% endfor %}
+            {% else %}
+              
+            {% endif %}
+          </div>
+          <div class="col-md-10 col-md-offset-1">
+            <h3>working days</h3>
+           
+            <table id="userTable" class="table table-striped" boarder="1">
+              <tbody></tbody>
+              <input id="ranul" type="" class="invisible" >
+               <!-- <table id="userTable" class="table table-striped">
+                <tr id="user-{{day.id}}">
+                  
+                 
+                  {% for day in days %}
+                  {% with var=day.days|split %}
+                   {{day.days|split}} 
+                  {% for i in var %}
+                
+                  <th class="userdays userData" name="days">  {{i}}</th>
+                  {% endfor %}
+                  {% endwith %}
+  
+                 <th class="userdays userData" name="days">{{a}}</th> 
+                  {% endfor %}
+                  
+                </tr>
+
+                <input id="ranul" type="" class="invisible" >
+              <tr>
+                {% if days %}
+
+                  {% for day in days %}
+                  <td class="usernubdays userData" name="nubdays">{{day.nubdays}}</td>
+                  <td class="userdays userData" name="days">{{day.days}}</td>
+                  <td class="userstarttime userData" name="starttime">{{day.starttime}}</td>
+                  <td class="userendtime userData" name="endtime">{{day.endtime}}</td>
+                  <td class="userslot userData" name="slot">{{day.slot}}</td>
+                  <td align="center"></td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                      
+                    {% endif %}
+                    </table> -->
+                  </table>
+      </div>
+    </div>
+
+ <!-- Modal -->
+ <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title" id="myModalLabel">Update Working days</h4>
+      </div>
+      <form id="updatedays" action="">
+      <div class="modal-body">
+        <input class="form-control" id="form-id" type="hidden" name="formId"/>
+        <div class="checkbox">
+          <label><input type="checkbox" class="chkbxx"   value="monday">monday</label><br>
+          <label><input type="checkbox" class="chkbxx"value="tuesday">tuesday</label><br>
+          <label><input type="checkbox"class="chkbxx" value="wendsday">wendsday</label><br>
+          <label><input type="checkbox" class="chkbxx"value="thursday">thursday</label><br>
+          <label><input type="checkbox"class="chkbxx" value="friday">friday</label><br>
+          <label><input type="checkbox"class="chkbxx" value="saturday">saturday</label><br>
+          <label><input type="checkbox"class="chkbxx" value="sunday">sunday</label><br><br>
+
+        </div>
+        <div class="form-group">
+          <input class="form-control" type="text" name="countt" id="countt" readonly="readonly" placeholder="number of days" >
+        </div>
+        <div class="form-group">
+          <input class="form-control" type="text" name="selectedtextt" id="selectedtextt" readonly="readonly" placeholder="days selected" >
+           </div>
+   
+
+      <div class="form-group row">
+        <h3>select working time</h3><br>
+        <div class="col-sm-6">
+            <input type="time" name ="sstime" id="stime" class="form-control" placeholder="Select time">
+            <label for="default-picker">start time</label>
+          </div>
+          <div class="col-sm-6">
+            <input type="time" name="eetime" id="etime" class="form-control" placeholder="Select time">
+            <label for="default-picker">end time</label>
+          </div>
+    </div>
+
+   <br>
+   <h3>arrange time slots</h3><br>
+   <div class="form-group">
+    <label for="exampleFormControlSelect1">arrange time slots</label>
+    <select class="form-control"  id="slotss">
+      <option >1 hour slots</option>
+      <option >30 min slots</option>
+    </select>
+
+  </div>
+  <div class="form-group">
+    <input class="form-control" type="text"  name="sltt" id="sltt" readonly="readonly" placeholder="selected time slot" >
+  </div>
+  <br>
+      </div>
+      <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" >Save changes</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+$(document).ready(function(){
+  $('.chkbx').click(function(){
+    var text="";
+    $('.chkbx:checked').each(function(){
+      text+=$(this).val()+',';
+    });
+    text=text.substring(0,text.length-1);
+    $("#selectedtext").val(text);
+    var count=$("[type='checkbox']:checked").length;
+      $('#count').val($("[type='checkbox']:checked").length);
+  });
+});
+$(function(){
+  $("#slots").change(function(){
+    var slot=$("#slots option:selected").text();
+    $("#slt").val(slot);
+  });
+});
+
+$(document).ready(function(){
+  $('.chkbxx').click(function(){
+    var text="";
+    $('.chkbxx:checked').each(function(){
+      text+=$(this).val()+',';
+    });
+    text=text.substring(0,text.length-1);
+    $("#selectedtextt").val(text);
+    var count=$("[type='checkbox']:checked").length;
+      $('#countt').val($("[type='checkbox']:checked").length);
+  });
+});
+$(function(){
+  $("#slotss").change(function(){
+    var slot=$("#slotss option:selected").text();
+    $("#sltt").val(slot);
+  });
+});
+
+  console.log("awa awa")
+  $("form#addworkingdays").submit(function() {
+    console.log("awa awa 2")
+    var numdays = $('input[id="count"]').val().trim();
+    console.log("awa awa 3")
+    var workingdays = $('input[id="selectedtext"]').val().trim();
+    console.log("awa awa 4")
+    var stime = $('input[name="stime"]').val();
+    console.log(stime+"awa awa 5")
+    var etime = $('input[name="etime"]').val();
+    console.log("awa awa 6")
+    var slots = $('input[id="slt"]').val().trim();
+    console.log("awa awa 7")
+   console.log(numdays+workingdays+stime+etime+slots)
+
+    if (numdays && workingdays && stime && etime && slots) {
+        // Create Ajax Call
+        $.ajax({
+            url: '{% url "workingdays_create" %}',
+            data: {
+              'numdays':numdays,
+              'workingdays':workingdays,
+              'stime':stime,
+              'etime':etime,
+              'slots':slots
+              
+            },
+            
+            
+            dataType: 'json',
+            success: function (data) {
+              $('.btn_save').addClass('invisible');
+              $('.btn_amda').removeClass('invisible');
+              $('#ranul').attr("value", data.day.id);
+              
+
+              console.log(data.day);
+
+                if (data.day) {
+                  appendToUsrTable(data.day);
+                  alert("'Data Added'")
+                 
+                  
+                }
+                
+            }
+        });
+      } else {
+        alert("All fields must have a valid value.");
+    }
+    $('form#addworkingdays').trigger("reset");
+    return false;
+});
+console.log("aaad");
+function appendToUsrTable(day) {
+  console.log(day.nubdays+"dcd");
+  
+  
+  
+  var starttime=moment(day.starttime,"HH:mm");
+  console.log(starttime);
+  var endtime=moment(day.endtime,"HH:mm");
+  console.log(endtime);
+  var sl=0;
+  if( endtime.isBefore(starttime) ){
+    endtime.add(1, 'day');
+  }
+  console.log(day.slot);
+  if(day.slot==="30 min slots"){
+    sl=30;
+  }
+  else{
+    sl=60;
+  }
+  var alltimes=[];
+  //var current=moment(starttime,"HH:mm").format('LT');
+  //console.log(current);
+  //var sl=moment.duration(30,'minutes');
+  //console.log(sl);
+
+  while(starttime<=endtime){
+    alltimes.push(new moment(starttime).format("HH:mm"));
+    starttime.add(sl,'minutes');
+  }
+  console.log(alltimes);
+ // while(starttime<endtime){
+   // alltimes.push(starttime.format("HH:mm"));
+    //console.log("dddss");
+    //starttime.add(day.slot,'minutes')
+  //}
+ // console.log(alltimes+"slotssssss");
+  var arr = day.days.split(',');
+
+  $("#userTable > tbody:last-child").append(
+      '<th class="ud userData xxx" name="days"> </th>');
+  
+
+  for(var i = 0; i< arr.length;i++){
+    $("#userTable > tbody:last-child").append(
+      '<th class="ud userData xxx" name="days">'+arr[i]+' </th>');
+  
+  }
+
+  for(var i = 0; i<alltimes.length;i++){
+    $("#userTable > tbody:last-child").append(`
+    <tr id="user-">
+      <td class="erg userData sss" name="aaa">`+alltimes[i]+'-'+alltimes[i+1]+ `
+      </td></tr>
+    `);
+
+  
+  }
+  
+
+  $("#userTable > tbody:last-child").append(`
+        <tr id="user-${day.id}" class="invisible">
+            <td class="usernubdays userData" name="usernubdays">${day.nubdays}</td>
+            '<td class="userdays userData" name="userdays">${day.days}</td>
+            '<td class="userstarttime userData" name="userstarttime">${day.starttime}</td>
+            '<td class="userendtime userData" name="userendtime">${day.endtime}</td>
+            '<td class="userslot userData" name="userslot">${day.slot}</td>
+            
+           
+        </tr>
+    `);
+}
+
+
+
+// Create Django Ajax Call
+$("form#updatedays").submit(function() {
+    var idInput = $('input[name="formId"]').val().trim();
+    console.log(idInput+"awa awa 22")
+    var numdays = $('input[name="countt"]').val().trim();
+    console.log(numdays+"awa awa 33")
+    var workingdays = $('input[name="selectedtextt"]').val().trim();
+    console.log(workingdays+"awa awa 44")
+    var stime = $('input[name="sstime"]').val();
+    console.log(stime+"awa awa 55")
+    var etime = $('input[name="eetime"]').val();
+    console.log(etime+"awa awa 6")
+    var slots = $('input[name="sltt"]').val().trim();
+    console.log(slots+"awa awa 7")
+  if (numdays && workingdays && stime && etime && slots) {
+      // Create Ajax Call
+      $.ajax({
+          url: '{% url "workingdays_update" %}',
+          data: {
+              'id': idInput,
+              'numdays':numdays,
+              'workingdays':workingdays,
+              'stime':stime,
+              'etime':etime,
+              'slots':slots
+          },
+          dataType: 'json',
+          success: function (data) {
+              if (data.day) {
+                console.log(data.day);
+                updateToUserTabel(data.day);
+              }
+          }
+      });
+     } else {
+      alert("All fields must have a valid value.");
+  }
+  $('form#updatedays').trigger("reset");
+  $('#myModal').modal('hide');
+  return false;
+});
+
+// Update Django Ajax Call
+function editUser() {
+  console.log('ssssss')
+  var id = $('#ranul').val();
+  console.log('ssss'+ id)
+  if (id) {
+    tr_id = "#user-" + id;
+    
+    nubdays = $(tr_id).find(".usernubdays").text();
+    console.log(nubdays);
+    days = $(tr_id).find(".userdays").text();
+    console.log(days);
+    starttime = $(tr_id).find(".userstarttime").text();
+    endtime = $(tr_id).find(".userendtime").text();
+    slot = $(tr_id).find(".userslot").text();
+    $('#form-id').val(id);
+    $('#countt').val(nubdays);
+    $('#selectedtextt').val(days);
+    $('#stime').val(starttime);
+    $('#etime').val(endtime);
+    $('#sltt').val(slot);
+  }
+}
+function updateToUserTabel(day){
+  console.log('updateToUserTabel')
+  $("#userTable #user-" + day.id).children(".userData").each(function() {
+      var attr = $(this).attr("name");
+      if (attr == "usernubdays") {
+        $(this).text(day.nubdays);
+      } else if (attr == "userdays") {
+        $(this).text(day.days);
+      }else if (attr == "userstarttime") {
+          $(this).text(day.starttime);
+      } else if (attr == "userendtime") {
+        $(this).text(day.endtime);
+      } else {
+        $(this).text(day.slot);
+      }
+    });
+
+    var arr = day.days.split(',');
+
+    $(".xxx").remove();
+    
+
+    for(var i = 0; i< arr.length;i++){
+      $("#userTable > tbody:last-child").prepend(
+        '<th  class="userdays userData xxx" name="days">'+arr[i]+' </th>');
+      
+  
+    }
+
+    var starttime=moment(day.starttime,"HH:mm");
+  console.log(starttime);
+  var endtime=moment(day.endtime,"HH:mm");
+  console.log(endtime);
+  var sl=0;
+  if( endtime.isBefore(starttime) ){
+    endtime.add(1, 'day');
+  }
+  console.log(day.slot);
+  if(day.slot==="30 min slots"){
+    sl=30;
+  }
+  else{
+    sl=60;
+  }
+  var alltimes=[];
+  //var current=moment(starttime,"HH:mm").format('LT');
+  //console.log(current);
+  //var sl=moment.duration(30,'minutes');
+  //console.log(sl);
+
+  while(starttime<=endtime){
+    alltimes.push(new moment(starttime).format("HH:mm"));
+    starttime.add(sl,'minutes');
+  }
+  console.log(alltimes);
+  
+  $(".sss").remove();
+  $("#userTable > tbody:last-child").append(
+    '<th class="ud userData xxx" name="days"> </th>');
+
+  for(var i = 0; i<alltimes.length;i++){
+    $("#userTable > tbody:last-child").append(`
+    <tr id="user-">
+      <td class="erg userData sss" name="aaa">`+alltimes[i]+'-'+alltimes[i+1]+ `
+      </td></tr>
+    `);
+  }
+
+  }
+
+  // Delete Django Ajax Call
+function deletedays() {
+  var id = $('#ranul').val();
+  var action = confirm("Are you sure you want to delete this user?");
+  if (action != false) {
+    $.ajax({
+        url: '{% url "workingdays_delete" %}',
+        data: {
+            'id': id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if (data.deleted) {
+              $('.btn_amda').addClass('invisible');
+              $('.btn_save').removeClass('invisible');
+              $("#userTable #user-" + id).remove();
+            }
+        }
+    });
+  }
+  $(".xxx").remove();
+  $(".sss").remove();
+}
+
+
+
+</script>
+{% endblock %}

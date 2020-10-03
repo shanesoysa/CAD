@@ -21,7 +21,7 @@ function createWindow() {
   // and load the index.html of the app.
   win.loadURL("http://127.0.0.1:8000/");
   // Open the DevTools.
-  //   win.webContents.openDevTools();
+  win.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
