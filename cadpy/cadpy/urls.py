@@ -230,8 +230,8 @@ urlpatterns = [
          views.ConsecutiveSessionsView.as_view(), name="consecutive_sessions"),
     path('sessions/<int:pk>/consecutive/group-details',
          views.get_group_data, name="get_group_data"),
-    #     path('sessions/<int:pk>/consecutive/add',
-    #          views.create_consecutive_session, name="add_consecutive_sessions"),
+    path('sessions/<int:pk>/consecutive/add',
+              views.create_consecutive_session, name="add_consecutive_sessions"),
     path('sessions/<int:pk>/consecutive/search',
          views.get_consecutive_session, name="search_consecutive_sessions"),
 
