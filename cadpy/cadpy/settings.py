@@ -29,6 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['rehanih.pythonanywhere.com']
 # ALLOWED_HOSTS = []
+
 # 'rehanih.pythonanywhere.com'
 
 
