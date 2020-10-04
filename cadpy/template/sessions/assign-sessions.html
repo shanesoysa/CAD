@@ -180,17 +180,26 @@
                 <div class="modal-body">
                     <input id="bIdId" name="bIdname" type="hidden" />
                     <div class="row">
-                        {% for days in work_days %}
-                        <div class="col-4" id="col_day">
-                            <p>Day(s)</p>
-                            {% for day in days.get_all_days %}
-                            <div class="form-check">
-                                <input class="form-check-input check_count" type="checkbox" value="{{day}}" id="d-{{day}}">
-                                <label class="form-check-label" for="d-{{day}}">{{day}}</label>
+                        {% if  work_days %}
+                            {% for days in work_days %}
+                            <div class="col-4" id="col_day">
+                                <p>Day(s)</p>
+                                {% for day in days.get_all_days %}
+                                <div class="form-check">
+                                    <input class="form-check-input check_count" type="checkbox" value="{{day}}" id="d-{{day}}">
+                                    <label class="form-check-label" for="d-{{day}}">{{day}}</label>
+                                </div>
+                                {% endfor %}
                             </div>
                             {% endfor %}
+                        {% else %}  
+                        <div class="col-4" id="col_day">
+                            <p>Day(s)</p>
+                            <div class="form-check">
+                                <p>No Days found in system to display</p>
+                            </div>
                         </div>
-                        {% endfor %}
+                        {% endif %}
                         <div class="form-group col-4">
                             <div class="md-form md-outline">
                                 <label for="startTimeId">Start Time: </label>

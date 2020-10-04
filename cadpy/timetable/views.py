@@ -947,36 +947,36 @@ class NonParallelSessionsView(generic.ListView):
     template_name = 'sessions/non-parallel-sessions.html'
 
 
-# @csrf_exempt
-# def create_consecutive_session(request, pk):
-#     try:
-#         list_json = request.POST.get('session2_id_list', None)
-#         session2_list = json.loads(session2_list)
-#         session1_obj = Session.objects.get(pk=pk)
+@csrf_exempt
+def create_consecutive_session(request, pk):
+    try:
+        list_json = request.POST.get('session2_id_list', None)
+        session2_list = json.loads(session2_list)
+        session1_obj = Session.objects.get(pk=pk)
 
-#         for session2 in session2_list:
-#             session2_obj = Session.objects.get(pk=session2)
-#             ConsecutiveSession.objects.create(
-#                 session1=session1_obj,
-#                 session2=session2_obj
-#             )
+        for session2 in session2_list:
+            session2_obj = Session.objects.get(pk=session2)
+            ConsecutiveSession.objects.create(
+                session1=session1_obj,
+                session2=session2_obj
+            )
 
-#         data = {
-#             'success_stat': 1
-#         }
-#         return JsonResponse(data)
-#     except IntegrityError as e:
-#         data = {
-#             'error_msg': 'Consecutive Session already exists',
-#             'success_stat': 0
-#         }
-#         return JsonResponse(data)
-#     except Exception as ex:
-#         data = {
-#             'error_msg': 'unexpected error',
-#             'success_stat': 0
-#         }
-#         return JsonResponse(data)
+        data = {
+            'success_stat': 1
+        }
+        return JsonResponse(data)
+    except IntegrityError as e:
+        data = {
+            'error_msg': 'Consecutive Session already exists',
+            'success_stat': 0
+        }
+        return JsonResponse(data)
+    except Exception as ex:
+        data = {
+            'error_msg': 'unexpected error',
+            'success_stat': 0
+        }
+        return JsonResponse(data)
 
 @csrf_exempt
 def create_consecutive_session(request, pk):
