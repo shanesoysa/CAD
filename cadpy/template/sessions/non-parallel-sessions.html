@@ -25,7 +25,7 @@
     <hr>
     <div class="container-fluid">
         {% for psessions in nonparallelsession_list %}
-        <div class="row" id="sessions_list_id">
+        <div class="row" id="{{psessions.id}}">
             <i style="font-weight: 500; font-size: medium; color: #33344a;">{{ forloop.counter }} .</i>&nbsp; &nbsp;
             {% for session in psessions.sessions.all %}
             <div class="bg-white col-3 shadow text-black my-4 mr-4 some" id="{{session.id}}">
@@ -40,6 +40,9 @@
                 </div>
             </div>
             {% endfor %}
+            <div class="align-self-end ml-auto" id="remove_session_btn">
+                <i class="far fa-trash-alt"></i>
+            </div>
         </div>
         <hr/>
         {% endfor %}
@@ -52,7 +55,27 @@
 <script>
 $(function(){
 
-    
+    $('#remove_session_btn').click(function(){
+        var confirmation_result = confirm('Are you sure to delete non parallel session ? ')
+        var id = $(this).parent().attr('id')
+        if(confirmation_result){
+            $.ajax({
+                url: '{% url "non_parallel_sessions_remove" %}',
+                data: {
+                    'id': id,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.deleted) {
+                        $("#" + id).remove();
+                    }else{
+                        alert('Deletion Failed')
+                    }
+                }
+            });
+        }
+        
+    });
 
 });
 </script>

@@ -917,7 +917,6 @@ class DeleteSubGroups(View):
             }
             return JsonResponse(data)
         except:
-            print("programme delete failed")
             data = {
                 'deleted': False
             }
@@ -1042,7 +1041,6 @@ def create_consecutive_session(request, pk):
             'success_stat': 0
         }
         return JsonResponse(data)
-
 
 @csrf_exempt
 def create_consecutive_session(request, pk):
@@ -1371,12 +1369,17 @@ def view_blocked_timeslots(request):
             'day_list': day_list
         }
         return JsonResponse(data)
+    except WorkingDays.DoesNotExist as ex:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Please add working days information before proceding'
+        }
+        return JsonResponse(data)    
     except Exception as e:
         data = {
             'success_stat': 0,
             'error_msg': 'Unexpected Error'
         }
-        print(e)
         return JsonResponse(data)
 
 
@@ -2106,5 +2109,34 @@ def loadConsecutiveSessions(request):
     return JsonResponse(list, safe=False)
 
 
-# ranul
+# rehani
 #########################################################################################
+
+def deleteParallelSession(request, pk):
+    try:
+        id =  request.GET.get('id', None)
+        ParallelSession.objects.get(id=id).delete()
+        data = {
+            'deleted': True
+        }
+        return JsonResponse(data)
+    except:
+        data = {
+            'deleted': False
+        }
+        return JsonResponse(data)
+    
+def deleteNonParallelSession(request, pk):
+    try:
+        id =  request.GET.get('id', None)
+        NonParallelSession.objects.get(id=id).delete()
+        data = {
+            'deleted': True
+        }
+        return JsonResponse(data)
+    except:
+        data = {
+            'deleted': False
+        }
+        return JsonResponse(data)
+    
