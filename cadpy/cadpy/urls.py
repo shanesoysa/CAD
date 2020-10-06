@@ -203,7 +203,7 @@ urlpatterns = [
     path('rooms/loadConsecutiveSessions',
          views.loadConsecutiveSessions, name='loadConsecutiveSessions'),
 
-    # ranul
+    # rehani
     #################################################################################
     path('tags/', views.TagsView.as_view(), name='tags'),
     path('tags/add', views.AddTagsView.as_view(), name='add_tags'),
@@ -242,7 +242,11 @@ urlpatterns = [
 
     path('sessions/parallel', views.ParallelSessionsView.as_view(),
          name="parallel_sessions"),
+    path('sessions/parallel/<int:pk>', views.deleteParallelSession,
+         name="parallel_sessions_remove"),      
     path('sessions/non-parallel', views.NonParallelSessionsView.as_view(),
          name="non_parallel_sessions"),
+    path('sessions/non-parallel/remove', views.deleteNonParallelSession,
+         name="non_parallel_sessions_remove"),
 
 ]
