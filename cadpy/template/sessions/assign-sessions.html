@@ -248,24 +248,29 @@
             setTimeout(hideDrop, 2000);
         });
 
-        $('.add_icon').click(function(){
+        $(document.body).on('click', '.add_icon', function(){
+
             var id = $(this).parent().parent().attr('id');
             
-            var idList = JSON.stringify(getSession2IdList());
+            var idList = getSession2IdList();
             if(idList.includes(id)){
                 alert('Session already added to list')
             }else{
                 $('.boxed #boxes').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'));
-                $('#boxes #' + id).find('.all_icons').html('<i class="icon-remove topcornerright remove_icon"></i>');
-                $(this).hide();
-                $('#parallel_btn').prop('disabled', false);
+                $(this).css('display', 'hidden');
+                $('#boxes #' + id).find('.all_icons').html('<i class="fas fa-minus topcornerright remove_icon"></i>');
+                idList = getSession2IdList();
+                if((idList.length) > 1){
+                    $('#parallel_btn').prop('disabled', false);
+                }
             }
         });
 
-        $('.remove_icon').click(function(){
+        $(document.body).on('click', '.remove_icon',
+            function(){
             var id = $(this).parent().parent().attr('id');
             $('#boxes #' + id).remove()
-            $('#sessions_list_id #' + id + '.add_icon').show();
+            $('#sessions_list_id #' + id + '.add_icon').css('display', 'block');
         });
 
         $('.boxed > button').click(function(){
