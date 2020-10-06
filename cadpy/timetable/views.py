@@ -1,3 +1,4 @@
+import json
 from django.db.models import fields
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -243,8 +244,43 @@ class Deletedays(View):
         return JsonResponse(data)
 
 
-def timetables(request):
-    return render(request, 'timetables.html')
+class timetables(generic.ListView):
+    model = Session1
+    context_object_name = 'sessions'
+    template_name = 'timetables.html'
+
+    # se=Session1()
+    # print(se)
+    # queryset = Session1.objects.prefetch_related('lecturers')
+
+    def get_queryset(self):
+        """Return the lecturer objects with only specified fields"""
+        return Session1.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['work_days'] = WorkingDays.objects.all()
+        context['lecturers'] = Lecturer1.objects.all()
+        context['tags'] = Tags.objects.all()
+        context['subjects'] = Subjects1.objects.all()
+        context['groups'] = Group.objects.all()
+        return context
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(Session, self).get_context_data(**kwargs)
+    #     print("---------------------------------")
+    #     print(context)
+    #     context.update({
+    #         'lecturers': Lecturer1.objects.all(),
+    #         'tags': Tags.objects.all(),
+    #         'subjects': Subjects1.objects.all(),
+    #         'groups': Group.objects.all(),
+    #         'subgroups': .objects.select_related('group'),
+    #         'sessions': Session1.objects.prefetch_related('group_id', 'subject', 'tag', 'subgroup_id').all(),
+    #         'more_context': Model.objects.all(),
+    #     })
+
+        # return context
 
 
 class Subjects(ListView):
@@ -257,6 +293,7 @@ class AddSubjects(View):
     def get(self, request):
 
         try:
+            Subgroup
             offeredYear1 = request.GET.get('offeredYear', None)
             offeredSemester1 = request.GET.get('offeredSemester', None)
             subjectName1 = request.GET.get('subjectName', None)
@@ -363,6 +400,7 @@ class Session(generic.ListView):
             'sessions': Session1.objects.prefetch_related('group_id', 'subject', 'tag', 'subgroup_id').all(),
             # 'more_context': Model.objects.all(),
         })
+
         return context
 
     # def get_queryset(self):
@@ -396,15 +434,36 @@ class AddSession(View):
             students = request.GET.get('students', None)
             groups = request.GET.get('groups', None)
             duration = request.GET.get('duration', None)
+            x = request.GET.get('x', None)
 
-            obj = Session1.objects.create(
-                subject_id=subjects,
-                tag_id=tags,
-                student_count=students,
-                group_id_id=groups,
-                duration=duration
-            )
+            print(x)
+            if x == 'group':
 
+                print("inside group")
+                obj = Session1.objects.create(
+                    group_id_id=groups,
+                    subject_id=subjects,
+                    tag_id=tags,
+                    duration=duration,
+                    student_count=students
+                )
+                print(obj)
+            elif x == 'subgroup':
+                print("inside sub-group")
+                groupforeign = Subgroup.objects.get(pk=groups)
+                print(groupforeign)
+                id_of_group = groupforeign.group_id
+                obj = Session1.objects.create(
+                    group_id_id=id_of_group,
+                    subgroup_id_id=groups,
+                    subject_id=subjects,
+                    tag_id=tags,
+                    duration=duration,
+                    student_count=students
+                )
+                print(obj)
+
+            print('#############################################')
             latestid = Session1.objects.latest('id')
             # for lec in lecturers:
             #     print(lec)
@@ -427,6 +486,12 @@ class AddSession(View):
         except:
             print("fail adding data")
             pass
+            result = {
+                'success': 'failed'
+            }
+            # print('lectureeeeeeeeeeeees:'+lecturers)
+            return JsonResponse(result)
+
             # result = {
             #     'success': 'false'
             # }
@@ -947,36 +1012,37 @@ class NonParallelSessionsView(generic.ListView):
     template_name = 'sessions/non-parallel-sessions.html'
 
 
-# @csrf_exempt
-# def create_consecutive_session(request, pk):
-#     try:
-#         list_json = request.POST.get('session2_id_list', None)
-#         session2_list = json.loads(session2_list)
-#         session1_obj = Session.objects.get(pk=pk)
+@csrf_exempt
+def create_consecutive_session(request, pk):
+    try:
+        list_json = request.POST.get('session2_id_list', None)
+        session2_list = json.loads(session2_list)
+        session1_obj = Session.objects.get(pk=pk)
 
-#         for session2 in session2_list:
-#             session2_obj = Session.objects.get(pk=session2)
-#             ConsecutiveSession.objects.create(
-#                 session1=session1_obj,
-#                 session2=session2_obj
-#             )
+        for session2 in session2_list:
+            session2_obj = Session.objects.get(pk=session2)
+            ConsecutiveSession.objects.create(
+                session1=session1_obj,
+                session2=session2_obj
+            )
 
-#         data = {
-#             'success_stat': 1
-#         }
-#         return JsonResponse(data)
-#     except IntegrityError as e:
-#         data = {
-#             'error_msg': 'Consecutive Session already exists',
-#             'success_stat': 0
-#         }
-#         return JsonResponse(data)
-#     except Exception as ex:
-#         data = {
-#             'error_msg': 'unexpected error',
-#             'success_stat': 0
-#         }
-#         return JsonResponse(data)
+        data = {
+            'success_stat': 1
+        }
+        return JsonResponse(data)
+    except IntegrityError as e:
+        data = {
+            'error_msg': 'Consecutive Session already exists',
+            'success_stat': 0
+        }
+        return JsonResponse(data)
+    except Exception as ex:
+        data = {
+            'error_msg': 'unexpected error',
+            'success_stat': 0
+        }
+        return JsonResponse(data)
+
 
 @csrf_exempt
 def create_consecutive_session(request, pk):

@@ -28,7 +28,7 @@ urlpatterns = [
     path('adddays/', views.Adddays.as_view(), name='workingdays_create'),
     path('updatedays/', views.Updatedays.as_view(), name='workingdays_update'),
     path('deletedays/', views.Deletedays.as_view(), name='workingdays_delete'),
-    path('timetables/', views.timetables, name='timetable'),
+    path('timetables/', views.timetables.as_view(), name='timetable'),
 
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
@@ -230,8 +230,8 @@ urlpatterns = [
          views.ConsecutiveSessionsView.as_view(), name="consecutive_sessions"),
     path('sessions/<int:pk>/consecutive/group-details',
          views.get_group_data, name="get_group_data"),
-    #     path('sessions/<int:pk>/consecutive/add',
-    #          views.create_consecutive_session, name="add_consecutive_sessions"),
+     path('sessions/<int:pk>/consecutive/add',
+          views.create_consecutive_session, name="add_consecutive_sessions"),
     path('sessions/<int:pk>/consecutive/search',
          views.get_consecutive_session, name="search_consecutive_sessions"),
 

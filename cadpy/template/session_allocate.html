@@ -14,7 +14,7 @@
     <li class="cycle-tab-item active">
       <a class="nav-link" role="tab" id="addsection" data-toggle="tab" href="">Add New Session</a>
     </li>
-    <li class="cycle-tab-item"> 
+    <li class="cycle-tab-item active"> 
       <a class="nav-link" role="tab" id="viewsection" data-toggle="tab" href="">View Added Sessions</a>
     </li>
 
@@ -106,6 +106,7 @@
             type="text"
             name="nostudents"
             id="nostudents"
+            readonly
             
            
           />
@@ -137,7 +138,7 @@
 
       {% for group in groups %}
     
-          <option style="color:black;" value="{{group.id}}"> {{group.generated_group}}&nbsp; |&nbsp;{{group.student_count}}</option>
+          <option style="color:black;" data-value="{{group.student_count}}" value="{{group.id}}"> {{group.generated_group}}&nbsp; |&nbsp;{{group.student_count}}</option>
       {% endfor %}
       
      
@@ -153,7 +154,7 @@
 
       {% for subgroup in subgroups %}
     
-          <option style="color:black;" value="{{subgroup.id}}">{{subgroup.generated_subgroup}}&nbsp; |&nbsp;{{subgroup.group.student_count}}</option>
+          <option style="color:black;" data-value="{{subgroup.group.student_count}}" value="{{subgroup.id}}">{{subgroup.generated_subgroup}}&nbsp; |&nbsp;{{subgroup.group.student_count}}</option>
       {% endfor %}
       
      
@@ -222,30 +223,31 @@
 <div class="container" id="tablediv">
 
   <div class="row">
-  <div class="col-4">
+  <div class="col-8">
   <h3>Sessions</h3>
 </div>
-<div class="col-4">
-  
-</div>
 
-  <div class="col-4" style="float: left;">
+
+  
+  
+    <div class="col-4">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
       </div>
       <input type="text" class="form-control" id="myInput" placeholder="Search..." aria-label="Username" aria-describedby="basic-addon1">
     </div>
-    
-  </div>
+    </div>
+
+  
 
 </div>
 <div class="row">
 {% for session in sessions %}
 
-<div class="col-3">
+<div class="col-3" id="sessionblock">
 
-  <div class="card p-2" style="width: 18rem;">
+  <div class="card p-2" style="width: 18rem;" id="card">
     <div class="card-body" style="line-height: 100%;">
       <!-- <h5 class="card-title">Card title</h5> -->
       <h6 class="card-subtitle mb-2 text">{{session.get_lecturers}}</h6>
@@ -304,10 +306,40 @@
     $("#divsubgroup").addClass('d-none');
     $("#divgroup").removeClass('d-none');
     $("#tablediv").hide();
-
     
+    
+    $("#myInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#sessionblock .card").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+      });
+    });
+
 
   });
+
+
+function loadsessions(){
+  $.ajax({
+    url: '{% url "sessions" %}',
+    method: 'GET',   
+    success: function (r) {
+     console.log(r.result)
+        
+    }
+});
+  
+}
+
+var groupstdcount=0;
+var subgroupstdcount=0;
+$("#loadgroups").change(function () {
+  groupstdcount=$(this).find(':selected').data("value");
+});
+
+$("#loadsubgroups").change(function () {
+  subgroupstdcount=$(this).find(':selected').data("value");
+});
 
 
   $("form#addsession").submit(function() {
@@ -323,17 +355,21 @@
     console.log("lec :"+lecturers+"subject :"+subjects+"tags :"+tags+"student :"+students+"groups :"+groups+"subgroups :"+subgroups+"duration :"+duration);
     if (lecturers && subjects && tags && students && duration && (groups || subgroups)) {
       if(radiovalue == 1)
+     
         // Create Ajax Call
         {
+          console.log('group submission');
+          var x = 'group';
           $.ajax({
             url: '{% url "session_create" %}',
             data: {
               'lecturers':lecturers,
               'subjects':subjects,
               'tags':tags,
-              'students':students,
+              'students':groupstdcount,
               'groups':groups,
-              'duration':duration
+              'duration':duration,
+              'x':x
               
             },
             dataType: 'json',
@@ -348,21 +384,29 @@
 
               
               console.log(r.success);
-
+              
               swal("success","session created for group", "success");
-              location.reload();
+              
                 
+            },
+            error:function(){
+              swal("error","notadded", "error");
             }
         });
-      }else{
+      }
+      else{
+        console.log('subgroup submission');
+        var x ='subgroup';
         $.ajax({
           url: '{% url "session_create" %}',
           data: {
             'lecturers':lecturers,
             'subjects':subjects,
             'tags':tags,
-            'students':students,
-            'groups':subgroups
+            'students':groupstdcount,
+            'groups':subgroups,
+            'duration':duration,
+            'x': x
           },
           dataType: 'json',
           beforeSend: function() {
@@ -375,7 +419,7 @@
 
             console.log(r.success);
             swal("success","session created for sub-group", "success");
-              location.reload();
+              
 
               
           }
@@ -389,22 +433,36 @@
     $('form#addLecturer').trigger("reset");
     return false;
 });
+var student = $('#nostudents');
+$('#loadgroups').change(function(){
+  student.val(groupstdcount);
+});
 
+$('#loadsubgroups').change(function(){
+  student.val(subgroupstdcount);
+});
 
    $('input[name="groups"]').change(function(){
     var value = $('input[name="groups"]:checked').val();
     var lecturers = $('#loadlecturers').val();
+    
+
 
     if(value==1){
 
+      student.val('');
+      
+      
       $("#divsubgroup").addClass('d-none');
       $("#divgroup").removeClass('d-none');
-     console.log("pressed 1");
+     console.log("pressed 1"+groupstdcount);
 
 
     }else{
-
-      console.log("pressed 2");
+      
+      
+      student.val('');
+      console.log("pressed 2"+subgroupstdcount);
 
       $("#divsubgroup").removeClass('d-none');
       $("#divgroup").addClass('d-none');
