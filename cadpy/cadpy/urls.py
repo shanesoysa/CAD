@@ -202,6 +202,12 @@ urlpatterns = [
          views.deleteAllSessionRooms, name='deleteAllSessionRooms'),
     path('rooms/loadConsecutiveSessions',
          views.loadConsecutiveSessions, name='loadConsecutiveSessions'),
+    path('rooms/addConsecutiveSessionRooms',
+         views.addConsecutiveSessionRooms, name='addConsecutiveSessionRooms'),
+    path('rooms/deleteConsecutiveSessionRooms',
+         views.deleteConsecutiveSessionRooms, name='deleteConsecutiveSessionRooms'),
+    path('rooms/deleteAllConsecutiveSessionRooms',
+         views.deleteAllConsecutiveSessionRooms, name='deleteAllConsecutiveSessionRooms'),
 
     # rehani
     #################################################################################

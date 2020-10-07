@@ -135,6 +135,7 @@ class Session(models.Model):
     duration = models.IntegerField(default=1)
     consecutive_session = models.ForeignKey(
         'self', on_delete=models.CASCADE, null=True, blank=True)
+    objects = models.Manager()
 
     def get_lecturers(self):
         if self.lecturers:
@@ -262,6 +263,17 @@ class SessionRoom(models.Model):
     building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     objects = models.Manager()
+
+
+class ConsecutiveSessionRoom(models.Model):
+    session1 = models.ForeignKey(
+        Session, on_delete=models.CASCADE, related_name='session1')
+    session2 = models.ForeignKey(
+        Session, on_delete=models.CASCADE, related_name='session2')
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, null=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    objects = models.Manager()
+
 
 #########################################################################
 
