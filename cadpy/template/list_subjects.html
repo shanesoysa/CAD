@@ -14,7 +14,7 @@
       <li class="cycle-tab-item active">
         <a class="nav-link" role="tab" id="addsubject" data-toggle="tab" href="">Add New Subject</a>
       </li>
-      <li class="cycle-tab-item"> 
+      <li class="cycle-tab-item active"> 
         <a class="nav-link" role="tab" id="viewsubjecttable" data-toggle="tab" href="#profile">View Added Subjects</a>
       </li>
   
@@ -187,7 +187,7 @@
                   <button class="btn btn-success form-control" onClick="editUser({{subject.id}})" data-toggle="modal" data-target="#myModal")">EDIT</button>
               </td>
               <td align="center">
-                  <button class="btn btn-danger form-control" onClick="deleteUser({{subject.id}})">DELETE</button>
+                  <button class="btn btn-danger form-control" onClick="deleteUser({{subject.id}})">X</button>
               </td>
           </tr>
           {% endfor %}
@@ -383,7 +383,7 @@
                   <button class="btn btn-success form-control" onClick="editUser(${subject.id})" data-toggle="modal" data-target="#myModal")">EDIT</button>
               </td>
               <td align="center">
-                  <button class="btn btn-danger form-control" onClick="deleteUser(${subject.id})">DELETE</button>
+                  <button class="btn btn-danger form-control" onClick="deleteUser(${subject.id})">X</button>
               </td>
           </tr>l
       `);

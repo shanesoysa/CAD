@@ -28,7 +28,7 @@ urlpatterns = [
     path('adddays/', views.Adddays.as_view(), name='workingdays_create'),
     path('updatedays/', views.Updatedays.as_view(), name='workingdays_update'),
     path('deletedays/', views.Deletedays.as_view(), name='workingdays_delete'),
-    path('timetables/', views.timetables, name='timetable'),
+    path('timetables/', views.timetables.as_view(), name='timetable'),
 
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
@@ -209,7 +209,7 @@ urlpatterns = [
     path('rooms/deleteAllConsecutiveSessionRooms',
          views.deleteAllConsecutiveSessionRooms, name='deleteAllConsecutiveSessionRooms'),
 
-    # ranul
+    # rehani
     #################################################################################
     path('tags/', views.TagsView.as_view(), name='tags'),
     path('tags/add', views.AddTagsView.as_view(), name='add_tags'),
@@ -248,7 +248,11 @@ urlpatterns = [
 
     path('sessions/parallel', views.ParallelSessionsView.as_view(),
          name="parallel_sessions"),
+    path('sessions/parallel/<int:pk>', views.deleteParallelSession,
+         name="parallel_sessions_remove"),
     path('sessions/non-parallel', views.NonParallelSessionsView.as_view(),
          name="non_parallel_sessions"),
+    path('sessions/non-parallel/remove', views.deleteNonParallelSession,
+         name="non_parallel_sessions_remove"),
 
 ]

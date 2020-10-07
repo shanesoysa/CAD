@@ -1,3 +1,4 @@
+import json
 from django.db.models import fields
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -10,6 +11,8 @@ from django.views import generic
 from django.http import JsonResponse
 from .models import ConsecutiveSessionRoom, GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
 from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
+from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
+from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags
 from django.db.utils import IntegrityError
 # import sys
 from .models import Lecturer as Lecturer1
@@ -243,8 +246,43 @@ class Deletedays(View):
         return JsonResponse(data)
 
 
-def timetables(request):
-    return render(request, 'timetables.html')
+class timetables(generic.ListView):
+    model = Session1
+    context_object_name = 'sessions'
+    template_name = 'timetables.html'
+
+    # se=Session1()
+    # print(se)
+    # queryset = Session1.objects.prefetch_related('lecturers')
+
+    def get_queryset(self):
+        """Return the lecturer objects with only specified fields"""
+        return Session1.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['work_days'] = WorkingDays.objects.all()
+        context['lecturers'] = Lecturer1.objects.all()
+        context['tags'] = Tags.objects.all()
+        context['subjects'] = Subjects1.objects.all()
+        context['groups'] = Group.objects.all()
+        return context
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(Session, self).get_context_data(**kwargs)
+    #     print("---------------------------------")
+    #     print(context)
+    #     context.update({
+    #         'lecturers': Lecturer1.objects.all(),
+    #         'tags': Tags.objects.all(),
+    #         'subjects': Subjects1.objects.all(),
+    #         'groups': Group.objects.all(),
+    #         'subgroups': .objects.select_related('group'),
+    #         'sessions': Session1.objects.prefetch_related('group_id', 'subject', 'tag', 'subgroup_id').all(),
+    #         'more_context': Model.objects.all(),
+    #     })
+
+        # return context
 
 
 class Subjects(ListView):
@@ -257,6 +295,7 @@ class AddSubjects(View):
     def get(self, request):
 
         try:
+            Subgroup
             offeredYear1 = request.GET.get('offeredYear', None)
             offeredSemester1 = request.GET.get('offeredSemester', None)
             subjectName1 = request.GET.get('subjectName', None)
@@ -363,6 +402,7 @@ class Session(generic.ListView):
             'sessions': Session1.objects.prefetch_related('group_id', 'subject', 'tag', 'subgroup_id').all(),
             # 'more_context': Model.objects.all(),
         })
+
         return context
 
     # def get_queryset(self):
@@ -879,7 +919,6 @@ class DeleteSubGroups(View):
             }
             return JsonResponse(data)
         except:
-            print("programme delete failed")
             data = {
                 'deleted': False
             }
@@ -928,7 +967,7 @@ class AssignSessionsView(generic.ListView):
         context['tags_list'] = Tags.objects.all()
         context['subject_list'] = Subjects1.objects.all()
         context['lecturer_list'] = Lecturer1.objects.all()
-        context['work_days'] = MockWorkingDays.objects.all()
+        context['work_days'] = WorkingDays.objects.all()
         context['group_list'] = Group.objects.exclude(generated_group=None)
         return context
 
@@ -960,7 +999,7 @@ class BlockTimeSlotsView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['work_days'] = MockWorkingDays.objects.all()
+        context['work_days'] = WorkingDays.objects.all()
         return context
 
 
@@ -1261,7 +1300,7 @@ def create_blocked_session(request):
                     endtime=end_time
                 )
 
-        timeobj = MockWorkingDays.objects.get()
+        timeobj = WorkingDays.objects.get()
         start_time = datetime.strptime(timeobj.starttime, '%H:%M')
         end_time = datetime.strptime(timeobj.endtime, '%H:%M')
         day_list = timeobj.get_all_days()
@@ -1315,7 +1354,7 @@ def view_blocked_timeslots(request):
                                  'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
                 return_list.append(subgroup_info)
 
-        timeobj = MockWorkingDays.objects.get()
+        timeobj = WorkingDays.objects.get()
         start_time = datetime.strptime(timeobj.starttime, '%H:%M')
         end_time = datetime.strptime(timeobj.endtime, '%H:%M')
         day_list = timeobj.get_all_days()
@@ -1332,12 +1371,17 @@ def view_blocked_timeslots(request):
             'day_list': day_list
         }
         return JsonResponse(data)
+    except WorkingDays.DoesNotExist as ex:
+        data = {
+            'success_stat': 0,
+            'error_msg': 'Please add working days information before proceding'
+        }
+        return JsonResponse(data)    
     except Exception as e:
         data = {
             'success_stat': 0,
             'error_msg': 'Unexpected Error'
         }
-        print(e)
         return JsonResponse(data)
 
 
@@ -2126,5 +2170,34 @@ def deleteAllConsecutiveSessionRooms(request):
         pass
 
 
-# ranul
+# rehani
 #########################################################################################
+
+def deleteParallelSession(request, pk):
+    try:
+        id =  request.GET.get('id', None)
+        ParallelSession.objects.get(id=id).delete()
+        data = {
+            'deleted': True
+        }
+        return JsonResponse(data)
+    except:
+        data = {
+            'deleted': False
+        }
+        return JsonResponse(data)
+    
+def deleteNonParallelSession(request, pk):
+    try:
+        id =  request.GET.get('id', None)
+        NonParallelSession.objects.get(id=id).delete()
+        data = {
+            'deleted': True
+        }
+        return JsonResponse(data)
+    except:
+        data = {
+            'deleted': False
+        }
+        return JsonResponse(data)
+    

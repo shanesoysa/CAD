@@ -1,5 +1,144 @@
 {% extends 'base.html' %} {% block title %}Blocking Sessions{% endblock title %}
 {% block stylesheet %}{% endblock stylesheet %} {% block content %}
+<style>
+  body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-family: "Roboto", sans-serif;
+    letter-spacing: 0px;
+    font-size: 16px;
+    color: #94999e;
+    font-weight: 400;
+    line-height: 28px;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #222528;
+    margin: 0px 0px 15px 0px;
+    font-family: "Oswald", sans-serif;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  h1 {
+    font-size: 36px;
+  }
+  h2 {
+    font-size: 32px;
+    line-height: 38px;
+  }
+  h3 {
+    font-size: 20px;
+    line-height: 32px;
+  }
+  h4 {
+    font-size: 18px;
+  }
+  h5 {
+    font-size: 14px;
+    line-height: 27px;
+  }
+  h6 {
+    font-size: 12px;
+  }
+  p {
+    margin: 0 0 20px;
+    line-height: 1.7;
+  }
+  p:last-child {
+    margin: 0px;
+  }
+  ul,
+  ol {
+    font-family: "Roboto", sans-serif;
+  }
+  a {
+    text-decoration: none;
+    color: #94999e;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    transition: all 0.3s;
+  }
+  a:focus,
+  a:hover {
+    text-decoration: none;
+    color: #33344a;
+  }
+
+  .timetable {
+  }
+  .timetable-workout {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background-color: #33344a;
+    font-weight: 700;
+    font-family: "Oswald", sans-serif;
+  }
+  .timetable-workout,
+  .timetable.table > tbody > tr > td {
+    color: #fff;
+  }
+  .timetable,
+  .table > tbody > tr > th {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    font-family: "Oswald", sans-serif;
+  }
+  .timetable,
+  .table > thead > tr > th {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    font-family: "Oswald", sans-serif;
+  }
+  .table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+  .box-table {
+    padding: 16px 30px;
+    margin: 0 -15px 15px;
+    border-color: ;
+    border: 1px solid #eee;
+  }
+  .table > tbody > tr > td,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > td,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > thead > tr > th {
+    border-top: transparent;
+    color: #26282c;
+    border-bottom: 1px solid #eee;
+  }
+  .table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #eee;
+  }
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: hsl(224, 100%, 99%);
+  }
+  caption {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    color: #26282c;
+    text-align: left;
+    caption-side: bottom;
+  }
+  .mb30 {
+    margin-bottom: 30px;
+  }
+</style>
 <div class="container-fluid main bg-white">
   <div class="bg-light" style="padding: 10px 0px; font-weight: 900">
     <h3 style="color: #33344a">select timetable</h3>
@@ -14,7 +153,7 @@
             name="block_name"
             id="lecturer"
             value="L"
-            checked="true"
+            
           />
           <label class="form-check-label" for="lecturer">Lecturer</label>
         </div>
@@ -25,6 +164,7 @@
             name="block_name"
             id="group"
             value="G"
+            
           />
           <label class="form-check-label" for="group"> Room</label>
         </div>
@@ -35,6 +175,7 @@
             name="block_name"
             id="room"
             value="R"
+            checked="true"
           />
           <label class="form-check-label" for="subgroup">Group</label>
         </div>
@@ -44,24 +185,855 @@
             class="form-control selectpicker"
             data-live-search="true"
             name="group"
+            
+            
           >
             <option value="default" disabled selected>Select</option>
-            {% for lecturer in lecturer_list %}
-            <option value="{{lecturer.id}}">
-              {{ lecturer.employee_id }} - {{ lecturer.name }}
+            {% for lecturer in groups %}
+            <option value="{{lecturer.generated_group}}" >
+              {{ lecturer.id }} - {{ lecturer.generated_group }}
             </option>
             {% endfor %}
           </select>
         </div>
-        <button
+        <!-- <button
           onclick="displayFormInfo()"
           id="set_btn"
           class="btn btn-primary col-1"
         >
           view timetable
-        </button>
+        </button> -->
       </form>
     </div>
   </div>
+
+  <div class="content" id="timetable1">
+    <div class="container">
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mb30"
+        >
+          <h2>GYM TIMETABLE</h2>
+        </div> -->
+        <div class="table-responsive">
+          <table class="timetable table table-striped">
+            <thead>
+              <tr class="text-center">
+                <th scope="col"></th>
+                <th scope="col">Monday</th>
+                <th scope="col">Tuesday</th>
+                <th scope="col">Wednesday</th>
+                <th scope="col">Thursday</th>
+                <th scope="col">Friday</th>
+                <th scope="col">Saturday</th>
+                <th scope="col">Sunday</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">06:00 Am - 07:00 Am</th>
+                <td></td>
+                <td></td>
+                <td class="timetable-workout">
+                  shane perera <br />
+                  OOC (IT2030)<br />
+                  Tutorial<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A401
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">07:00 Am - 08:00 Am</th>
+                <td class="timetable-workout">
+                  dr.pramodya yoga <br />
+                  SE (IT7080)<br />
+                  LAB<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A6002
+                </td>
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">08:00 Am - 09:00 Am</th>
+                <td class="timetable-workout">
+                  Dr.ranul silva<br />
+                  OOP (IT2090)<br />
+                  Tutorial<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A501
+                </td>
+                <td></td>
+                  
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  shalini perera <br />
+                  MAD (IT2090)<br />
+                  Tutorial<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A501
+                </td>
+                <td class="timetable-workout">
+                  ranul de silva<br />
+                  SPM (IT3040)<br />
+                  Lecture<br />
+                  Y1.S1.IT.01<br />
+              
+                  A501
+                </td>
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  ABC(IT5070)<br />
+                  Tutorial<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A701
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">09:00 Am - 10:00 Am</th>
+                <td class="timetable-workout">
+                  chanaka silva <br />
+                  Aghu(IT4060)<br />
+                  lecuture<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A701
+                </td>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  ABC(IT5070)<br />
+                  Tutorial<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A701
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">10:00 Am - 11:00 Am</th>
+                <td></td>
+                <td >
+                 
+                </td>
+                <td> <td class="timetable-workout">
+                  himasha perera <br />
+                  tuy(IT7070)<br />
+                  Tutorial<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A5067
+                </td></td>
+                <td >
+                 
+                </td>
+                <td >
+                
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">11:00 Am - 12:00 Am</th>
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td ></td>
+                <td class="timetable-workout">
+                  janith silva <br />
+                  WSA(IT5060)<br />
+                  Tutorial<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A801
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">12:00 Am - 01:00 Am</th>
+                <td >
+                  
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">01:00 Am - 02:00 Am</th>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">02:00 Am - 03:00 Am</th>
+                <td >
+                 
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">03:00 Am - 04:00 Am</th>
+                <td ></td>
+                <td></td>
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  OOC(IT5040)<br />
+                  Lab<br />
+                  Y1.S1.IT.01<br />
+                  
+                  A4060
+                </td>
+                <td></td>
+                <td></td>
+                <td ></td>
+                <td></td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+        <!-- timetable -->
+      </div>
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mt-4"
+        >
+          Created for
+          <a
+            href="https://easetemplate.com/downloads/fitness-website-template/"
+            target="_blank"
+            class="text-primary"
+            >easetemplate</a
+          >
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="timetable2">
+    <div class="container">
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mb30"
+        >
+          <h2>GYM TIMETABLE</h2>
+        </div> -->
+        <div class="table-responsive">
+          <table class="timetable table table-striped">
+            <thead>
+              <tr class="text-center">
+                <th scope="col"></th>
+                <th scope="col">Monday</th>
+                <th scope="col">Tuesday</th>
+                <th scope="col">Wednesday</th>
+                <th scope="col">Thursday</th>
+                <th scope="col">Friday</th>
+                <th scope="col">Saturday</th>
+                <th scope="col">Sunday</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">06:00 Am - 07:00 Am</th>
+                <td></td>
+                <td></td>
+               
+                <td></td>
+                <td></td>
+                <td class="timetable-workout">
+                  suresh perera <br />
+                  OOP (IT4050)<br />
+                  Lab<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A201
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">07:00 Am - 08:00 Am</th>
+                
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td class="timetable-workout">
+                  dr.shane perera <br />
+                  SE (IT5050)<br />
+                  Lecture<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A702
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">08:00 Am - 09:00 Am</th>
+                <td class="timetable-workout">
+                  Dr.ranul silva<br />
+                  OOP (IT2090)<br />
+                  Tutorial<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A501
+                </td>
+                <td class="timetable-workout">
+                  maduranga silva <br />
+                  OOC(IT9080)<br />
+                  LAB<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A802
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  apple perera <br />
+                  MAD (IT2090)<br />
+                  Lecture<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A601
+                </td>
+                <td class="timetable-workout">
+                  ranul de silva<br />
+                  SPM (IT3040)<br />
+                  Lecture<br />
+                  Y2.S1.IT.01<br />
+              
+                  A501
+                </td>
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  ABC(IT5070)<br />
+                  Tutorial<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A701
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">09:00 Am - 10:00 Am</th>
+                <td></td>>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  ABC(IT5070)<br />
+                  Tutorial<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A701
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">10:00 Am - 11:00 Am</th>
+                <td></td>
+                <td >
+                 
+                </td>
+                <td> <td class="timetable-workout">
+                  himasha perera <br />
+                  tuy(IT7070)<br />
+                  Tutorial<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A5067
+                </td></td>
+                <td >
+                 
+                  <td class="timetable-workout">
+                    dr.nilukshi silva <br />
+                    SE (IT2030)<br />
+                    Lecture<br />
+                    Y2.S1.IT.01<br />
+                    
+                    A6002
+                  </td>
+                
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">11:00 Am - 12:00 Am</th>
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td ></td>
+                <td class="timetable-workout">
+                  maduranga silva <br />
+                  WSA(IT5060)<br />
+                  Tutorial<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A601
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  pramodya hettiarachi <br />
+                  TU (IT7080)<br />
+                  LAB<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A7002
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">12:00 Am - 01:00 Am</th>
+                <td >
+                  
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  dr.shalini perera <br />
+                  MAD (IT3080)<br />
+                  Tutorial<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A5002
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  shane silva <br />
+                  MAD (IT7080)<br />
+                  LAB<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A6002
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">01:00 Am - 02:00 Am</th>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">02:00 Am - 03:00 Am</th>
+                <td >
+                 
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">03:00 Am - 04:00 Am</th>
+                <td ></td>
+                <td></td>
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  OOC(IT5040)<br />
+                  Lab<br />
+                  Y2.S1.IT.01<br />
+                  
+                  A4060
+                </td>
+                <td></td>
+                <td></td>
+                <td ></td>
+                <td></td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+        <!-- timetable -->
+      </div>
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mt-4"
+        >
+          Created for
+          <a
+            href="https://easetemplate.com/downloads/fitness-website-template/"
+            target="_blank"
+            class="text-primary"
+            >easetemplate</a
+          >
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="timetable3">
+    <div class="container">
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mb30"
+        >
+          <h2>GYM TIMETABLE</h2>
+        </div> -->
+        <div class="table-responsive">
+          <table class="timetable table table-striped">
+            <thead>
+              <tr class="text-center">
+                <th scope="col"></th>
+                <th scope="col">Monday</th>
+                <th scope="col">Tuesday</th>
+                <th scope="col">Wednesday</th>
+                <th scope="col">Thursday</th>
+                <th scope="col">Friday</th>
+                <th scope="col">Saturday</th>
+                <th scope="col">Sunday</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">06:00 Am - 07:00 Am</th>
+                <td></td>
+                <td></td>
+                
+                <td></td>
+                <td></td>
+                <td class="timetable-workout">
+                  sudana perera <br />
+                  OOP (IT2070)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A401
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">07:00 Am - 08:00 Am</th>
+                
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td class="timetable-workout">
+                  Dr.kasun soyza <br />
+                  MAD(IT6080)<br />
+                  LAB<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A609
+                </td>
+                <td class="timetable-workout">
+                  dr.pramodya yoga <br />
+                  SE (IT7080)<br />
+                  LAB<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A6002
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">08:00 Am - 09:00 Am</th>
+                <td class="timetable-workout">
+                  Dr.ranul silva<br />
+                  OOP (IT2090)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A501
+                </td>
+                <td></td>
+                  
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  sachini perera <br />
+                  MAD (IT4060)<br />
+                  LAB<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A301
+                </td>
+               
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  ABC(IT5070)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A701
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  ranul de silva<br />
+                  SPM (IT3040)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+              
+                  A805
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">09:00 Am - 10:00 Am</th>
+                <td class="timetable-workout">
+                  jude silva <br />
+                  DS(IT5060)<br />
+                  lecuture<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A501
+                </td>
+                <td ></td>
+                <td class="timetable-workout">
+                  abdul reheman<br />
+                  DE (IT4540)<br />
+                  Lecture<br />
+                  Y3.S2.IT.02<br />
+              
+                  A201
+                </td>
+                <td></td>
+                <td class="timetable-workout">
+                  sudana silva <br />
+                  ABC(IT5070)<br />
+                  Lab<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A701
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">10:00 Am - 11:00 Am</th>
+                <td></td>
+                <td >
+                 
+                </td>
+                
+                <td >
+                 
+                </td>
+                <td> <td class="timetable-workout">
+                 anushi perera <br />
+                  HY(IT9070)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A4067
+                </td>
+                <td></td>
+                <td></td>
+                <td> <td class="timetable-workout">
+                  jude silva <br />
+                  AA(IT5070)<br />
+                  Lab<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A2005
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">11:00 Am - 12:00 Am</th>
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td ></td>
+                <td class="timetable-workout">
+                  janith silva <br />
+                  WSA(IT5060)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A801
+                </td>
+                <td></td>
+                <td> <td class="timetable-workout">
+                  himasha perera <br />
+                  tuy(IT7070)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A5067
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">12:00 Am - 01:00 Am</th>
+                <td >
+                  
+                </td>
+                <td></td>
+                <td> <td class="timetable-workout">
+                  himasha perera <br />
+                  tuy(IT7070)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A5067
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">01:00 Am - 02:00 Am</th>
+                <td ></td>
+                <td></td>
+                <td> <td class="timetable-workout">
+                  himasha perera <br />
+                  RE(IT8070)<br />
+                  Lab<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A5008
+                </td>
+                <td></td>
+                <td></td>
+                 <td class="timetable-workout">
+                  shane perera <br />
+                  tuy(IT4080)<br />
+                  Lecture<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A8001
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">02:00 Am - 03:00 Am</th>
+                <td >
+                 
+                </td>
+                 <td class="timetable-workout">
+                 janith silva <br />
+                  SEL(IT7070)<br />
+                  Tutorial<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A5004
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>
+                  
+                </td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">03:00 Am - 04:00 Am</th>
+                <td ></td>
+                <td></td>
+               
+                <td></td>
+                <td></td>
+                <td ></td>
+                <td class="timetable-workout">
+                  ayesh perera <br />
+                  OOP(IT5040)<br />
+                  Lab<br />
+                  Y3.S2.IT.02<br />
+                  
+                  A4060
+                </td>
+                <td></td>
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+        <!-- timetable -->
+      </div>
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mt-4"
+        >
+          Created for
+          <a
+            href="https://easetemplate.com/downloads/fitness-website-template/"
+            target="_blank"
+            class="text-primary"
+            >easetemplate</a
+          >
+        </div> -->
+      </div>
+    </div>
+  </div>
+
 </div>
 {%endblock%}
+{% block javascript %}
+<script>
+
+  $(document).ready(function(){
+    $('#timetable1').hide();
+    $('#timetable3').hide();
+    $('#timetable2').hide();
+
+    $("#blockId").change(function(){
+        $(this).find("option:selected").each(function(){
+            var optionValue = $(this).attr("value");
+            if(optionValue=='Y2.S1.IT.02'){
+              console.log('option 1');
+                $('#timetable1').show(1000);
+                $('#timetable2').hide();
+                $('#timetable3').hide();
+            }
+            if(optionValue=='Y4.S1.SE.03'){
+              console.log('option 2');
+              $('#timetable1').hide();
+              $('#timetable2').show(1000);
+              $('#timetable3').hide();
+            }
+            if(optionValue =='Y2.S1.DS.05'){
+              console.log('option 3');
+              $('#timetable1').hide();
+              $('#timetable2').hide();
+              $('#timetable3').show(1000);
+            }
+            
+        });
+    }).change();
+});
+
+</script>
+{% endblock javascript %}
