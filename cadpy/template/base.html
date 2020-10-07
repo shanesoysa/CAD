@@ -285,19 +285,21 @@
           <button class="sidebar-button">
             <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
             <span class="sidebar-text"> Locations </span>
-            <a href="#" class="stretched-link"></a>
+            <a href="{% url 'all_buildings'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-chart-pie sidebar-icon"></i>
             <span class="sidebar-text"> Statistics </span>
-            <a href="#" class="stretched-link"></a>
+            <a href="{% url 'statistics'%}" class="stretched-link"></a>
           </button>
         </li>
       </ul>
     </div>
-    <main>{% block content %} {% endblock content %}</main>
+    <div class="container-fluid main pb-3">
+      {% block content %} {% endblock content %}
+    </div>
     <script>
       if (typeof module === "object") {
         window.module = module;

@@ -94,7 +94,7 @@
 
           <div class="form-group row">
             <div class="col-6">
-            <input class="form-control" type="text" name="subjectCode1" placeholder="Subject Code" >
+            <input class="form-control" type="text" name="subjectCode1" id="subjectCode1" placeholder="Subject Code" >
             </div>
             <div class="col-6">
               <input class="form-control" type="number" name="noEveHours1" placeholder="No of Evaluation Hours" >
@@ -305,6 +305,48 @@
     $("#subjectTitle").show(500);
     $("#subjectSection").addClass('d-none');
   });
+
+  $('#employee_id1').on('keyup', function(e) {
+
+    var employee_id1 = $('#employee_id1').val();
+    
+    $.ajax({
+        url: '{% url "validations" %}',
+        data: {
+          employee_id1: employee_id1
+        },
+       
+        dataType: 'json',
+        success: function(data) {
+          if (data.is_taken == true) {
+            swal("Error","Employee ID exisit", "error");
+            $('#employee_id1').val("");
+  
+          }
+        }
+    });
+    });
+
+    $('#subjectCode1').on('keyup', function(e) {
+
+      var subjectCode1 = $('#subjectCode1').val();
+      
+      $.ajax({
+          url: '{% url "validations" %}',
+          data: {
+            subjectCode1: subjectCode1
+          },
+         
+          dataType: 'json',
+          success: function(data) {
+            if (data.is_taken == true) {
+              swal("Error","Subject Code Exist", "error");
+              $('#subjectCode1').val("");
+    
+            }
+          }
+      });
+      });
 
 
     $(document).ready(function(){
