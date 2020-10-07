@@ -395,9 +395,9 @@
     <script>
       var key = 0;
       var locations, groups, subgroups;
-      varp = [];
+      var p = [];
       $(document).ready(function () {
-        // $.LoadingOverlay("show");
+        $.LoadingOverlay("show");
         $(".js-example-basic-single").select2({
           placeholder: "Select a group/sub-group",
           // minimumResultsForSearch: -1,
@@ -406,67 +406,72 @@
           placeholder: "Select room(s)",
           allowClear: true,
         });
+        p.push(
+          $.ajax({
+            url: '{% url "loadGroupSessions" %}',
+            dataType: "json",
+            success: function (data) {
+              // console.log(data);
+              groups = data;
+              var length = groups.length;
+              for (var i = 0; i < length; i++) {
+                var o = new Option(
+                  groups[i].group_name +
+                    " - " +
+                    groups[i].subject +
+                    " - " +
+                    groups[i].tag,
+                  groups[i].id
+                );
+                $(o).html(
+                  groups[i].group_name +
+                    " - " +
+                    groups[i].subject +
+                    " - " +
+                    groups[i].tag
+                );
+                $("#lecturers").append(o);
+              }
+            },
+          })
+        );
 
-        $.ajax({
-          url: '{% url "loadGroupSessions" %}',
-          dataType: "json",
-          success: function (data) {
-            // console.log(data);
-            groups = data;
-            var length = groups.length;
-            for (var i = 0; i < length; i++) {
-              var o = new Option(
-                groups[i].group_name +
-                  " - " +
-                  groups[i].subject +
-                  " - " +
-                  groups[i].tag,
-                groups[i].id
-              );
-              $(o).html(
-                groups[i].group_name +
-                  " - " +
-                  groups[i].subject +
-                  " - " +
-                  groups[i].tag
-              );
-              $("#lecturers").append(o);
-            }
-          },
-        });
+        p.push(
+          $.ajax({
+            url: '{% url "loadSubGroupSessions" %}',
+            dataType: "json",
+            success: function (data) {
+              subgroups = data;
+            },
+          })
+        );
 
-        $.ajax({
-          url: '{% url "loadSubGroupSessions" %}',
-          dataType: "json",
-          success: function (data) {
-            subgroups = data;
-          },
-        });
-
-        $.ajax({
-          url: '{% url "loadRooms" %}',
-          dataType: "json",
-          success: function (data) {
-            // console.log(data);
-            locations = data;
-            var length = locations.length;
-            for (var i = 0; i < length; i++) {
-              var obj = {
-                bid: locations[i].building_id,
-                rid: locations[i].room_id,
-              };
-              var o = new Option(
-                locations[i].building_name,
-                JSON.stringify(obj)
-              );
-              $(o).html(
-                locations[i].building_name + " - " + locations[i].room_name
-              );
-              $("#rooms").append(o);
-            }
-            console.log(1);
-          },
-        });
+        p.push(
+          $.ajax({
+            url: '{% url "loadRooms" %}',
+            dataType: "json",
+            success: function (data) {
+              // console.log(data);
+              locations = data;
+              var length = locations.length;
+              for (var i = 0; i < length; i++) {
+                var obj = {
+                  bid: locations[i].building_id,
+                  rid: locations[i].room_id,
+                };
+                var o = new Option(
+                  locations[i].building_name,
+                  JSON.stringify(obj)
+                );
+                $(o).html(
+                  locations[i].building_name + " - " + locations[i].room_name
+                );
+                $("#rooms").append(o);
+              }
+              console.log(1);
+            },
+          })
+        );
 
         $("#groups").bind("click", function () {
           $("#lecturers").empty();
@@ -515,9 +520,12 @@
           }
         });
 
-        $.ajax({
-          url: "{% url 'deleteAllSessionRooms' %}",
-          async: false,
+        $.when.apply(null, p).done(function () {
+          $.LoadingOverlay("hide");
+          $.ajax({
+            url: "{% url 'deleteAllSessionRooms' %}",
+            async: false,
+          });
         });
       });
 
@@ -544,7 +552,7 @@
                 room: JSON.parse(element.id).rid,
               },
               success: function (data) {
-                $("#add span").removeClass("spinner-border");
+                // $("#add span").removeClass("spinner-border");
                 $("#add").prop("disabled", false);
                 arr.push([
                   data.id,
@@ -554,7 +562,7 @@
                 ]);
               },
               error: function () {
-                $("#add span").removeClass("spinner-border");
+                // $("#add span").removeClass("spinner-border");
                 $("#add").prop("disabled", false);
                 return;
               },
@@ -570,6 +578,7 @@
           return;
         }
         $.when.apply(null, promises).done(function () {
+          $.LoadingOverlay("hide");
           $("#table > tbody").append(
             "<tr id='row" +
               key +
@@ -596,7 +605,7 @@
       // remove table row
       function del(key) {
         // console.log(JSON.parse($("#hid" + key).val()));
-
+        $.LoadingOverlay("show");
         $("#row" + key).fadeTo("slow", 0.5);
         $("#row" + key + " i").css("pointer-events", "none");
         var arr = JSON.parse($("#hid" + key).val());
@@ -616,6 +625,7 @@
         $.when.apply(null, promises).done(function () {
           // console.log("in");
           $("#row" + key).remove();
+          $.LoadingOverlay("hide");
         });
       }
     </script>
