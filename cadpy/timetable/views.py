@@ -42,9 +42,21 @@ def index(request):
 
 def Validations(request):
     employee_id1 = request.GET.get('employee_id1', None)
-    data = {
-        'is_taken': Lecturer1.objects.filter(employee_id__iexact=employee_id1).exists()
-    }
+    subjectCode1 = request.GET.get('subjectCode1', None)
+
+    print(employee_id1)
+    print(subjectCode1)
+
+    if subjectCode1 == None:
+        print("inside emp")
+        data = {
+            'is_taken': Lecturer1.objects.filter(employee_id__iexact=employee_id1).exists()
+        }
+    else:
+        print("inside subject")
+        data = {
+            'is_taken': Subjects1.objects.filter(subjectCode__iexact=subjectCode1).exists()
+        }
 
     return JsonResponse(data)
 
@@ -1044,6 +1056,7 @@ class NonParallelSessionsView(generic.ListView):
 #         }
 #         return JsonResponse(data)
 
+
 @csrf_exempt
 def create_consecutive_session(request, pk):
     try:
@@ -1376,7 +1389,7 @@ def view_blocked_timeslots(request):
             'success_stat': 0,
             'error_msg': 'Please add working days information before proceding'
         }
-        return JsonResponse(data)    
+        return JsonResponse(data)
     except Exception as e:
         data = {
             'success_stat': 0,
@@ -2175,7 +2188,7 @@ def deleteAllConsecutiveSessionRooms(request):
 
 def deleteParallelSession(request, pk):
     try:
-        id =  request.GET.get('id', None)
+        id = request.GET.get('id', None)
         ParallelSession.objects.get(id=id).delete()
         data = {
             'deleted': True
@@ -2186,10 +2199,11 @@ def deleteParallelSession(request, pk):
             'deleted': False
         }
         return JsonResponse(data)
-    
+
+
 def deleteNonParallelSession(request, pk):
     try:
-        id =  request.GET.get('id', None)
+        id = request.GET.get('id', None)
         NonParallelSession.objects.get(id=id).delete()
         data = {
             'deleted': True
@@ -2200,4 +2214,3 @@ def deleteNonParallelSession(request, pk):
             'deleted': False
         }
         return JsonResponse(data)
-    

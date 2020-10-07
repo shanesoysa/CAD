@@ -219,15 +219,15 @@
     </div>
    
  
-      </div>
-    </div>
+      <!-- </div>
+    </div> -->
 
     
     
   </form>
 </div>
 
-</div>
+<!-- </div> -->
 
 <div class="container d-none" id="tablediv">
 
@@ -431,6 +431,7 @@ $('#employee_id1').on('keyup', function(e) {
         if (data.is_taken == true) {
           swal("Error","Employee ID exisit", "error");
           $('#employee_id1').val("");
+          $('input[name="rank1"]').val("");
 
         }
       }

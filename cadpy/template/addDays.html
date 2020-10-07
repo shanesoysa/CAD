@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<div class="sidebar text-center">
+<!-- <div class="sidebar text-center">
   <ul>
     <li>
       <button class="sidebar-button">
@@ -62,7 +62,7 @@
       </button>
     </li>
   </ul>
-</div>
+</div> -->
 
 
 
@@ -194,7 +194,7 @@
     </div>
 
  <!-- Modal -->
- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+ <div class="modal" id="myModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -330,10 +330,14 @@ $(function(){
               'slots':slots
               
             },
+            beforeSend:function(){
+              $.LoadingOverlay("show");
+            },
             
             
             dataType: 'json',
             success: function (data) {
+              $.LoadingOverlay("hide");
               $('.btn_save').addClass('invisible');
               $('.btn_amda').removeClass('invisible');
               $('#ranul').attr("value", data.day.id);
@@ -343,6 +347,7 @@ $(function(){
 
                 if (data.day) {
                   appendToUsrTable(data.day);
+                  swal("Success!", "Data Added", "success");
                   alert("'Data Added'")
                  
                   
@@ -351,7 +356,7 @@ $(function(){
             }
         });
       } else {
-        alert("All fields must have a valid value.");
+        swal("error", "Null fields", "error");
     }
     $('form#addworkingdays').trigger("reset");
     return false;
