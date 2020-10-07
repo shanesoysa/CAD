@@ -13,12 +13,14 @@
         line-height: 1.5;
     }
 }
-
+.main{
+    background-color: #F8F9FA !important;
+}
 </style>
 {% endblock stylesheet %}
 
 {% block content %}
-<div class="container-fluid main bg-light">
+<div class="container-fluid bg-light">
     <div class="bg-light text-info" style="padding: 10px 0px; font-weight: 900;">
         <h3><a href="{% url 'assign_sessions' %}"><i class="fas fa-chevron-left fa-lg"></i></a>&nbsp; Non - Parallel Sessions </h3>
     </div>
