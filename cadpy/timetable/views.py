@@ -8,7 +8,7 @@ from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
-from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
+from .models import ConsecutiveSessionRoom, GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
 from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
 from django.db.utils import IntegrityError
 # import sys
@@ -396,15 +396,36 @@ class AddSession(View):
             students = request.GET.get('students', None)
             groups = request.GET.get('groups', None)
             duration = request.GET.get('duration', None)
+            x = request.GET.get('x', None)
 
-            obj = Session1.objects.create(
-                subject_id=subjects,
-                tag_id=tags,
-                student_count=students,
-                group_id_id=groups,
-                duration=duration
-            )
+            print(x)
+            if x == 'group':
 
+                print("inside group")
+                obj = Session1.objects.create(
+                    group_id_id=groups,
+                    subject_id=subjects,
+                    tag_id=tags,
+                    duration=duration,
+                    student_count=students
+                )
+                print(obj)
+            elif x == 'subgroup':
+                print("inside sub-group")
+                groupforeign = Subgroup.objects.get(pk=groups)
+                print(groupforeign)
+                id_of_group = groupforeign.group_id
+                obj = Session1.objects.create(
+                    group_id_id=id_of_group,
+                    subgroup_id_id=groups,
+                    subject_id=subjects,
+                    tag_id=tags,
+                    duration=duration,
+                    student_count=students
+                )
+                print(obj)
+
+            print('#############################################')
             latestid = Session1.objects.latest('id')
             # for lec in lecturers:
             #     print(lec)
@@ -427,6 +448,12 @@ class AddSession(View):
         except:
             print("fail adding data")
             pass
+            result = {
+                'success': 'failed'
+            }
+            # print('lectureeeeeeeeeeeees:'+lecturers)
+            return JsonResponse(result)
+
             # result = {
             #     'success': 'false'
             # }
@@ -1599,56 +1626,57 @@ def sessionRooms(request):
 
 
 def consecutiveSessionRooms(request):
-    some()
+    # some()
     return render(request, 'rooms/consecutive_sessions.html')
 
 
-def some():
-    try:
-        print('lol')
-        print(datetime.timedelta(hours=2))
-        va = WorkingDays.objects.all()
-        days = va[0].days
-        v = []
-        v = days.split(',')
-        print(v)
-        # for index, i in enumerate(v):
-        #     if i == 'tuesday':
-        #         v[index] = 2
-        # print(v)
+# def some():
+#     try:
+#         print('lol')
+#         print(datetime.timedelta(hours=2))
+#         va = WorkingDays.objects.all()
+#         days = va[0].days
+#         v = []
+#         v = days.split(',')
+#         print(v)
+#         # for index, i in enumerate(v):
+#         #     if i == 'tuesday':
+#         #         v[index] = 2
+#         # print(v)
 
-        gid = 68
-        st = 8
-        et = 5
+#         gid = 68
+#         st = 8
+#         et = 5
 
-        sessions = Session.objects.filter(group_id_id=gid)
-        sessionids = []
-        for i in sessions:
-            sessionids.append(i.id)
+#         sessions = Session.objects.filter(group_id_id=gid)
+#         sessionids = []
+#         for i in sessions:
+#             sessionids.append(i.id)
 
-        print(sessionids)
+#         print(sessionids)
 
-        blockedtimes = GroupBlockedTimeslots.objects.filter(
-            group_id=gid)
+#         blockedtimes = GroupBlockedTimeslots.objects.filter(
+#             group_id=gid)
 
-        print('#########')
-        s = '18:00'
+#         print('#########')
+#         s = '18:00'
 
-        datetime_object = datetime.strptime(
-            'Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
-        print(datetime_object)
+#         datetime_object = datetime.strptime(
+#             'Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
+#         print(datetime_object)
 
-        # for i in sessions:
-        #     end = st + i.duration
-        #     for k in v:
-        #         for j in blockedtimes:
-        #             if(j.day != k and st > j.endtime and end < j.starttime):
-        #                 print('ok'+i.id)
+#         # for i in sessions:
+#         #     end = st + i.duration
+#         #     for k in v:
+#         #         for j in blockedtimes:
+#         #             if(j.day != k and st > j.endtime and end < j.starttime):
+#         #                 print('ok'+i.id)
 
-        print(sessionids)
-        return HttpResponse(' ')
-    except:
-        pass
+#         print(sessionids)
+#         a = '18:00'
+#         return HttpResponse(' ')
+#     except:
+#         pass
 
 # rooms for subjects and relevant tags
 
@@ -1964,19 +1992,26 @@ def deleteAllSubjectTagRooms(request):
 
 
 def loadGroupSessions(request):
-    locations = Session.objects.select_related(
-        'group_id').select_related('tag').select_related('subject')
+    print('###########################################')
+    locations = Session1.objects.all()
+
+    print(locations)
+    print('###########################################')
     list = []
+    print('###########################################')
     for row in locations:
         list.append(
             {'group_name': row.group_id.generated_group, 'id': row.id, 'tag': row.tag.label, 'subject': row.subject.subjectName})
+    print('###########################################')
+    print(list)
     return JsonResponse(list, safe=False)
 
 
 # load all subgroup sessions
 
 def loadSubGroupSessions(request):
-    locations = Session.objects.filter(subgroup_id__isnull=False).select_related(
+    print('loadSubGroupSessions')
+    locations = Session1.objects.filter(subgroup_id__isnull=False).select_related(
         'subgroup_id').select_related('tag').select_related('subject')
     list = []
     for row in locations:
@@ -2034,10 +2069,61 @@ def loadConsecutiveSessions(request):
     list = []
     for row in locations:
         list.append(
-            {'session1_subject': row.session1.subject.subjectName, 'session1_tag': row.session1.tag.label, 'session1_group': row.session1.group_id.generated_group, 'session2_subject': row.session2.subject.subjectName, 'session2_tag': row.session2.tag.label, 'session2_group': row.session2.group_id.generated_group})
+            {'session1_subject': row.session1.subject.subjectName, 'session1_tag': row.session1.tag.label, 'session1_group': row.session1.group_id.generated_group, 'session2_subject': row.session2.subject.subjectName, 'session2_tag': row.session2.tag.label, 'session2_group': row.session2.group_id.generated_group, 's1_id': row.session1_id, 's2_id': row.session2_id})
 
     # print(list)
     return JsonResponse(list, safe=False)
+
+# load consecutive session rooms
+
+
+def addConsecutiveSessionRooms(request):
+    try:
+        session1 = request.GET.get('session1', None)
+        session2 = request.GET.get('session2', None)
+        building = request.GET.get('building', None)
+        room = request.GET.get('room', None)
+        print(session2)
+        print(session1)
+        print(building)
+        print(room)
+
+        obj = ConsecutiveSessionRoom.objects.create(
+            session1_id=session1, session2_id=session2, building_id=building, room_id=room
+        )
+
+        data = {
+            'id': obj.id
+        }
+
+        return JsonResponse(data)
+    except:
+        pass
+
+# delete consecutive session rooms
+
+
+def deleteConsecutiveSessionRooms(request):
+    try:
+        id = request.GET.get('id', None)
+        ConsecutiveSessionRoom.objects.get(id=id).delete()
+        data = {
+            'created': True
+        }
+        return JsonResponse(data)
+    except:
+        pass
+
+
+# delete all consecutive session rooms
+
+
+def deleteAllConsecutiveSessionRooms(request):
+    try:
+        ConsecutiveSessionRoom.objects.all().delete()
+        return HttpResponse('')
+    except:
+        pass
 
 
 # ranul
