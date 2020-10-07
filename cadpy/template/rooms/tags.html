@@ -198,34 +198,39 @@
             <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
             <span class="sidebar-text"> Working</span>
             <span class="sidebar-text"> Days</span>
+            <a href="{% url 'Workingdays'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-users sidebar-icon"></i>
             <span class="sidebar-text"> Lecturers</span>
+            <a href="{% url 'lecturer'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-book sidebar-icon"></i>
             <span class="sidebar-text"> Subjects </span>
+            <a href="{% url 'subject'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
             <span class="sidebar-text"> Students </span>
+            <a href="{% url 'students'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-tags sidebar-icon"></i>
             <span class="sidebar-text"> Tags </span>
+            <a href="{% url 'tags'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
-          <button class="sidebar-button" autofocus>
+          <button class="sidebar-button">
             <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
             <span class="sidebar-text"> Locations </span>
             <a href="{% url 'all_buildings'%}" class="stretched-link"></a>
@@ -279,12 +284,17 @@
               style="width: 100%"
             ></select>
           </div>
-          <div class="form-group d-flex align-items-start">
+          <div class="form-group d-flex align-items-center">
             <button id="add" class="btn btn-outline-primary" onclick="add()">
               <span class="spinner-border-sm"></span>
               Add
             </button>
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3 text-danger">
+          <small id="error">&nbsp;</small>
         </div>
       </div>
       <div class="row mt-3">
@@ -302,7 +312,7 @@
           </div>
         </div>
       </div>
-      <div class="row mt-5">
+      <div class="row mt-3">
         <div class="col m-auto d-flex flex-row-reverse">
           <a href="{% url 'subjectRooms' %}" class="btn btn-outline-primary"
             >Next</a
@@ -335,9 +345,9 @@
     </script>
     <script>
       var key = 0;
-      var promises = [];
-      // $.LoadingOverlay("show");
+      var p = [];
       $(document).ready(function () {
+        $.LoadingOverlay("show");
         $(".js-example-basic-single").select2({
           placeholder: "Select a lecturer",
           minimumResultsForSearch: -1,
@@ -349,9 +359,6 @@
         var req1 = $.ajax({
           url: '{% url "loadTags" %}',
           dataType: "json",
-          beforeSend: function () {
-            $.LoadingOverlay("show");
-          },
           success: function (data) {
             var tags = JSON.parse(data);
             var length = tags.length;
@@ -360,18 +367,14 @@
               $(o).html(tags[i].fields.name);
               $("#lecturers").append(o);
             }
-            $.LoadingOverlay("hide");
           },
         });
 
-        promises.push(req1);
+        p.push(req1);
 
         var req2 = $.ajax({
           url: '{% url "loadRooms" %}',
           dataType: "json",
-          beforeSend: function () {
-            $.LoadingOverlay("show");
-          },
           success: function (data) {
             var locations = data;
             var length = locations.length;
@@ -390,13 +393,12 @@
               $("#rooms").append(o);
             }
             console.log(1);
-            $.LoadingOverlay("hide");
           },
         });
 
-        promises.push(req2);
+        p.push(req2);
 
-        $.when.apply(null, promises).done(function () {
+        $.when.apply(null, p).done(function () {
           $.LoadingOverlay("hide");
           $.ajax({
             url: "{% url 'deleteAllTagRooms' %}",
@@ -408,15 +410,16 @@
 
       // retrieve from select
       function add() {
+        $("#error").text("\xA0");
         $.LoadingOverlay("show");
         $("#add").prop("disabled", true);
-        $("#add span").addClass("spinner-border");
+        // $("#add span").addClass("spinner-border");
         var rooms = "";
         var lecturer = $("#lecturers").select2("data");
         var room = $("#rooms").select2("data");
         var arr = [];
         var promises = [];
-        if (lecturer != "" && room != "") {
+        if (jQuery("#rooms").val() != "" && jQuery("#lecturers").val() != "") {
           room.forEach((element) => {
             var request = $.ajax({
               url: "{% url 'addTagRoom' %}",
@@ -431,7 +434,7 @@
                 room: JSON.parse(element.id).rid,
               },
               success: function (data) {
-                $("#add span").removeClass("spinner-border");
+                // $("#add span").removeClass("spinner-border");
                 $("#add").prop("disabled", false);
                 arr.push([
                   data.id,
@@ -442,7 +445,7 @@
                 // $.LoadingOverlay("hide");
               },
               error: function () {
-                $("#add span").removeClass("spinner-border");
+                // $("#add span").removeClass("spinner-border");
                 $("#add").prop("disabled", false);
                 return;
               },
@@ -450,9 +453,14 @@
             promises.push(request);
             rooms += element.text + ", ";
           });
+        } else {
+          $("#error").html("All fields are required");
+          $("#add").prop("disabled", false);
+          $.LoadingOverlay("hide");
+          return;
         }
         $.when.apply(null, promises).done(function () {
-          // $.LoadingOverlay("hide");
+          $.LoadingOverlay("hide");
           $("#table > tbody").append(
             "<tr id='row" +
               key +
@@ -474,8 +482,8 @@
 
       // remove table row
       function del(key) {
-        console.log(JSON.parse($("#hid" + key).val()));
-
+        // console.log(JSON.parse($("#hid" + key).val()));
+        $.LoadingOverlay("show");
         $("#row" + key).fadeTo("slow", 0.5);
         $("#row" + key + " i").css("pointer-events", "none");
         var arr = JSON.parse($("#hid" + key).val());
@@ -495,6 +503,7 @@
         $.when.apply(null, promises).done(function () {
           // console.log("in");
           $("#row" + key).remove();
+          $.LoadingOverlay("hide");
         });
       }
     </script>

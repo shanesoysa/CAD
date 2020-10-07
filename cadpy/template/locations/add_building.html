@@ -127,34 +127,39 @@
             <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
             <span class="sidebar-text"> Working</span>
             <span class="sidebar-text"> Days</span>
+            <a href="{% url 'Workingdays'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-users sidebar-icon"></i>
             <span class="sidebar-text"> Lecturers</span>
+            <a href="{% url 'lecturer'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-book sidebar-icon"></i>
             <span class="sidebar-text"> Subjects </span>
+            <a href="{% url 'subject'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
             <span class="sidebar-text"> Students </span>
+            <a href="{% url 'students'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-tags sidebar-icon"></i>
             <span class="sidebar-text"> Tags </span>
+            <a href="{% url 'tags'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
-          <button class="sidebar-button" autofocus>
+          <button class="sidebar-button">
             <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
             <span class="sidebar-text"> Locations </span>
             <a href="{% url 'all_buildings'%}" class="stretched-link"></a>

@@ -198,34 +198,39 @@
             <i class="far fa-calendar-alt fa-1x sidebar-icon"></i>
             <span class="sidebar-text"> Working</span>
             <span class="sidebar-text"> Days</span>
+            <a href="{% url 'Workingdays'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-users sidebar-icon"></i>
             <span class="sidebar-text"> Lecturers</span>
+            <a href="{% url 'lecturer'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-book sidebar-icon"></i>
             <span class="sidebar-text"> Subjects </span>
+            <a href="{% url 'subject'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-user-friends sidebar-icon"></i>
             <span class="sidebar-text"> Students </span>
+            <a href="{% url 'students'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
           <button class="sidebar-button">
             <i class="fas fa-1x fa-tags sidebar-icon"></i>
             <span class="sidebar-text"> Tags </span>
+            <a href="{% url 'tags'%}" class="stretched-link"></a>
           </button>
         </li>
         <li>
-          <button class="sidebar-button" autofocus>
+          <button class="sidebar-button">
             <i class="fas fa-1x fa-map-marker-alt sidebar-icon"></i>
             <span class="sidebar-text"> Locations </span>
             <a href="{% url 'all_buildings'%}" class="stretched-link"></a>
@@ -286,12 +291,17 @@
               style="width: 100%"
             ></select>
           </div>
-          <div class="form-group d-flex align-items-end">
+          <div class="form-group d-flex align-items-center">
             <button id="add" class="btn btn-outline-primary" onclick="add()">
               <span class="spinner-border-sm"></span>
               Add
             </button>
           </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-3 text-danger">
+          <small id="error">&nbsp;</small>
         </div>
       </div>
       <div class="row mt-3">
@@ -310,7 +320,7 @@
           </div>
         </div>
       </div>
-      <div class="row mt-5">
+      <div class="row mt-3">
         <div class="col m-auto d-flex flex-row-reverse">
           <a href="{% url 'lecturerRooms' %}" class="btn btn-outline-primary"
             >Next</a
@@ -327,6 +337,7 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
       integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
@@ -342,7 +353,9 @@
     </script>
     <script>
       var key = 0;
+      var p = [];
       $(document).ready(function () {
+        $.LoadingOverlay("show");
         $("#tags").select2({
           placeholder: "Select a tag",
           minimumResultsForSearch: -1,
@@ -355,79 +368,93 @@
           placeholder: "Select room(s)",
           allowClear: true,
         });
-        $.ajax({
-          url: '{% url "loadSubjects" %}',
-          dataType: "json",
-          success: function (data) {
-            var subjects = JSON.parse(data);
-            var length = subjects.length;
-            for (var i = 0; i < length; i++) {
-              var o = new Option(
-                subjects[i].fields.subjectName,
-                subjects[i].pk
-              );
-              $(o).html(subjects[i].fields.name);
-              $("#subjects").append(o);
-            }
-          },
-        });
+        p.push(
+          $.ajax({
+            url: '{% url "loadSubjects" %}',
+            dataType: "json",
+            success: function (data) {
+              var subjects = JSON.parse(data);
+              var length = subjects.length;
+              for (var i = 0; i < length; i++) {
+                var o = new Option(
+                  subjects[i].fields.subjectName,
+                  subjects[i].pk
+                );
+                $(o).html(subjects[i].fields.name);
+                $("#subjects").append(o);
+              }
+            },
+          })
+        );
 
-        $.ajax({
-          url: '{% url "loadTags" %}',
-          dataType: "json",
-          success: function (data) {
-            var tags = JSON.parse(data);
-            var length = tags.length;
-            for (var i = 0; i < length; i++) {
-              var o = new Option(tags[i].fields.label, tags[i].pk);
-              $(o).html(tags[i].fields.name);
-              $("#tags").append(o);
-            }
-          },
-        });
+        p.push(
+          $.ajax({
+            url: '{% url "loadTags" %}',
+            dataType: "json",
+            success: function (data) {
+              var tags = JSON.parse(data);
+              var length = tags.length;
+              for (var i = 0; i < length; i++) {
+                var o = new Option(tags[i].fields.label, tags[i].pk);
+                $(o).html(tags[i].fields.name);
+                $("#tags").append(o);
+              }
+            },
+          })
+        );
 
-        $.ajax({
-          url: '{% url "loadRooms" %}',
-          dataType: "json",
-          // async: false,
-          success: function (data) {
-            var locations = data;
-            var length = locations.length;
-            for (var i = 0; i < length; i++) {
-              var obj = {
-                bid: locations[i].building_id,
-                rid: locations[i].room_id,
-              };
-              var o = new Option(
-                locations[i].building_name,
-                JSON.stringify(obj)
-              );
-              $(o).html(
-                locations[i].building_name + " - " + locations[i].room_name
-              );
-              $("#rooms").append(o);
-            }
-            console.log(1);
-          },
-        });
+        p.push(
+          $.ajax({
+            url: '{% url "loadRooms" %}',
+            dataType: "json",
+            // async: false,
+            success: function (data) {
+              var locations = data;
+              var length = locations.length;
+              for (var i = 0; i < length; i++) {
+                var obj = {
+                  bid: locations[i].building_id,
+                  rid: locations[i].room_id,
+                };
+                var o = new Option(
+                  locations[i].building_name,
+                  JSON.stringify(obj)
+                );
+                $(o).html(
+                  locations[i].building_name + " - " + locations[i].room_name
+                );
+                $("#rooms").append(o);
+              }
+              console.log(1);
+            },
+          })
+        );
 
-        $.ajax({
-          url: '{% url "deleteAllSubjectTagRooms" %}',
-          async: false,
+        $.when.apply(null, p).done(function () {
+          $.LoadingOverlay("hide");
+          $.ajax({
+            url: '{% url "deleteAllSubjectTagRooms" %}',
+            async: false,
+          });
         });
       });
 
       // retrieve from select
       function add() {
         $("#add").prop("disabled", true);
-        $("#add span").addClass("spinner-border");
+        $("#error").text("\xA0");
+        $.LoadingOverlay("show");
         var rooms = "";
         var subject = $("#subjects").select2("data");
         var tag = $("#tags").select2("data");
         var room = $("#rooms").select2("data");
         var arr = [];
         var promises = [];
-        if (subject != "" && tag != "" && room != "") {
+        if (
+          jQuery("#rooms").val() != "" &&
+          jQuery("#tags").val() != "" &&
+          jQuery("#subjects").val() != ""
+        ) {
           room.forEach((element) => {
             var request = $.ajax({
               url: "{% url 'addSubjectTagRoom' %}",
@@ -439,12 +466,8 @@
                 building: JSON.parse(element.id).bid,
                 room: JSON.parse(element.id).rid,
               },
-              beforeSend: function () {
-                $("#add").prop("disabled", true);
-                $("#add span").addClass("spinner-border");
-              },
               success: function (data) {
-                $("#add span").removeClass("spinner-border");
+                // $("#add span").removeClass("spinner-border");
                 $("#add").prop("disabled", false);
                 arr.push([
                   data.id,
@@ -455,7 +478,7 @@
                 ]);
               },
               error: function () {
-                $("#add span").removeClass("spinner-border");
+                // $("#add span").removeClass("spinner-border");
                 $("#add").prop("disabled", false);
                 return;
               },
@@ -463,8 +486,14 @@
             promises.push(request);
             rooms += element.text + ", ";
           });
+        } else {
+          $("#error").html("All fields are required");
+          $("#add").prop("disabled", false);
+          $.LoadingOverlay("hide");
+          return;
         }
         $.when.apply(null, promises).done(function () {
+          $.LoadingOverlay("hide");
           $("#table > tbody").append(
             "<tr id='row" +
               key +
@@ -489,7 +518,7 @@
       // remove table row
       function del(key) {
         // console.log(JSON.parse($("#hid" + key).val()));
-
+        $.LoadingOverlay("show");
         $("#row" + key).fadeTo("slow", 0.5);
         $("#row" + key + " i").css("pointer-events", "none");
         var arr = JSON.parse($("#hid" + key).val());
@@ -503,16 +532,13 @@
             data: {
               id: e[0],
             },
-            beforeSend: function () {
-              $("#row" + key).fadeTo("slow", 0.5);
-              $("#row" + key + " i").css("pointer-events", "none");
-            },
           });
           promises.push(request);
         });
         $.when.apply(null, promises).done(function () {
           // console.log("in");
           $("#row" + key).remove();
+          $.LoadingOverlay("hide");
         });
       }
     </script>
