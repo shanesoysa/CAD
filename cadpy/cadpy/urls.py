@@ -28,7 +28,7 @@ urlpatterns = [
     path('adddays/', views.Adddays.as_view(), name='workingdays_create'),
     path('updatedays/', views.Updatedays.as_view(), name='workingdays_update'),
     path('deletedays/', views.Deletedays.as_view(), name='workingdays_delete'),
-    path('timetables/', views.timetables, name='timetable'),
+    path('timetables/', views.timetables.as_view(), name='timetable'),
 
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
@@ -231,7 +231,7 @@ urlpatterns = [
     path('sessions/<int:pk>/consecutive/group-details',
          views.get_group_data, name="get_group_data"),
     path('sessions/<int:pk>/consecutive/add',
-              views.create_consecutive_session, name="add_consecutive_sessions"),
+         views.create_consecutive_session, name="add_consecutive_sessions"),
     path('sessions/<int:pk>/consecutive/search',
          views.get_consecutive_session, name="search_consecutive_sessions"),
 
@@ -243,7 +243,7 @@ urlpatterns = [
     path('sessions/parallel', views.ParallelSessionsView.as_view(),
          name="parallel_sessions"),
     path('sessions/parallel/<int:pk>', views.deleteParallelSession,
-         name="parallel_sessions_remove"),      
+         name="parallel_sessions_remove"),
     path('sessions/non-parallel', views.NonParallelSessionsView.as_view(),
          name="non_parallel_sessions"),
     path('sessions/non-parallel/remove', views.deleteNonParallelSession,
