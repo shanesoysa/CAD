@@ -132,7 +132,7 @@
             <input id="bId" name="bname" type="hidden" />
             <input id="bIdId" name="bIdname" type="hidden" />
             <div class="row">
-              {% for days in work_days %}
+              
               <div class="col-4" id="col_day">
                 <p>Day(s)</p>
                 {% for day in days.get_all_days %}
@@ -149,7 +149,7 @@
                 </div>
                 {% endfor %}
               </div>
-              {% endfor %}
+              
               <div class="form-group col-4">
                 <div class="md-form md-outline">
                   <label for="startTimeId">Start Time: </label>

@@ -184,7 +184,7 @@
                     <input id="bIdId" name="bIdname" type="hidden" />
                     <div class="row">
                         {% if  work_days %}
-                            {% for days in work_days %}
+                            
                             <div class="col-4" id="col_day">
                                 <p>Day(s)</p>
                                 {% for day in days.get_all_days %}
@@ -194,7 +194,7 @@
                                 </div>
                                 {% endfor %}
                             </div>
-                            {% endfor %}
+                           
                         {% else %}  
                         <div class="col-4" id="col_day">
                             <p>Day(s)</p>

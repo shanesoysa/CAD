@@ -1,17 +1,15 @@
-import json
 from django.db.models import fields
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.context_processors import request
-from django.shortcuts import render
 from django.template import RequestContext
 from django.views.generic import ListView
 from django.views.generic import View
 from django.views import generic
 from django.http import JsonResponse
-from .models import ConsecutiveSessionRoom, GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
-from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags, MockWorkingDays
-from .models import GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom, Subgroup, Group, Programme, AcademicYearSemester, SubjectTagRoom, TagRoom, Tags, UnavailableRoom
+from .models import SubjectTagRoom, TagRoom, UnavailableRoom
+from .models import ConsecutiveSessionRoom, GroupRoom, LecturerRoom, SessionRoom, SubGroupRoom
+from .models import MockWorkingDays
 from .models import Subgroup, Group, Programme, AcademicYearSemester, Tags
 from django.db.utils import IntegrityError
 # import sys
@@ -25,14 +23,13 @@ from django.views.generic import DetailView
 from .models import Building as BuildingModel, Room as RoomModel
 from django.core import serializers
 
-from .models import Session, ParallelSession, NonParallelSession, ConsecutiveSession
+from .models import Session
 from .models import NonParallelSession, ConsecutiveSession
 from .models import GroupBlockedTimeslots, LecturerBlockedTimeslots, SessionBlockedTimeslots
-from django.core import serializers
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 import json
-import datetime
+from datetime import datetime
 # Create your views here.
 
 
@@ -979,7 +976,7 @@ class AssignSessionsView(generic.ListView):
         context['tags_list'] = Tags.objects.all()
         context['subject_list'] = Subjects1.objects.all()
         context['lecturer_list'] = Lecturer1.objects.all()
-        context['work_days'] = WorkingDays.objects.all()
+        context['work_days'] = WorkingDays.objects.all()[:1].get()
         context['group_list'] = Group.objects.exclude(generated_group=None)
         return context
 
@@ -1011,7 +1008,7 @@ class BlockTimeSlotsView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['work_days'] = WorkingDays.objects.all()
+        context['work_days'] = WorkingDays.objects.all()[:1].get()
         return context
 
 
@@ -1367,7 +1364,7 @@ def view_blocked_timeslots(request):
                                  'day': g.day, 'start_time': g.starttime, 'end_time': g.endtime}
                 return_list.append(subgroup_info)
 
-        timeobj = WorkingDays.objects.get()
+        timeobj = WorkingDays.objects.all()[:1].get()
         start_time = datetime.strptime(timeobj.starttime, '%H:%M')
         end_time = datetime.strptime(timeobj.endtime, '%H:%M')
         day_list = timeobj.get_all_days()
@@ -1391,9 +1388,10 @@ def view_blocked_timeslots(request):
         }
         return JsonResponse(data)
     except Exception as e:
+        print(e)
         data = {
             'success_stat': 0,
-            'error_msg': 'Unexpected Error'
+            'error_msg': 'New Error'
         }
         return JsonResponse(data)
 

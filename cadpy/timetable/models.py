@@ -36,6 +36,9 @@ class WorkingDays(models.Model):
     endtime = models.CharField(max_length=255, null=True, blank=True)
     slot = models.CharField(max_length=255, null=True, blank=True)
 
+    def get_all_days(self):
+       return self.days.split(',')
+
 
 class Tags(models.Model):
     label = models.CharField(max_length=25, unique=True)
