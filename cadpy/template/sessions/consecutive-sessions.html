@@ -199,19 +199,26 @@ $(document).ready(function(){
                 'tag': tag
             },
             dataType:'json',
+            beforeSend: function() {
+                $.LoadingOverlay("show");
+
+              },
             success: function(data){
+                $.LoadingOverlay("hide");
                 if(data.success_stat == 1){
                     var session2_list = getSession2IdList()
                     if(session1_id == data.id)
-                        alert('cannot add a consecutive session to itself')
+                        swal("Error","cannot add a consecutive session to itself", "error"); //alert('cannot add a consecutive session to itself')
                     else if(session2_list.includes(data.id))
-                        alert('Session already exists in the list') 
+                        swal("Error","Session already exists in the list", "error"); //alert('Session already exists in the list') 
                     else{
                         displaySession2(data)
                         $('#save_btn').prop('disabled', false);
                     }    
                 }else{
-                    alert(data.error_msg)
+                    var error_msg = data.error_msg
+                    swal("Error",error_msg, "error");
+                    
                 }
             }
         });
@@ -244,10 +251,14 @@ $(document).ready(function(){
             },
             dataType:'json',
             success: function(data){
+               
                 if(data.success_stat == 1)
                     window.location.href = '{%url "assign_sessions" %}'
-                else
-                    alert(data.error_msg)
+                else{
+                    var error_msg = data.error_msg
+                    swal("Error",error_msg, "error");
+                }
+                    //alert(data.error_msg)
             }
 
         });
