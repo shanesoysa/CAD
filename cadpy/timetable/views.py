@@ -30,6 +30,7 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 import json
 from datetime import datetime
+from datetime import timedelta
 # Create your views here.
 
 
@@ -1107,7 +1108,7 @@ def get_group_data(request, pk):
 
 def get_group_data_2(request):
     group = request.GET.get('group_type', None)
-
+    group_list = []
     if(group == 'G'):
         group_list = Group.objects.exclude(
             generated_group=None).values('id', 'generated_group')
@@ -1402,7 +1403,7 @@ def get_time_range(start_time, end_time, time_interval):
     while (current_time < end_time):
         stime = current_time.strftime('%H:%M')
         time_arr.append(stime)
-        current_time += datetime.timedelta(minutes=time_interval)
+        current_time += timedelta(minutes=time_interval)
 
     time_arr.append(end_time.strftime('%H:%M'))
     return time_arr

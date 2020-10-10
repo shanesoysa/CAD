@@ -257,7 +257,8 @@
             
             var idList = getSession2IdList();
             if(idList.includes(id)){
-                alert('Session already added to list')
+                swal("Error","Session already added to list", "error");
+                //alert('Session already added to list')
             }else{
                 $('.boxed #boxes').prepend($('#' + id).clone().removeClass('col-6').addClass('col-10'));
                 $(this).css('display', 'hidden');
@@ -297,7 +298,8 @@
                             window.location.href = '{%url "non_parallel_sessions" %}'
                     }       
                     else{
-                        alert(data.error_msg)
+                       // alert(data.error_msg)
+                        swal("Error",data.error_msg, "error");
                     }
                 }
             });
@@ -345,11 +347,18 @@
                     'tag': tag
                 },
                 dataType: 'json',
+                beforeSend: function() {
+                    $.LoadingOverlay("show");
+
+                },
                 success: function(data) {
-                    if(data.success_stat){
+                    $.LoadingOverlay("hide");
+                    if(data.success_stat == 1){
+                       // swal("Success!", "New Lecturer Added", "success");
                         AddSearchedSessions(data.sessions_list)
                     }else{
-                        alert(data.error_msg);
+                        var error_msg = data.error_msg
+                        swal("Error",error_msg, "error");
                     }
                 }
             });
@@ -446,14 +455,18 @@
                     dataType: 'json',
                     success: function (data) {
                         if (data.success_stat == 1) { 
-                            alert('Blocked Session')
+                            //alert('Blocked Session')
+                            swal("Success!", "Blocked Session", "success");
                         }else{
-                            alert(data.error_msg)
+                            var error_msg = data.error_msg
+                            swal("Error",error_msg, "error");
+                            //alert(data.error_msg)
                         }
                     }
                 });
             } else {
-                alert("All fields must have a valid value.");
+                swal("Error","All fields must have a valid value", "error");
+                //alert("All fields must have a valid value.");
             }
 
             $('form#timeslotForm').trigger("reset");

@@ -225,7 +225,8 @@
               );
               makeDropdownChange(data.groups, data.group_type);
             } else {
-              alert("unexpected error");
+              swal("Error","Unexpected Error", "error")
+              //alert("unexpected error");
             }
           },
         });
@@ -274,13 +275,19 @@
               block: block,
             },
             dataType: "json",
+            beforeSend: function() {
+                $.LoadingOverlay("show");
+
+            },
             success: function (data) {
+              $.LoadingOverlay("hide");
               if (data.success_stat == 1) {
                 $("#set_btn").prop("disabled", false);
                 appendToTimeTable(data.blocks, data.time_list, data.day_list);
                 $("#keytimetable").css("display", "block");
               } else {
-                alert(data.error_msg);
+                var error_msg = data.error_msg
+                swal("Error",error_msg, "error")
               }
             },
           });
@@ -323,17 +330,25 @@
               end_time: endTimeInput,
             },
             dataType: "json",
+            beforeSend: function() {
+                    $.LoadingOverlay("show");
+
+                },
             success: function (data) {
+              $.LoadingOverlay("hide");
               if (data.success_stat == 1) {
                 var hash = getListOfDays(data.day_list);
                 addTimeblocks(hash, data.blocks);
               } else {
-                alert(data.error_msg);
+                var error_msg = data.error_msg
+                swal("Error",error_msg, "error")
+               // alert();
               }
             },
           });
         } else {
-          alert("All fields must have a valid value.");
+          swal("Error","All fields must have a valid value.", "error")
+          //alert("All fields must have a valid value.");
         }
 
         $("form#timeslotForm").trigger("reset");

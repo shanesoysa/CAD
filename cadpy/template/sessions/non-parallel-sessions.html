@@ -67,11 +67,16 @@ $(function(){
                     'id': id,
                 },
                 dataType: 'json',
+                beforeSend: function() {
+                    $.LoadingOverlay("show");
+                },
                 success: function (data) {
+                    $.LoadingOverlay("hide");
                     if (data.deleted) {
                         $("#" + id).remove();
                     }else{
-                        alert('Deletion Failed')
+                        swal("Error","Deletion Failed", "error");
+                        //alert('Deletion Failed')
                     }
                 }
             });
