@@ -2,7 +2,13 @@
 
 
 {% block title %}Students{% endblock %}
-
+{% block stylesheet %}
+<style>
+.main{
+    background-color: #FFFFFF !important;
+  }
+</style>
+{% endblock stylesheet %}
 
 {% block content %}
 <div class="container-fluid main bg-white">
@@ -15,7 +21,7 @@
             <div>
                 <div style="width: 90%;float: left;">
 
-                
+
                     {% if group_list %}
                         {% for groups in group_list%}
                         <div class="card shadow pb-3 mb-3 bg-white rounded" style="width: 90%" id="gg-{{groups.id}}">
@@ -26,19 +32,19 @@
                                             <a href="{% url 'subgroups' groups.id %}">
                                             <button type="submit" class="btn btn-primary" id={{groups.generated_group}}>Add Sub Group</button></a>
                                         <!-- </form> -->
-                                        
-                                        &nbsp; 
+
+                                        &nbsp;
                                         <span id="deleteIcon" onclick="deleteGroup({{groups.id}})">
                                             <i class="far fa-trash-alt" style="color: purple;"></i>
                                         </span>
-                                        &nbsp; 
+                                        &nbsp;
                                     </div>
-                                </h5>    
+                                </h5>
                             </div>
                             {% if groups.subgroup_set.all != null and groups.subgroup_set.count > 0 %}<!-- does this even work-->
                                 <div class="card-body">
                                     <div class="card-text">
-                                            <h6 class="mb-3" style="color: #33344a;">Sub Groups</h6> 
+                                            <h6 class="mb-3" style="color: #33344a;">Sub Groups</h6>
                                             <div class="row">
                                                 {% for subgroup in groups.subgroup_set.all %}
                                                     {% if subgroup.generated_subgroup != None %}
@@ -54,12 +60,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            {% endif %} 
+                            {% endif %}
                         </div>
                         {%endfor%}
                     {% else %}
                         <p>No student groups available to display</p>
-                    {% endif%}  
+                    {% endif%}
                 </div>
                 <div style="width: 10%; float: right;">
                     <h1 class="mb-5"><a href="{% url 'groups' %}"><i class="fa fa-plus-circle shadow" aria-hidden="true" style="color:purple;border-radius: 100%;" data-toggle="tooltip" data-placement="top" title="Group Ids">
@@ -81,7 +87,7 @@
 
 {% block javascript %}
 <script>
-    
+
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
     });
@@ -102,7 +108,7 @@
                 }
             });
         }
-    } 
+    }
 
     function deleteGroup(id) {
         var action = confirm("Are you sure you want to delete the group and all it's subgroups ?");
@@ -119,8 +125,8 @@
                     }
                 }
             });
-        }  
+        }
     }
-        
+
 </script>
 {% endblock javascript %}
