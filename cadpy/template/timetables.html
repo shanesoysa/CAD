@@ -986,6 +986,150 @@
     </div>
   </div>
 
+
+  <div class="content" id="timetable4">
+    <div class="container">
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mb30"
+        >
+          <h2>GYM TIMETABLE</h2>
+        </div> -->
+        <div class="table-responsive">
+          <table class="timetable table table-striped">
+            <thead>
+              <tr class="text-center">
+                <th scope="col"></th>
+                <th scope="col">Monday</th>
+                <th scope="col">Tuesday</th>
+                <th scope="col">Wednesday</th>
+                <th scope="col">Thursday</th>
+                <th scope="col">Friday</th>
+                
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">08:00 Am - 09:00 Am</th>
+                <td class="timetable-workout">
+                  mark perera <br />
+                  OOP (IT2070)<br />
+                  Tutorial<br />
+                  Y4.S2.IT.05<br />
+                  
+                  A401
+                </td>
+                <td></td>
+                <td></td>
+                
+                <td></td>
+                <td></td>
+                
+               
+              </tr>
+              <tr>
+                <th scope="row">09:00 Am - 10:00 Am</th>
+                
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                
+              </tr>
+              <tr>
+                <th scope="row">11:00 Am - 12:00 Pm</th>
+               <td></td>
+                <td></td>
+                  
+                
+                <td></td>
+                <td></td>>
+               
+               
+                <td></td>
+                
+              </tr>
+              <tr>
+                <th scope="row">12:00 Pm - 01:00 Pm</th>
+                <td></td>
+                <td ></td>
+                
+                <td></td>
+               
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <th scope="row">01:00 Pm - 02:00 Pm</th>
+                <td></td>
+                <td >
+                 
+                </td>
+                
+                <td >
+                 
+                </td>
+                
+                <td></td>
+                <td></td>
+                
+              </tr>
+              <tr>
+                <th scope="row">02:00 Pm - 03:00 Pm</th>
+                <td></td>
+                <td ></td>
+                <td></td>
+                <td ></td>
+              
+                <td></td>
+               
+              </tr>
+              <tr>
+                <th scope="row">03:00 Pm - 04:00 Pm</th>
+                <td >
+                  
+                </td>
+                <td></td>
+                
+                <td></td>
+                <td></td>
+                <td></td>
+                
+              </tr>
+              <tr>
+                <th scope="row">04:00 Pm - 05:00 Pm</th>
+                <td ></td>
+                <td></td>
+               
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+             
+              
+            </tbody>
+          </table>
+        </div>
+        <!-- timetable -->
+      </div>
+      <div class="row">
+        <!-- <div
+          class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 text-center mt-4"
+        >
+          Created for
+          <a
+            href="https://easetemplate.com/downloads/fitness-website-template/"
+            target="_blank"
+            class="text-primary"
+            >easetemplate</a
+          >
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+
 </div>
 {%endblock%}
 {% block javascript %}
@@ -995,27 +1139,39 @@
     $('#timetable1').hide();
     $('#timetable3').hide();
     $('#timetable2').hide();
+    $('#timetable4').hide();
 
     $("#blockId").change(function(){
         $(this).find("option:selected").each(function(){
             var optionValue = $(this).attr("value");
-            if(optionValue=='Y2.S1.IT.02'){
+            if(optionValue=='Y3.S2.IT.12'){
               console.log('option 1');
                 $('#timetable1').show(1000);
                 $('#timetable2').hide();
                 $('#timetable3').hide();
+                $('#timetable4').hide();
             }
-            if(optionValue=='Y4.S1.SE.03'){
+            if(optionValue=='Y2.S1.IT.01'){
               console.log('option 2');
               $('#timetable1').hide();
               $('#timetable2').show(1000);
               $('#timetable3').hide();
+              $('#timetable4').hide();
             }
-            if(optionValue =='Y2.S1.DS.05'){
+            if(optionValue =='Y3.S2.IT.02'){
               console.log('option 3');
               $('#timetable1').hide();
               $('#timetable2').hide();
               $('#timetable3').show(1000);
+              $('#timetable4').hide();
+            }
+            if(optionValue =='Y4.S2.IT.05'){
+              console.log('option 4');
+              $('#timetable1').hide();
+              $('#timetable2').hide();
+              $('#timetable3').hide();
+              $('#timetable4').show(1000);
+
             }
             
         });
