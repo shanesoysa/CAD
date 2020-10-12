@@ -19,8 +19,6 @@ strategy:
   maxParallel: 3
 
 steps:
-- script: | 
-    cd cadpy
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(PYTHON_VERSION)'
@@ -49,7 +47,7 @@ steps:
   displayName: 'Install prerequisites'
 
 - script: |
-    pushd '$(projectRoot)'
+    pushd '$(projectRoot)/cadpy'
     python manage.py test --testrunner xmlrunner.extra.djangotestrunner.XMLTestRunner --no-input
   displayName: 'Run tests'
 
