@@ -19,6 +19,8 @@ strategy:
   maxParallel: 3
 
 steps:
+- script: | 	
+    cd cadpy
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '$(PYTHON_VERSION)'
